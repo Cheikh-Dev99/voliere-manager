@@ -1,0 +1,28 @@
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
+import faviconUrl from './assets/favicon.png'
+import './index.css'
+import App from './App.jsx'
+import { AuthBootstrap } from './router/AuthBootstrap.jsx'
+
+let faviconLink = document.querySelector("link[rel='icon']")
+if (!faviconLink) {
+  faviconLink = document.createElement('link')
+  faviconLink.rel = 'icon'
+  document.head.appendChild(faviconLink)
+}
+faviconLink.type = 'image/png'
+faviconLink.href = faviconUrl
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <BrowserRouter>
+      <AuthBootstrap>
+        <App />
+        <Toaster position="top-center" />
+      </AuthBootstrap>
+    </BrowserRouter>
+  </StrictMode>,
+)

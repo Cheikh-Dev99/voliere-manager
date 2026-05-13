@@ -1,0 +1,99 @@
+# --- Cursor / IDE local (ne pas pousser le contexte machine) ---
+.cursor/
+
+# --- Dépendances Node ---
+node_modules/
+
+# Yarn Berry (4+) : caches & état local — le dépôt versionne `yarn.lock`
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+yarn-error.log
+yarn-debug.log*
+npm-debug.log*
+pnpm-debug.log*
+
+# --- Variables d’environnement (garder les `.env.example`) ---
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# --- Clés & comptes de service (ne jamais versionner) ---
+*-firebase-adminsdk*.json
+**/serviceAccount*.json
+*.pem
+*.p12
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# --- Build & prévisualisation (Vite / bundlers) ---
+dist/
+dist-ssr/
+build/
+.vite/
+*.tsbuildinfo
+
+# --- Tests & couverture ---
+coverage/
+.nyc_output/
+*.lcov
+
+# --- Lint / format caches ---
+.eslintcache
+.prettiercache
+
+# --- Firebase CLI (cache déploiement local) ---
+.firebase/
+firestore-debug.log
+ui-debug.log
+dataconnect-debug.log
+
+# --- Expo / React Native ---
+.expo/
+web-build/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+metro-health-check*
+
+# Prébuild natif (`expo prebuild`) : retirer ces lignes si tu versionnes le code natif custom.
+apps/mobile/android/
+apps/mobile/ios/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# --- Logs divers ---
+logs/
+*.log
+
+# --- Hébergeurs / CI local (si utilisés plus tard) ---
+.vercel
+.netlify
+.turbo
+
+# --- Sauvegardes & archives ---
+*.bak
+*.tmp
+*.temp
+*.zip
+*.tar.gz

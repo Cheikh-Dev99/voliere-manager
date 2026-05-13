@@ -1,0 +1,71 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "pigeons",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "matricule", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "cages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "numero", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "couples",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "dateDebut", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "couples",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "statut", "order": "ASCENDING" },
+        { "fieldPath": "dateDebut", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "sorties",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reproductions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "datePonte", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reproductions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "coupleId", "order": "ASCENDING" },
+        { "fieldPath": "datePonte", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reproductions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "coupleId", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

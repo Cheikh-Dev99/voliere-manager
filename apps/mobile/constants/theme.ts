@@ -1,0 +1,38 @@
+/** Aligné sur `apps/web/src/index.css` (@theme) + Tailwind slate/teal du layout web. */
+export const theme = {
+  teal50: '#f0fdfa',
+  teal600: '#0d9488',
+  teal700: '#0f766e',
+  teal800: '#115e59',
+  teal100: '#ccfbf1',
+  teal900: '#134e4a',
+  slate50: '#f8fafc',
+  slate100: '#f1f5f9',
+  slate200: '#e2e8f0',
+  slate500: '#64748b',
+  slate600: '#475569',
+  slate700: '#334155',
+  slate800: '#1e293b',
+  slate900: '#0f172a',
+  white: '#ffffff',
+  emerald50: '#ecfdf5',
+  emerald900: '#064e3b',
+  rose50: '#fff1f2',
+  rose900: '#881337',
+  amber50: '#fffbeb',
+  amber950: '#451a03',
+  red600: '#dc2626',
+  border: '#e2e8f0',
+  screenPadding: 16,
+  radiusLg: 14,
+  radiusMd: 10,
+  radiusSm: 8,
+} as const;
+
+export const shadowCard = {
+  shadowColor: '#0f172a',
+  shadowOpacity: 0.06,
+  shadowRadius: 10,
+  shadowOffset: { width: 0, height: 3 },
+  elevation: 2,
+} as const;

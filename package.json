@@ -1,0 +1,37 @@
+{
+  "name": "voliere-manager",
+  "private": true,
+  "packageManager": "yarn@4.6.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "expo": "54.0.34"
+  },
+  "resolutions": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "expo": "54.0.34"
+  },
+  "dependencies": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "scripts": {
+    "unlink:rolldown": "node scripts/rm-web-rolldown.mjs",
+    "reinstall": "node scripts/rm-web-rolldown.mjs && yarn install",
+    "mobile": "yarn workspace @voliere/mobile start",
+    "mobile:go": "yarn workspace @voliere/mobile run start -- --go",
+    "mobile:go:clear": "yarn workspace @voliere/mobile run start -- --go --clear",
+    "seed:cages": "node scripts/seed-cages.mjs",
+    "migrate:owner-uid": "node scripts/migrate-owner-uid.mjs",
+    "reassign:owner-uid": "node scripts/reassign-owner-uid.mjs",
+    "test": "yarn workspace @voliere/shared test"
+  },
+  "devDependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}

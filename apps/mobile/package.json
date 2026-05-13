@@ -1,0 +1,41 @@
+{
+  "name": "@voliere/mobile",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "cross-env EXPO_NO_CACHE=1 expo start",
+    "android": "cross-env EXPO_NO_CACHE=1 expo start --android",
+    "ios": "cross-env EXPO_NO_CACHE=1 expo start --ios",
+    "web": "cross-env EXPO_NO_CACHE=1 expo start --web",
+    "start:no-dep-check": "cross-env EXPO_NO_DEPENDENCY_VALIDATION=1 EXPO_NO_CACHE=1 expo start"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~54.0.34",
+    "expo-constants": "~18.0.13",
+    "expo-linking": "~8.0.11",
+    "expo-router": "~6.0.21",
+    "expo-status-bar": "~3.0.9",
+    "firebase": "^12.13.0",
+    "lucide-react-native": "^0.554.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-hook-form": "^7.75.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@expo/rudder-sdk-node": "1.1.1",
+    "@types/react": "19.1.17",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "cross-env": "^7.0.3",
+    "find-yarn-workspace-root": "2.0.0",
+    "graphql": "^16.9.0",
+    "graphql-tag": "^2.12.6",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}

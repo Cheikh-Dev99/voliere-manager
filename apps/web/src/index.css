@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* Thème personnalisé Volière Manager */
+@theme {
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+}
+
+/* Modales natives (<dialog>) — fond lisible + centrage (évite coin haut-gauche avec preflight) */
+dialog[open] {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  max-height: min(90vh, 90dvh);
+}
+
+dialog::backdrop {
+  background: rgb(15 23 42 / 0.45);
+}
+
+/* Impression (ex. depuis « Imprimer » sur le détail cage) : masquer la barre d’app */
+@media print {
+  .app-header-no-print {
+    display: none !important;
+  }
+
+  .app-root {
+    background: #fff !important;
+  }
+}
+
+/* Chargement — pigeon aligné sur le logo (vol doux, battements discrets) */
+@keyframes vm-pigeon-float {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(4px, -10px) rotate(1.5deg);
+  }
+}
+
+@keyframes vm-loading-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.vm-pigeon-root {
+  animation: vm-pigeon-float 3s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+.vm-loading-dot:nth-child(1) {
+  animation: vm-loading-dot 1.1s ease-in-out infinite;
+}
+
+.vm-loading-dot:nth-child(2) {
+  animation: vm-loading-dot 1.1s ease-in-out 0.15s infinite;
+}
+
+.vm-loading-dot:nth-child(3) {
+  animation: vm-loading-dot 1.1s ease-in-out 0.3s infinite;
+}

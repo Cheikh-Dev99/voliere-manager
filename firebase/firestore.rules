@@ -1,0 +1,84 @@
+rules_version = '2';
+
+// Déployer : `firebase deploy --only firestore:rules` (depuis la racine voliere-manager)
+// Chaque document racine porte ownerUid (= request.auth.uid du créateur).
+// Données sans ownerUid : exécuter `npm run migrate:owner-uid -- <UID>` (voir scripts/migrate-owner-uid.mjs).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns() {
+      return signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    function ownsOnCreate() {
+      return signedIn() && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    function ownsAfterUpdate() {
+      return signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid;
+    }
+
+    function cageDocOwner(cageId) {
+      return get(/databases/$(database)/documents/cages/$(cageId)).data.ownerUid == request.auth.uid;
+    }
+
+    function pigeonDocOwner(pigeonId) {
+      return get(/databases/$(database)/documents/pigeons/$(pigeonId)).data.ownerUid == request.auth.uid;
+    }
+
+    match /cages/{cageId} {
+      allow read: if owns();
+      allow create: if ownsOnCreate();
+      allow update, delete: if ownsAfterUpdate();
+
+      match /evenements/{eventId} {
+        allow read, create, update, delete: if signedIn() && cageDocOwner(cageId);
+      }
+    }
+
+    match /pigeons/{pigeonId} {
+      allow read: if owns();
+      allow create: if ownsOnCreate();
+      allow update, delete: if ownsAfterUpdate();
+
+      match /evenements_sante/{eventId} {
+        allow read: if signedIn() && pigeonDocOwner(pigeonId);
+        allow create: if signedIn()
+          && pigeonDocOwner(pigeonId)
+          && request.resource.data.ownerUid == request.auth.uid;
+        allow update, delete: if signedIn()
+          && pigeonDocOwner(pigeonId)
+          && resource.data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == resource.data.ownerUid;
+      }
+    }
+
+    match /couples/{docId} {
+      allow read: if owns();
+      allow create: if ownsOnCreate();
+      allow update, delete: if ownsAfterUpdate();
+    }
+
+    match /reproductions/{docId} {
+      allow read: if owns();
+      allow create: if ownsOnCreate();
+      allow update, delete: if ownsAfterUpdate();
+    }
+
+    match /sorties/{docId} {
+      allow read: if owns();
+      allow create: if ownsOnCreate();
+      allow update, delete: if ownsAfterUpdate();
+    }
+
+    match /users/{userId} {
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+  }
+}
