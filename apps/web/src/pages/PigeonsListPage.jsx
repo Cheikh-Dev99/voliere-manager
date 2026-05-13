@@ -806,10 +806,6 @@ export function PigeonsListPage() {
           <h2 id="delete-pigeon-title" className="text-lg font-semibold">
             Retirer ce pigeon ?
           </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Il sera <strong>archivé</strong> (suppression logique). Impossible s’il a déjà des jeunes
-            enregistrés comme descendants.
-          </p>
         </div>
         {pendingDelete ? (
           <p className="px-5 py-3 text-sm text-slate-800">

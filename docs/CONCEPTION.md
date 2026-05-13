@@ -1,6 +1,6 @@
-# Conception — Volière Manager (DTS Bakeli 2026)
+# Conception
 
-Document de synthèse (conception + persistance). Aligné sur le cahier DTS « gestion de volière » et les règles métier du PDF.
+Document de synthèse (conception + persistance) « gestion de volière » et les règles métier.
 
 ## 1. Objectifs
 
@@ -64,5 +64,3 @@ Cardinalités clés : une **cage** référence au plus un **pigeon seul** OU un 
 | OCCUPE_COUPLE | Orange | couple référencé par `coupleId` |
 
 ---
-
-*Version initiale — à compléter avec captures MCD graphique (draw.io / dbdiagram) pour le rendu jury si exigé visuellement.*

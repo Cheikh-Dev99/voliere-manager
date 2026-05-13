@@ -76,7 +76,7 @@ export const supprimerPigeon = async (pigeonId: string): Promise<void> => {
   const [snapPere, snapMere] = await Promise.all([getDocs(qPere), getDocs(qMere)]);
 
   if (!snapPere.empty || !snapMere.empty) {
-    throw new Error('Ce pigeon a des descendants — suppression logique uniquement');
+    throw new Error('Ce pigeon a des descendants');
   }
 
   await updateDoc(doc(db, COLLECTIONS.PIGEONS, pigeonId), {
