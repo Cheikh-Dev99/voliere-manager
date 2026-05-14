@@ -52,7 +52,8 @@ export function CageCell({
       <div className="h-5" />
     )
 
-  const showDragHandle = Boolean(onDragStartSolo && cage.statut === 'OCCUPE_PIGEON' && pigeon)
+  const showDragHandle = Boolean(onDragStartSolo && cage.statut === 'OCCUPE_PIGEON' && cage.pigeonId)
+  const soloPigeonId = cage.statut === 'OCCUPE_PIGEON' ? cage.pigeonId : null
   const hasDescription = Boolean((cage.description ?? '').trim())
 
   return (
@@ -92,10 +93,12 @@ export function CageCell({
         </div>
         <div className="mt-2 flex min-h-[28px] items-center justify-center">{birds}</div>
         <p className="mt-1 text-center text-xs font-medium text-slate-600">{st.label}</p>
-        {cage.statut === 'OCCUPE_PIGEON' && pigeon ? (
+        {cage.statut === 'OCCUPE_PIGEON' && soloPigeonId ? (
           <div className="mt-0.5 min-h-0 text-center">
-            <p className="truncate text-[11px] font-medium text-slate-700">{pigeon.matricule}</p>
-            <p className="truncate text-[10px] leading-tight text-slate-500">{pigeon.nom}</p>
+            <p className="truncate text-[11px] font-medium text-slate-700">
+              {pigeon?.matricule ?? '—'}
+            </p>
+            <p className="truncate text-[10px] leading-tight text-slate-500">{pigeon?.nom ?? ''}</p>
           </div>
         ) : null}
         {cage.statut === 'OCCUPE_COUPLE' && male && femelle ? (
@@ -114,11 +117,11 @@ export function CageCell({
           draggable
           onDragStart={(e) => {
             e.stopPropagation()
-            onDragStartSolo(pigeon.id, e)
+            onDragStartSolo(soloPigeonId, e)
           }}
           className="flex w-9 shrink-0 cursor-grab flex-col items-center justify-center rounded-r-lg border-l border-rose-200/80 bg-rose-100/50 text-rose-800 hover:bg-rose-100 active:cursor-grabbing"
-          title={`Glisser ${pigeon.matricule} sur une autre cage « 1 pigeon » du sexe opposé pour créer un couple`}
-          aria-label={`Glisser ${pigeon.matricule} pour former un couple`}
+          title={`Glisser ${pigeon?.matricule ?? 'le pigeon'} sur une autre cage « 1 pigeon » du sexe opposé pour créer un couple`}
+          aria-label={`Glisser ${pigeon?.matricule ?? 'le pigeon'} pour former un couple`}
         >
           <GripVertical className="size-5 opacity-80" aria-hidden />
         </div>

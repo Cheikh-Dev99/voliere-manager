@@ -16,9 +16,12 @@ if (!faviconLink) {
 faviconLink.type = 'image/png'
 faviconLink.href = faviconUrl
 
+const routerBasename =
+  import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL.replace(/\/$/, '')
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename}>
       <AuthBootstrap>
         <App />
         <Toaster position="top-center" />

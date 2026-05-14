@@ -15,7 +15,7 @@ export function VoliereGrid({
   onDropOnCage,
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-3">
       {cages.map((cage) => {
         const pigeon = cage.pigeonId ? pigeonById.get(cage.pigeonId) : null
         const couple = cage.coupleId ? coupleById.get(cage.coupleId) : null

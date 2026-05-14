@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
+  Image,
   Modal,
   Platform,
   Pressable,
@@ -11,13 +11,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { Timestamp } from 'firebase/firestore';
-import { Sparkles } from 'lucide-react-native';
+import { Camera, Image as ImageIcon, Sparkles } from 'lucide-react-native';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { PIGEON_COULEURS_REFERENCE, PIGEON_RACES_REFERENCE } from '@shared/data/pigeonFormCatalog';
 import { usePigeons } from '@shared/hooks/usePigeons';
 import { creerPigeon, modifierPigeon, obtenirPigeon } from '@shared/services/pigeonsService';
 import { proposerMatriculeSuivant } from '@shared/utils/pigeonMatricule';
@@ -25,6 +25,22 @@ import { PigeonSchema } from '@shared/validators/schemas';
 import type { Pigeon, PigeonStatut } from '@shared/types';
 
 import { theme } from '../../constants/theme';
+import { AppLoadingView } from '../ui/AppLoadingView';
+import { PigeonBirthDatePicker } from './PigeonBirthDatePicker';
+import { PigeonCouleurPicker } from './PigeonCouleurPicker';
+import { PigeonRacePicker } from './PigeonRacePicker';
+import {
+  clearDraftPigeonLocalPhoto,
+  clearPigeonLocalPhoto,
+  compressPickerImageToJpegDataUrl,
+  loadDraftPigeonLocalPhoto,
+  loadPigeonLocalPhoto,
+  migrateDraftPigeonLocalPhoto,
+  saveDraftPigeonLocalPhoto,
+  savePigeonLocalPhoto,
+} from '../../utils/localPigeonPhoto';
+
+import { appFeedback } from '../../lib/appFeedback';
 
 const EditStatutSchema = z.enum(['ACTIF', 'VENDU', 'MORT', 'PERDU']);
 
@@ -58,14 +74,13 @@ const defaultValues: FormValues = {
 
 type ParentPick = 'pere' | 'mere' | null;
 
-const RACE_CHIPS = PIGEON_RACES_REFERENCE.slice(0, 12);
-const COULEUR_CHIPS = PIGEON_COULEURS_REFERENCE.slice(0, 16);
-
 export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: string }) {
   const router = useRouter();
   const { pigeons, loading: loadList, males, femelles } = usePigeons(false);
   const [bootLoading, setBootLoading] = useState(isEdit);
   const [editNotFound, setEditNotFound] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [localPhotoDataUrl, setLocalPhotoDataUrl] = useState<string | null>(null);
   const [parentPick, setParentPick] = useState<ParentPick>(null);
   const createInitRef = useRef(false);
 
@@ -149,6 +164,25 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
     };
   }, [isEdit, pigeonId, reset]);
 
+  useEffect(() => {
+    if (isEdit && bootLoading) return;
+    let alive = true;
+    (async () => {
+      if (isEdit && pigeonId) {
+        const v = await loadPigeonLocalPhoto(pigeonId);
+        if (alive) setLocalPhotoDataUrl(v);
+      } else if (!isEdit) {
+        const v = await loadDraftPigeonLocalPhoto();
+        if (alive) setLocalPhotoDataUrl(v);
+      } else {
+        setLocalPhotoDataUrl(null);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [isEdit, pigeonId, bootLoading]);
+
   const onSubmit = useCallback(
     async (values: FormValues) => {
       clearErrors();
@@ -179,7 +213,7 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
           const k = key as keyof FormValues;
           if (msgs?.[0]) setError(k, { type: 'manual', message: msgs[0] });
         });
-        Alert.alert('Formulaire', 'Merci de corriger les champs indiqués.');
+        appFeedback.alert('Formulaire', 'Merci de corriger les champs indiqués.');
         return;
       }
 
@@ -195,7 +229,15 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
             pereId: parsed.data.pereId ?? null,
             mereId: parsed.data.mereId ?? null,
           });
-          Alert.alert('Succès', 'Pigeon créé.', [
+          try {
+            await migrateDraftPigeonLocalPhoto(newId);
+          } catch (e) {
+            appFeedback.alert(
+              'Photo locale',
+              e instanceof Error ? e.message : 'La fiche est créée mais la photo locale n’a pas pu être déplacée.',
+            );
+          }
+          appFeedback.alert('Succès', 'Pigeon créé.', [
             { text: 'OK', onPress: () => router.replace(`/(app)/pigeon/${newId}`) },
           ]);
           return;
@@ -203,7 +245,7 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
         if (!pigeonId) return;
         const st = EditStatutSchema.safeParse(values.statut);
         if (!st.success) {
-          Alert.alert('Erreur', 'Statut invalide.');
+          appFeedback.alert('Erreur', 'Statut invalide.');
           return;
         }
         await modifierPigeon(pigeonId, {
@@ -219,11 +261,11 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
           photo: parsed.data.photo ?? null,
           statut: st.data,
         });
-        Alert.alert('Succès', 'Pigeon mis à jour.', [
+        appFeedback.alert('Succès', 'Pigeon mis à jour.', [
           { text: 'OK', onPress: () => router.replace(`/(app)/pigeon/${pigeonId}`) },
         ]);
       } catch (e) {
-        Alert.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
+        appFeedback.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
       }
     },
     [clearErrors, isEdit, pigeonId, router, setError],
@@ -234,6 +276,80 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
     clearErrors('matricule');
   }, [clearErrors, pigeons, setValue]);
 
+  const pickerOptions = useCallback((): ImagePicker.ImagePickerOptions => {
+    const base: ImagePicker.ImagePickerOptions = {
+      mediaTypes: ['images'],
+      allowsEditing: false,
+      quality: 0.85,
+    };
+    if (Platform.OS === 'ios') {
+      base.preferredAssetRepresentationMode =
+        ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible;
+    }
+    return base;
+  }, []);
+
+  const processPickedAsset = useCallback(
+    async (asset: ImagePicker.ImagePickerAsset) => {
+      setPhotoBusy(true);
+      try {
+        const dataUrl = await compressPickerImageToJpegDataUrl(asset.uri);
+        if (isEdit && pigeonId) {
+          await savePigeonLocalPhoto(pigeonId, dataUrl);
+        } else {
+          await saveDraftPigeonLocalPhoto(dataUrl);
+        }
+        setLocalPhotoDataUrl(dataUrl);
+      } catch (e) {
+        appFeedback.alert('Photo', e instanceof Error ? e.message : 'Enregistrement local impossible');
+      } finally {
+        setPhotoBusy(false);
+      }
+    },
+    [isEdit, pigeonId],
+  );
+
+  const onPickFromLibrary = useCallback(async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      appFeedback.alert('Photos', 'L’accès à la galerie est nécessaire pour choisir une image.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync(pickerOptions());
+    if (result.canceled || !result.assets[0]) return;
+    await processPickedAsset(result.assets[0]);
+  }, [pickerOptions, processPickedAsset]);
+
+  const onPickFromCamera = useCallback(async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      appFeedback.alert('Caméra', 'L’accès à la caméra est nécessaire pour prendre une photo.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync(pickerOptions());
+    if (result.canceled || !result.assets[0]) return;
+    await processPickedAsset(result.assets[0]);
+  }, [pickerOptions, processPickedAsset]);
+
+  const onClearPhoto = useCallback(async () => {
+    try {
+      if (isEdit && pigeonId) await clearPigeonLocalPhoto(pigeonId);
+      else await clearDraftPigeonLocalPhoto();
+    } catch {
+      /* ignore */
+    }
+    setLocalPhotoDataUrl(null);
+    setValue('photo', '', { shouldValidate: true, shouldDirty: true });
+    clearErrors('photo');
+  }, [clearErrors, isEdit, pigeonId, setValue]);
+
+  const photoPreviewUri = useMemo(() => {
+    if (localPhotoDataUrl?.trim()) return localPhotoDataUrl.trim();
+    const u = photoVal?.trim();
+    if (u && /^https?:\/\//i.test(u)) return u;
+    return null;
+  }, [localPhotoDataUrl, photoVal]);
+
   const parentList = parentPick === 'pere' ? malesSelect : parentPick === 'mere' ? femellesSelect : [];
   const parentLabel = (id: string) => {
     const p = pigeons.find((x) => x.id === id);
@@ -243,8 +359,12 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
   if (isEdit && bootLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.teal700} />
-        <Text style={styles.muted}>Chargement…</Text>
+        <AppLoadingView
+          variant="embedded"
+          loadingContext="default"
+          message="Chargement du pigeon…"
+          subtitle="Formulaire d’édition."
+        />
       </View>
     );
   }
@@ -252,8 +372,12 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
   if (!isEdit && loadList) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.teal700} />
-        <Text style={styles.muted}>Chargement…</Text>
+        <AppLoadingView
+          variant="embedded"
+          loadingContext="default"
+          message="Chargement…"
+          subtitle="Liste des pigeons pour le formulaire."
+        />
       </View>
     );
   }
@@ -273,7 +397,8 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
     <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
       <Text style={styles.h1}>{isEdit ? 'Modifier le pigeon' : 'Nouveau pigeon'}</Text>
       <Text style={styles.lead}>
-        Parents : mâles et femelles actifs. Photo : URL https optionnelle (pas de stockage fichier local comme sur le web).
+        Parents : mâles et femelles actifs. Photo depuis l’appareil : stockée en local sur ce téléphone (AsyncStorage,
+        comme le localStorage sur le web), ou URL https optionnelle synchronisée avec Firestore.
       </Text>
 
       <View style={styles.field}>
@@ -321,50 +446,32 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
 
       <View style={styles.field}>
         <Text style={styles.lab}>Race *</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsScroll}>
-          {RACE_CHIPS.map((r) => (
-            <Pressable key={r} style={styles.chip} onPress={() => setValue('race', r, { shouldDirty: true })}>
-              <Text style={styles.chipTxt} numberOfLines={1}>
-                {r.length > 22 ? `${r.slice(0, 20)}…` : r}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-        <TextInput
-          style={[styles.inp, errors.race && styles.inpErr]}
+        <PigeonRacePicker
           value={raceVal}
-          onChangeText={(t) => setValue('race', t, { shouldValidate: true, shouldDirty: true })}
-          placeholder="Ou saisie libre"
+          onChange={(t) => setValue('race', t, { shouldValidate: true, shouldDirty: true })}
+          error={errors.race?.message}
+          onClearError={() => clearErrors('race')}
         />
-        {errors.race ? <Text style={styles.errTxt}>{errors.race.message}</Text> : null}
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.lab}>Date de naissance * (AAAA-MM-JJ)</Text>
-        <TextInput
-          style={[styles.inp, errors.dateNaissance && styles.inpErr]}
+        <Text style={styles.lab}>Date de naissance *</Text>
+        <PigeonBirthDatePicker
           value={dateNaissanceVal}
-          onChangeText={(t) => setValue('dateNaissance', t, { shouldValidate: true, shouldDirty: true })}
-          placeholder="2018-04-15"
+          onChange={(t) => setValue('dateNaissance', t, { shouldValidate: true, shouldDirty: true })}
+          error={errors.dateNaissance?.message}
+          onClearError={() => clearErrors('dateNaissance')}
         />
-        {errors.dateNaissance ? <Text style={styles.errTxt}>{errors.dateNaissance.message}</Text> : null}
       </View>
 
       <View style={styles.field}>
         <Text style={styles.lab}>Couleur *</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsScroll}>
-          {COULEUR_CHIPS.map((c) => (
-            <Pressable key={c} style={styles.chip} onPress={() => setValue('couleur', c, { shouldDirty: true })}>
-              <Text style={styles.chipTxt}>{c}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-        <TextInput
-          style={[styles.inp, errors.couleur && styles.inpErr]}
+        <PigeonCouleurPicker
           value={couleurVal}
-          onChangeText={(t) => setValue('couleur', t, { shouldValidate: true, shouldDirty: true })}
+          onChange={(t) => setValue('couleur', t, { shouldValidate: true, shouldDirty: true })}
+          error={errors.couleur?.message}
+          onClearError={() => clearErrors('couleur')}
         />
-        {errors.couleur ? <Text style={styles.errTxt}>{errors.couleur.message}</Text> : null}
       </View>
 
       <View style={styles.field}>
@@ -394,12 +501,64 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.lab}>Photo (URL https optionnelle)</Text>
+        <Text style={styles.lab}>Photo (optionnel)</Text>
+        <Text style={styles.micro}>
+          Galerie ou caméra : image compressée en JPEG et enregistrée uniquement sur cet appareil (invisible sur un
+          autre téléphone). Une URL https, si tu en saisis une, est enregistrée dans Firestore.
+        </Text>
+        <View style={styles.photoRow}>
+          <View style={styles.photoThumbWrap}>
+            {photoBusy ? (
+              <View style={[styles.photoThumb, styles.photoThumbCenter]}>
+                <ActivityIndicator color={theme.teal700} />
+              </View>
+            ) : photoPreviewUri ? (
+              <Image
+                source={{ uri: photoPreviewUri }}
+                style={styles.photoThumb}
+                accessibilityIgnoresInvertColors
+                accessibilityLabel="Aperçu photo pigeon"
+              />
+            ) : (
+              <View style={[styles.photoThumb, styles.photoThumbPh]}>
+                <Text style={styles.photoThumbPhTxt}>Aperçu</Text>
+              </View>
+            )}
+          </View>
+          <View style={styles.photoActions}>
+            <Pressable
+              style={[styles.photoBtn, photoBusy && styles.photoBtnDisabled]}
+              onPress={onPickFromLibrary}
+              disabled={photoBusy}
+              accessibilityLabel="Choisir une image dans la galerie"
+            >
+              <ImageIcon size={18} color={theme.teal800} />
+              <Text style={styles.photoBtnTxt}>Galerie</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.photoBtn, photoBusy && styles.photoBtnDisabled]}
+              onPress={onPickFromCamera}
+              disabled={photoBusy}
+              accessibilityLabel="Prendre une photo avec la caméra"
+            >
+              <Camera size={18} color={theme.teal800} />
+              <Text style={styles.photoBtnTxt}>Caméra</Text>
+            </Pressable>
+            {photoPreviewUri ? (
+              <Pressable onPress={() => void onClearPhoto()} disabled={photoBusy} style={styles.photoClearWrap}>
+                <Text style={styles.photoClearTxt}>Retirer la photo</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+        <Text style={[styles.micro, { marginTop: 10 }]}>URL de la photo (alternative)</Text>
         <TextInput
           style={[styles.inp, errors.photo && styles.inpErr]}
           value={photoVal}
           onChangeText={(t) => setValue('photo', t, { shouldValidate: true, shouldDirty: true })}
           autoCapitalize="none"
+          placeholder="https://…"
+          editable={!photoBusy}
         />
         {errors.photo ? <Text style={styles.errTxt}>{errors.photo.message}</Text> : null}
       </View>
@@ -432,9 +591,9 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
       ) : null}
 
       <Pressable
-        style={[styles.submit, isSubmitting && { opacity: 0.7 }]}
+        style={[styles.submit, (isSubmitting || photoBusy) && { opacity: 0.7 }]}
         onPress={handleSubmit(onSubmit)}
-        disabled={isSubmitting}
+        disabled={isSubmitting || photoBusy}
       >
         <Text style={styles.submitTxt}>{isSubmitting ? 'Enregistrement…' : isEdit ? 'Enregistrer' : 'Créer'}</Text>
       </Pressable>
@@ -488,7 +647,6 @@ function FlatListSafe({
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  muted: { marginTop: 8, color: theme.slate500 },
   scroll: { padding: 16, paddingBottom: 48 },
   h1: { fontSize: 22, fontWeight: '800', color: theme.slate900 },
   lead: { fontSize: 14, color: theme.slate600, marginTop: 8, marginBottom: 16, lineHeight: 20 },
@@ -554,6 +712,35 @@ const styles = StyleSheet.create({
     maxWidth: 200,
   },
   chipTxt: { fontSize: 12, fontWeight: '600', color: theme.teal900 },
+  photoRow: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', marginTop: 10 },
+  photoThumbWrap: { flexShrink: 0 },
+  photoThumb: {
+    width: 96,
+    height: 96,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: theme.border,
+    backgroundColor: theme.white,
+  },
+  photoThumbCenter: { justifyContent: 'center', alignItems: 'center' },
+  photoThumbPh: { justifyContent: 'center', alignItems: 'center', backgroundColor: theme.slate100 },
+  photoThumbPhTxt: { fontSize: 12, color: theme.slate500, fontWeight: '600' },
+  photoActions: { flex: 1, gap: 8, minWidth: 0 },
+  photoBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: theme.teal600,
+    backgroundColor: theme.teal50,
+  },
+  photoBtnDisabled: { opacity: 0.55 },
+  photoBtnTxt: { fontWeight: '700', color: theme.teal800, fontSize: 14 },
+  photoClearWrap: { paddingVertical: 4 },
+  photoClearTxt: { fontSize: 13, color: theme.slate500, fontWeight: '600' },
   pickBtn: {
     borderWidth: 1,
     borderColor: theme.border,

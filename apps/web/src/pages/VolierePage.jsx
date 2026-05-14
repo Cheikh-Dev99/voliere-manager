@@ -108,7 +108,7 @@ export function VolierePage() {
   const authEmail = useAuthStore((s) => s.user?.email ?? '')
   const { profile } = useUserProfile(authEmail)
   const { cages, loading: loadCages, error: errCages } = useCages()
-  const { pigeons, loading: loadPigeons, error: errPigeons } = usePigeons(true)
+  const { pigeons, loading: loadPigeons, error: errPigeons } = usePigeons(false)
   const { couples, loading: loadCouples, error: errCouples } = useCouples(false)
 
   const initialVisu = readVoliereVisuPrefs()
@@ -747,8 +747,8 @@ export function VolierePage() {
                     lorsque la cage a un pigeon seul (comme en vue grille).
                   </p>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-left text-sm">
+                <div className="overflow-x-auto md:overflow-x-visible">
+                  <table className="w-full min-w-[520px] text-left text-sm md:min-w-0">
                     <caption className="sr-only">
                       Cages de la volière {voliereCode}, numéro, statut et contenu
                     </caption>
@@ -773,7 +773,9 @@ export function VolierePage() {
                         const f = cp ? femelleByCouple.get(cp.id) : null
                         let contenu = '—'
                         if (c.statut === 'LIBRE') contenu = 'Libre'
-                        if (pg) contenu = `${pg.matricule} — ${pg.nom}`
+                        if (c.statut === 'OCCUPE_PIGEON' && c.pigeonId) {
+                          contenu = pg ? `${pg.matricule} — ${pg.nom}` : `Pigeon (${c.pigeonId.slice(0, 6)}…)`
+                        }
                         if (m && f) contenu = `${m.matricule} (${m.nom}) + ${f.matricule} (${f.nom})`
                         const selected = selectedIdVisible === c.id
                         return (
@@ -802,20 +804,20 @@ export function VolierePage() {
                             <td className="whitespace-nowrap px-4 py-3 align-middle">
                               <StatutListeBadge statut={c.statut} />
                             </td>
-                            <td className="max-w-[min(28rem,55vw)] px-4 py-3.5 text-slate-700">
+                            <td className="max-w-[min(28rem,92vw)] px-4 py-3.5 text-slate-700 sm:max-w-[min(28rem,55vw)]">
                               <div className="flex items-start gap-2">
-                                {c.statut === 'OCCUPE_PIGEON' && pg ? (
+                                {c.statut === 'OCCUPE_PIGEON' && c.pigeonId ? (
                                   <div
                                     draggable
                                     role="presentation"
                                     onDragStart={(e) => {
                                       e.stopPropagation()
-                                      handleDragStartSolo(pg.id, e)
+                                      handleDragStartSolo(c.pigeonId, e)
                                     }}
                                     onClick={(e) => e.stopPropagation()}
                                     className="mt-0.5 shrink-0 cursor-grab rounded border border-rose-200 bg-rose-50 p-1 text-rose-800 hover:bg-rose-100 active:cursor-grabbing"
-                                    title={`Glisser ${pg.matricule} sur une autre cage « 1 pigeon » du sexe opposé pour créer un couple`}
-                                    aria-label={`Glisser ${pg.matricule} pour former un couple`}
+                                    title={`Glisser ${pg?.matricule ?? 'le pigeon'} sur une autre cage « 1 pigeon » du sexe opposé pour créer un couple`}
+                                    aria-label={`Glisser ${pg?.matricule ?? 'le pigeon'} pour former un couple`}
                                   >
                                     <GripVertical className="size-4" aria-hidden />
                                   </div>
@@ -864,7 +866,7 @@ export function VolierePage() {
       )}
 
       {selectedCage && (
-        <div className="fixed inset-0 z-30 bg-black/20 lg:hidden" aria-hidden onClick={() => setSelectedId(null)} />
+        <div className="fixed inset-0 z-40 bg-black/20 lg:hidden" aria-hidden onClick={() => setSelectedId(null)} />
       )}
     </div>
   )

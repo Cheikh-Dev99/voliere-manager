@@ -1,7 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
   Modal,
   Platform,
   Pressable,
@@ -21,7 +19,9 @@ import { creerCouple } from '@shared/services/couplesService';
 import { CoupleSchema } from '@shared/validators/schemas';
 import type { Cage, Pigeon } from '@shared/types';
 
+import { appFeedback } from '../../lib/appFeedback';
 import { theme } from '../../constants/theme';
+import { AppLoadingView } from '../ui/AppLoadingView';
 
 type FormValues = {
   maleId: string;
@@ -114,7 +114,7 @@ export function CoupleFormScreen() {
           const k = key as keyof FormValues;
           if (msgs?.[0]) setError(k, { type: 'manual', message: msgs[0] });
         });
-        Alert.alert('Formulaire', 'Merci de corriger les champs indiqués.');
+        appFeedback.alert('Formulaire', 'Merci de corriger les champs indiqués.');
         return;
       }
       try {
@@ -125,11 +125,11 @@ export function CoupleFormScreen() {
           cageId: parsed.data.cageId ?? null,
           notes: parsed.data.notes ?? '',
         });
-        Alert.alert('Succès', 'Couple créé.', [
+        appFeedback.alert('Succès', 'Couple créé.', [
           { text: 'OK', onPress: () => router.replace('/(app)/(tabs)/couples') },
         ]);
       } catch (e) {
-        Alert.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
+        appFeedback.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
       }
     },
     [clearErrors, router, setError],
@@ -140,8 +140,12 @@ export function CoupleFormScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.teal700} />
-        <Text style={styles.muted}>Chargement…</Text>
+        <AppLoadingView
+          variant="embedded"
+          loadingContext="couples"
+          message="Chargement du formulaire…"
+          subtitle="Pigeons, cages et couples."
+        />
       </View>
     );
   }
@@ -267,7 +271,6 @@ export function CoupleFormScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  muted: { marginTop: 8, color: theme.slate500 },
   scroll: { padding: theme.screenPadding, paddingBottom: 40 },
   h1: { fontSize: 22, fontWeight: '800', color: theme.slate900 },
   lead: { fontSize: 14, color: theme.slate600, marginTop: 8, marginBottom: 16, lineHeight: 20 },

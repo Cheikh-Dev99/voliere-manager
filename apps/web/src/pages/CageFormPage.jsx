@@ -115,14 +115,40 @@ export function CageFormPage() {
     [profile?.voliereCodes, cages],
   )
 
-  const lotMergedOptions = useMemo(() => {
-    const s = new Set(voliereCodesFromCages)
-    const cur = lotVoliere.trim()
-    if (cur) s.add(cur)
-    return Array.from(s).sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }))
-  }, [voliereCodesFromCages, lotVoliere])
+  const lotMergedOptions = useMemo(
+    () => [...voliereCodesFromCages].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true })),
+    [voliereCodesFromCages],
+  )
 
-  const lotVoliereUiValue = lotMergedOptions.includes(lotVoliere.trim()) ? lotVoliere.trim() : '__OTHER__'
+  const voliereOptionsSingle = useMemo(() => {
+    const sorted = [...voliereCodesFromCages].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }))
+    if (isEdit && cageRemote) {
+      const v = (cageRemote.voliereCode ?? '').trim()
+      if (v && !sorted.includes(v)) {
+        return [...sorted, v].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }))
+      }
+    }
+    return sorted
+  }, [voliereCodesFromCages, isEdit, cageRemote])
+
+  useEffect(() => {
+    if (lotMergedOptions.length === 0) return
+    const cur = lotVoliere.trim()
+    if (!lotMergedOptions.includes(cur)) {
+      setLotVoliere(lotMergedOptions[0] ?? 'A')
+    }
+  }, [lotMergedOptions, lotVoliere])
+
+  useEffect(() => {
+    if (isEdit) return
+    if (voliereOptionsSingle.length === 0) return
+    const cur = (getValues('voliereCode') ?? '').trim()
+    if (!voliereOptionsSingle.includes(cur)) {
+      const next = voliereOptionsSingle[0] ?? 'A'
+      setValue('voliereCode', next, { shouldValidate: true })
+      setLotVoliere(next)
+    }
+  }, [voliereOptionsSingle, isEdit, getValues, setValue])
 
   const lotPreview = useMemo(() => {
     const prefix = lotPrefix.trim() || 'A'
@@ -303,39 +329,21 @@ export function CageFormPage() {
                 autoComplete="off"
               />
             ) : (
-              <>
-                <select
-                  id="lot-voliere"
-                  value={lotVoliereUiValue === '__OTHER__' ? '__OTHER__' : lotVoliere.trim()}
-                  onChange={(e) => {
-                    const v = e.target.value
-                    if (v === '__OTHER__') setLotVoliere('')
-                    else setLotVoliere(v)
-                  }}
-                  className={fieldClass()}
-                >
-                  {lotMergedOptions.map((code) => (
-                    <option key={code} value={code}>
-                      {code}
-                    </option>
-                  ))}
-                  <option value="__OTHER__">Autre code (saisie libre)</option>
-                </select>
-                {lotVoliereUiValue === '__OTHER__' ? (
-                  <input
-                    value={lotVoliere}
-                    onChange={(e) => setLotVoliere(e.target.value)}
-                    className={`mt-2 ${fieldClass()}`}
-                    maxLength={VOLIERE_CODE_MAX_LEN}
-                    placeholder="Ex. B, Nord…"
-                    autoComplete="off"
-                    aria-label="Nom court de la volière (saisie libre)"
-                  />
-                ) : null}
-              </>
+              <select
+                id="lot-voliere"
+                value={lotMergedOptions.includes(lotVoliere.trim()) ? lotVoliere.trim() : (lotMergedOptions[0] ?? '')}
+                onChange={(e) => setLotVoliere(e.target.value)}
+                className={fieldClass()}
+              >
+                {lotMergedOptions.map((code) => (
+                  <option key={code} value={code}>
+                    {code}
+                  </option>
+                ))}
+              </select>
             )}
             <p className="mt-1 text-xs text-slate-500">
-              Liste des volières déjà présentes dans tes cages ; choisis « Autre » pour un nouveau code.
+              Uniquement les volières déclarées dans ton profil ou déjà présentes sur tes cages.
             </p>
           </div>
 
@@ -500,10 +508,7 @@ export function CageFormPage() {
               control={control}
               render={({ field }) => {
                 const vcTrim = (field.value ?? '').trim()
-                const optSet = new Set(voliereCodesFromCages)
-                if (vcTrim) optSet.add(vcTrim)
-                const opts = Array.from(optSet).sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }))
-                const selUi = opts.includes(vcTrim) ? vcTrim : '__OTHER__'
+                const opts = voliereOptionsSingle
 
                 if (opts.length === 0) {
                   return (
@@ -518,49 +523,31 @@ export function CageFormPage() {
                   )
                 }
 
+                const sel = opts.includes(vcTrim) ? vcTrim : opts[0] ?? ''
+
                 return (
-                  <>
-                    <select
-                      id="voliere-select"
-                      className={fieldClass(errors.voliereCode)}
-                      value={selUi === '__OTHER__' ? '__OTHER__' : vcTrim}
-                      onChange={(e) => {
-                        const v = e.target.value
-                        if (v === '__OTHER__') field.onChange('')
-                        else field.onChange(v)
-                      }}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      aria-invalid={errors.voliereCode ? 'true' : 'false'}
-                    >
-                      {opts.map((code) => (
-                        <option key={code} value={code}>
-                          {code}
-                        </option>
-                      ))}
-                      <option value="__OTHER__">Autre code (saisie libre)</option>
-                    </select>
-                    {selUi === '__OTHER__' ? (
-                      <input
-                        id="voliereCode-custom"
-                        value={field.value ?? ''}
-                        onChange={(e) => field.onChange(e.target.value)}
-                        onBlur={field.onBlur}
-                        className={`mt-2 ${fieldClass(errors.voliereCode)}`}
-                        maxLength={VOLIERE_CODE_MAX_LEN}
-                        placeholder="Ex. B, Nord…"
-                        autoComplete="off"
-                        aria-label="Nom court de la volière (saisie libre)"
-                      />
-                    ) : null}
-                  </>
+                  <select
+                    id="voliere-select"
+                    className={fieldClass(errors.voliereCode)}
+                    value={sel}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    onBlur={field.onBlur}
+                    ref={field.ref}
+                    aria-invalid={errors.voliereCode ? 'true' : 'false'}
+                  >
+                    {opts.map((code) => (
+                      <option key={code} value={code}>
+                        {code}
+                      </option>
+                    ))}
+                  </select>
                 )
               }}
             />
             {errors.voliereCode ? <p className="mt-1 text-xs text-red-600">{errors.voliereCode.message}</p> : null}
             <p className="mt-1 text-xs text-slate-500">
-              Liste = volières déclarées dans ton profil (menu compte → Mes volières) + volières déjà présentes sur tes
-              cages. « Autre » pour un nom court ponctuel. La visualisation regroupe les cages par volière.
+              Uniquement les volières déclarées dans ton profil (menu compte → Mes volières) ou déjà présentes sur tes
+              cages. La visualisation regroupe les cages par volière.
             </p>
           </div>
 

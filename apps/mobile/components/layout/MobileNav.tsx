@@ -124,8 +124,8 @@ export function MobileNav() {
         <ListTree size={28} color={theme.teal700} strokeWidth={2.2} />
         <Text style={styles.heroTitle}>Navigation</Text>
         <Text style={styles.heroSub}>
-          Même périmètre que le menu du site : les six rubriques principales, plus les écrans de création accessibles
-          directement ici.
+          Même périmètre que le menu du site : accès aux rubriques principales et aux écrans de création. La grille
+          par volière et ce menu complet sont aussi disponibles depuis le profil (coin haut droit).
         </Text>
       </View>
 

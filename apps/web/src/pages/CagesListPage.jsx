@@ -6,7 +6,6 @@ import {
   ArrowUpNarrowWide,
   ArrowLeft,
   CopyPlus,
-  Download,
   FilterX,
   LayoutGrid,
   Pencil,
@@ -20,7 +19,6 @@ import { mergeProfileVoliereCodesWithCages } from '@shared/utils/voliereCodesMer
 import { supprimerCage } from '@shared/services/cagesService'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
 import useAuthStore from '../stores/authStore'
-import { downloadCsv } from '../utils/csvDownload'
 
 const statutLabel = {
   LIBRE: 'Libre',
@@ -247,25 +245,6 @@ export function CagesListPage() {
     }
   }
 
-  function exportCagesCsv() {
-    if (sorted.length === 0) {
-      toast.error('Aucune ligne à exporter.')
-      return
-    }
-    const header = ['Volière', 'Numéro', 'Nom', 'Superficie m²', 'Statut', 'Description']
-    const rows = sorted.map((c) => [
-      c.voliereCode ?? 'A',
-      c.numero,
-      c.nom ?? '',
-      String(c.superficie ?? ''),
-      statutLabel[c.statut] ?? c.statut,
-      (c.description ?? '').replace(/\r?\n/g, ' '),
-    ])
-    const stamp = new Date().toISOString().slice(0, 10)
-    downloadCsv(`cages_${stamp}.csv`, header, rows)
-    toast.success(`${sorted.length} cage(s) exportée(s).`)
-  }
-
   if (loading) {
     return <AppLoadingScreen variant="embedded" loadingContext="cages" message="Chargement des cages…" />
   }
@@ -391,15 +370,6 @@ export function CagesListPage() {
                       <ArrowUpNarrowWide className="size-4" aria-hidden />
                     )}
                   </button>
-                  <button
-                    type="button"
-                    onClick={exportCagesCsv}
-                    disabled={sorted.length === 0}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <Download className="size-4 shrink-0" aria-hidden />
-                    CSV
-                  </button>
                 </div>
               </div>
             </div>
@@ -490,8 +460,8 @@ export function CagesListPage() {
               </div>
             </div>
           ) : null}
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <table className="min-w-full text-left text-sm">
+          <div className="-mx-1 overflow-x-auto overflow-y-visible rounded-xl border border-slate-200 bg-white shadow-sm sm:mx-0 md:overflow-x-visible">
+          <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
               <tr>
                 <th className="w-10 px-2 py-3 text-center" scope="col">

@@ -1,13 +1,7 @@
-import { useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Egg, Plus } from 'lucide-react-native';
+import { useLayoutEffect, useMemo, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Link, useNavigation, useRouter } from 'expo-router';
+import { Egg } from 'lucide-react-native';
 
 import { useReproductions } from '@shared/hooks/useReproductions';
 import { useCouples } from '@shared/hooks/useCouples';
@@ -16,13 +10,25 @@ import type { Couple, Pigeon } from '@shared/types';
 
 import { EmptyStateCard } from '../../../components/layout/EmptyStateCard';
 import { PageHeader } from '../../../components/layout/PageHeader';
-import { PrimaryButton } from '../../../components/ui/PrimaryButton';
+import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
+import {
+  FloatingAddButton,
+  FLOATING_ADD_LIST_PADDING_BOTTOM,
+} from '../../../components/ui/FloatingAddButton';
 import { SearchField } from '../../../components/ui/SearchField';
+import { AppLoadingView } from '../../../components/ui/AppLoadingView';
 import { theme, shadowCard } from '../../../constants/theme';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
 export default function ReproductionsTabScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => <TabHeaderTitle Icon={Egg} label="Reproductions" />,
+    });
+  }, [navigation]);
   const { reproductions, loading, error } = useReproductions();
   const { couples } = useCouples(false);
   const { pigeons } = usePigeons(false);
@@ -56,17 +62,7 @@ export default function ReproductionsTabScreen() {
 
   const header = (
     <View style={styles.header}>
-      <PageHeader
-        title="Reproductions"
-        titleAccessory={<Egg size={26} color={theme.teal700} strokeWidth={2.2} />}
-        description="Portées enregistrées pour tes couples. Tu peux créer une fiche depuis l’onglet Reproductions (bouton) ou depuis le menu Navigation."
-      >
-        <PrimaryButton
-          label="+ Nouvelle reproduction"
-          icon={<Plus size={20} color={theme.white} strokeWidth={2.5} />}
-          onPress={() => router.push('/(app)/reproduction/nouveau')}
-        />
-      </PageHeader>
+      <PageHeader description="Portées enregistrées pour tes couples. Touche une ligne pour la fiche détail. Nouvelle reproduction : bouton + en bas à droite ou menu Navigation." />
       <SearchField
         value={query}
         onChangeText={setQuery}
@@ -79,60 +75,79 @@ export default function ReproductionsTabScreen() {
     <View style={styles.root}>
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.teal700} />
+          <AppLoadingView
+            variant="embedded"
+            loadingContext="reproduction"
+            message="Chargement des reproductions…"
+            subtitle="Portées et couples associés."
+          />
         </View>
       ) : error ? (
         <Text style={styles.err}>{error}</Text>
       ) : (
-        <FlatList
-          data={rows}
-          keyExtractor={(r) => r.id}
-          contentContainerStyle={styles.list}
-          ListHeaderComponent={
-            <>
-              {header}
-              {!rows.length ? (
-                <EmptyStateCard
-                  icon={<Egg size={30} color={theme.slate500} strokeWidth={1.8} />}
-                  iconBackgroundColor={theme.slate100}
-                  title="Aucune reproduction enregistrée"
-                  hint="Enregistre une première portée avec le bouton ci-dessus ou via l’onglet Menu (Navigation)."
-                  primaryLabel="+ Enregistrer une première portée"
-                  onPrimaryPress={() => router.push('/(app)/reproduction/nouveau')}
-                />
-              ) : null}
-            </>
-          }
-          renderItem={({ item }) => {
+        <>
+          <FlatList
+            data={rows}
+            keyExtractor={(r) => r.id}
+            contentContainerStyle={[styles.list, { paddingBottom: FLOATING_ADD_LIST_PADDING_BOTTOM }]}
+            ListHeaderComponent={
+              <>
+                {header}
+                {!rows.length ? (
+                  <EmptyStateCard
+                    icon={<Egg size={30} color={theme.slate500} strokeWidth={1.8} />}
+                    iconBackgroundColor={theme.slate100}
+                    title="Aucune reproduction enregistrée"
+                    hint="Enregistre une première portée avec le bouton rond + en bas à droite ou via l’onglet Menu (Navigation)."
+                  />
+                ) : null}
+              </>
+            }
+            renderItem={({ item }) => {
             const cp = coupleById.get(item.coupleId);
             const m = cp ? pigeonById.get(cp.maleId) : null;
             const f = cp ? pigeonById.get(cp.femelleId) : null;
             const label = m && f ? `${m.matricule} · ${f.matricule}` : `Couple ${item.coupleId.slice(0, 6)}…`;
             return (
-              <View style={[styles.card, shadowCard]}>
-                <Text style={styles.title}>{label}</Text>
-                <Text style={styles.sub}>
-                  Ponte {formatFirestoreDate(item.datePonte)} · Œufs {item.nombreOeufs} · jeunes{' '}
-                  {item.nombrePigeonneaux}
-                </Text>
-                {item.notes ? (
-                  <Text style={styles.notes} numberOfLines={2}>
-                    {item.notes}
-                  </Text>
-                ) : null}
-              </View>
+              <Link
+                href={{ pathname: '/reproduction/[reproductionId]', params: { reproductionId: item.id } }}
+                asChild
+                accessibilityLabel={`Fiche reproduction ${label}`}
+              >
+                <Pressable style={({ pressed }) => [styles.cardPressable, pressed && styles.cardPressed]}>
+                  <View style={[styles.card, shadowCard]}>
+                    <Text style={styles.title}>{label}</Text>
+                    <Text style={styles.sub}>
+                      Ponte {formatFirestoreDate(item.datePonte)} · Œufs {item.nombreOeufs} · jeunes{' '}
+                      {item.nombrePigeonneaux}
+                    </Text>
+                    {item.notes ? (
+                      <Text style={styles.notes} numberOfLines={2}>
+                        {item.notes}
+                      </Text>
+                    ) : null}
+                  </View>
+                </Pressable>
+              </Link>
             );
           }}
-        />
+          />
+          <FloatingAddButton
+            onPress={() => router.push('/(app)/reproduction/nouveau')}
+            accessibilityLabel="Nouvelle reproduction"
+            icon={<Egg size={24} color={theme.white} strokeWidth={2.4} />}
+          />
+        </>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: theme.slate50 },
+  root: { flex: 1, backgroundColor: 'transparent' },
   header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
   list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28 },
+  cardPressable: { marginBottom: 10 },
   card: {
     backgroundColor: theme.white,
     borderRadius: theme.radiusLg,
@@ -141,6 +156,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.border,
   },
+  cardPressed: { opacity: 0.92 },
   title: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
   sub: { fontSize: 13, color: theme.slate600, marginTop: 4 },
   notes: { fontSize: 13, color: theme.slate500, marginTop: 6 },

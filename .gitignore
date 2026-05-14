@@ -3,6 +3,8 @@
 
 # --- Dépendances Node ---
 node_modules/
+# Monorepo géré par Yarn : un `package-lock.json` (npm) déclenche YN0014 au `yarn install`.
+package-lock.json
 
 # Yarn Berry (4+) : caches & état local — le dépôt versionne `yarn.lock`
 .yarn/*

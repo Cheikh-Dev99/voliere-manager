@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
   Platform,
   Pressable,
   ScrollView,
@@ -23,7 +21,10 @@ import {
   proposerNumeroCageSuivant,
 } from '@shared/utils/cageNumeroProposition';
 
+import { appFeedback } from '../../lib/appFeedback';
 import { useMergedVoliereCodes } from '../../hooks/useMergedVoliereCodes';
+import { MobileLabeledSelect } from '../ui/MobileLabeledSelect';
+import { AppLoadingView } from '../ui/AppLoadingView';
 import { theme } from '../../constants/theme';
 
 type SingleForm = {
@@ -79,14 +80,50 @@ export function CageFormScreen(props: Props) {
 
   const mergedVoliereCodes = useMergedVoliereCodes();
 
-  const lotMergedOptions = useMemo(() => {
-    const s = new Set(mergedVoliereCodes);
-    const cur = lotVoliere.trim();
-    if (cur) s.add(cur);
-    return Array.from(s).sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }));
-  }, [mergedVoliereCodes, lotVoliere]);
+  const lotMergedOptions = useMemo(
+    () => [...mergedVoliereCodes].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true })),
+    [mergedVoliereCodes],
+  );
 
-  const lotVoliereUiValue = lotMergedOptions.includes(lotVoliere.trim()) ? lotVoliere.trim() : '__OTHER__';
+  const lotPadSelectOptions = useMemo(
+    () => [
+      { value: '1', label: '1 — A1' },
+      { value: '2', label: '2 — A01' },
+      { value: '3', label: '3 — A001' },
+      { value: '4', label: '4 — A0001' },
+    ],
+    [],
+  );
+
+  const voliereOptionsSingle = useMemo(() => {
+    const sorted = [...mergedVoliereCodes].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }));
+    if (isEdit && cageRemote) {
+      const v = (cageRemote.voliereCode ?? '').trim();
+      if (v && !sorted.includes(v)) {
+        return [...sorted, v].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }));
+      }
+    }
+    return sorted;
+  }, [mergedVoliereCodes, isEdit, cageRemote]);
+
+  useEffect(() => {
+    if (lotMergedOptions.length === 0) return;
+    const cur = lotVoliere.trim();
+    if (!lotMergedOptions.includes(cur)) {
+      setLotVoliere(lotMergedOptions[0] ?? 'A');
+    }
+  }, [lotMergedOptions, lotVoliere]);
+
+  useEffect(() => {
+    if (isEdit) return;
+    if (voliereOptionsSingle.length === 0) return;
+    const cur = (getValues('voliereCode') ?? '').trim();
+    if (!voliereOptionsSingle.includes(cur)) {
+      const next = voliereOptionsSingle[0] ?? 'A';
+      setValue('voliereCode', next, { shouldValidate: true });
+      setLotVoliere(next);
+    }
+  }, [voliereOptionsSingle, isEdit, getValues, setValue]);
 
   const lotPreview = useMemo(() => {
     const prefix = lotPrefix.trim() || 'A';
@@ -133,13 +170,13 @@ export function CageFormScreen(props: Props) {
   const onGenerateNumero = useCallback(() => {
     const volRaw = (getValues('voliereCode') ?? '').trim();
     if (!volRaw) {
-      Alert.alert('Code volière', 'Indique d’abord un code volière.');
+      appFeedback.alert('Volière (nom court)', 'Indique d’abord une volière (son nom court).');
       return;
     }
     const next = proposerNumeroCageSuivant(volRaw, cages, isEdit ? cageId : undefined);
     setValue('numero', next, { shouldValidate: true, shouldDirty: true });
     clearErrors('numero');
-    Alert.alert('Numéro proposé', `${next}\n(tu peux l’ajuster)`);
+    appFeedback.alert('Numéro proposé', `${next}\n(tu peux l’ajuster)`);
   }, [cages, cageId, clearErrors, getValues, isEdit, setValue]);
 
   const onSubmitSingle = handleSubmit(async (values) => {
@@ -150,39 +187,39 @@ export function CageFormScreen(props: Props) {
     });
     if (!parsed.success) {
       const first = parsed.error.issues[0];
-      Alert.alert('Validation', first?.message ?? 'Données invalides');
+      appFeedback.alert('Validation', first?.message ?? 'Données invalides');
       return;
     }
     try {
       if (isEdit && cageId) {
         await modifierCage(cageId, parsed.data);
-        Alert.alert('Succès', 'Cage mise à jour.', [
+        appFeedback.alert('Succès', 'Cage mise à jour.', [
           { text: 'OK', onPress: () => router.replace(`/(app)/cage/${cageId}`) },
         ]);
       } else {
         const id = await creerCage(parsed.data);
-        Alert.alert('Succès', 'Cage créée.', [
+        appFeedback.alert('Succès', 'Cage créée.', [
           { text: 'OK', onPress: () => router.replace(`/(app)/(tabs)/cages`) },
         ]);
         void id;
       }
     } catch (e) {
-      Alert.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
+      appFeedback.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
     }
   });
 
   const onSubmitLot = async () => {
     const { numeros, count, conflicts } = lotPreview;
     if (count === 0) {
-      Alert.alert('Lot', 'Indique une plage valide (du … au …).');
+      appFeedback.alert('Lot', 'Indique une plage valide (du … au …).');
       return;
     }
     if (count > CAGE_LOT_MAX) {
-      Alert.alert('Lot', `Maximum ${CAGE_LOT_MAX} cages par envoi.`);
+      appFeedback.alert('Lot', `Maximum ${CAGE_LOT_MAX} cages par envoi.`);
       return;
     }
     if (conflicts.length > 0) {
-      Alert.alert(
+      appFeedback.alert(
         'Conflit',
         `Numéros déjà utilisés : ${conflicts.slice(0, 8).join(', ')}${conflicts.length > 8 ? '…' : ''}`,
       );
@@ -200,7 +237,7 @@ export function CageFormScreen(props: Props) {
       const raw = { voliereCode: volCode, numero, nom, superficie: sup, description: desc };
       const parsed = CageSchema.safeParse(raw);
       if (!parsed.success) {
-        Alert.alert('Validation', parsed.error.issues[0]?.message ?? 'Données invalides');
+        appFeedback.alert('Validation', parsed.error.issues[0]?.message ?? 'Données invalides');
         return;
       }
       itemsPayload.push(parsed.data);
@@ -208,11 +245,11 @@ export function CageFormScreen(props: Props) {
     setLotSubmitting(true);
     try {
       const n = await creerCagesLot(itemsPayload);
-      Alert.alert('Succès', `${n} cage${n > 1 ? 's' : ''} créée${n > 1 ? 's' : ''}.`, [
+      appFeedback.alert('Succès', `${n} cage${n > 1 ? 's' : ''} créée${n > 1 ? 's' : ''}.`, [
         { text: 'OK', onPress: () => router.replace('/(app)/(tabs)/cages') },
       ]);
     } catch (err) {
-      Alert.alert('Erreur', err instanceof Error ? err.message : 'Création du lot impossible');
+      appFeedback.alert('Erreur', err instanceof Error ? err.message : 'Création du lot impossible');
     } finally {
       setLotSubmitting(false);
     }
@@ -221,8 +258,12 @@ export function CageFormScreen(props: Props) {
   if (isEdit && loadingCage) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.teal700} />
-        <Text style={styles.muted}>Chargement…</Text>
+        <AppLoadingView
+          variant="embedded"
+          loadingContext="cages"
+          message="Chargement de la cage…"
+          subtitle="Formulaire d’édition."
+        />
       </View>
     );
   }
@@ -240,8 +281,6 @@ export function CageFormScreen(props: Props) {
 
   return (
     <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-      <Text style={styles.h1}>{isEdit ? 'Modifier la cage' : 'Nouvelle cage'}</Text>
-
       {!isEdit ? (
         <View style={styles.segRow}>
           <Pressable onPress={() => setTab('single')} style={[styles.seg, tab === 'single' && styles.segOn]}>
@@ -260,61 +299,39 @@ export function CageFormScreen(props: Props) {
             indice.
           </Text>
 
-          <Text style={styles.lab}>Code volière</Text>
           {lotMergedOptions.length === 0 ? (
-            <TextInput
-              style={styles.inp}
-              value={lotVoliere}
-              onChangeText={setLotVoliere}
-              placeholder="Ex. A"
-              maxLength={8}
-            />
-          ) : (
             <>
-              <View style={styles.chipRow}>
-                {lotMergedOptions.map((code) => {
-                  const sel = lotVoliereUiValue === code;
-                  return (
-                    <Pressable
-                      key={code}
-                      onPress={() => setLotVoliere(code)}
-                      style={[styles.chip, sel && styles.chipOn]}
-                    >
-                      <Text style={[styles.chipTxt, sel && styles.chipTxtOn]} numberOfLines={1}>
-                        {code}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={() => setLotVoliere('')}
-                  style={[styles.chip, lotVoliereUiValue === '__OTHER__' && styles.chipOn]}
-                >
-                  <Text style={[styles.chipTxt, lotVoliereUiValue === '__OTHER__' && styles.chipTxtOn]}>Autre…</Text>
-                </Pressable>
-              </View>
-              {lotVoliereUiValue === '__OTHER__' ? (
-                <TextInput
-                  style={[styles.inp, { marginTop: 8 }]}
-                  value={lotVoliere}
-                  onChangeText={setLotVoliere}
-                  placeholder="Saisie libre"
-                  maxLength={8}
-                />
-              ) : null}
+              <Text style={styles.lab}>Volière (nom court)</Text>
+              <TextInput
+                style={styles.inp}
+                value={lotVoliere}
+                onChangeText={setLotVoliere}
+                placeholder="Ex. A"
+                maxLength={8}
+              />
             </>
+          ) : (
+            <MobileLabeledSelect
+              label="Volière (nom court)"
+              options={lotMergedOptions.map((code) => ({ value: code, label: code }))}
+              value={lotMergedOptions.includes(lotVoliere.trim()) ? lotVoliere.trim() : (lotMergedOptions[0] ?? 'A')}
+              onChange={setLotVoliere}
+              containerStyle={{ width: '100%' }}
+            />
           )}
 
-          <Text style={[styles.lab, { marginTop: 12 }]}>Préfixe / padding</Text>
-          <View style={styles.row2}>
-            <TextInput style={[styles.inp, styles.flex]} value={lotPrefix} onChangeText={setLotPrefix} />
-            <View style={styles.padRow}>
-              {[1, 2, 3, 4].map((p) => (
-                <Pressable key={p} onPress={() => setLotPad(p)} style={[styles.padBtn, lotPad === p && styles.padOn]}>
-                  <Text style={[styles.padTxt, lotPad === p && styles.padTxtOn]}>{p}</Text>
-                </Pressable>
-              ))}
+          <View style={[styles.row2, { marginTop: 12 }]}>
+            <View style={styles.flex}>
+              <Text style={styles.lab}>Préfixe du numéro</Text>
+              <TextInput style={styles.inp} value={lotPrefix} onChangeText={setLotPrefix} placeholder="A" />
             </View>
+            <MobileLabeledSelect
+              label="Chiffres (padding)"
+              options={lotPadSelectOptions}
+              value={String(Math.min(4, Math.max(1, Math.floor(Number(lotPad) || 2))))}
+              onChange={(v) => setLotPad(Number(v) || 2)}
+              containerStyle={styles.flex}
+            />
           </View>
 
           <Text style={styles.lab}>De → À</Text>
@@ -392,58 +409,36 @@ export function CageFormScreen(props: Props) {
         </View>
       ) : (
         <View style={styles.card}>
-          <Text style={styles.lab}>Code volière</Text>
           <Controller
             control={control}
             name="voliereCode"
             render={({ field: { value, onChange, onBlur } }) => {
               const vcTrim = (value ?? '').trim();
-              const optSet = new Set(mergedVoliereCodes);
-              if (vcTrim) optSet.add(vcTrim);
-              const opts = Array.from(optSet).sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }));
-              const selUi = opts.includes(vcTrim) ? vcTrim : '__OTHER__';
+              const opts = voliereOptionsSingle;
 
               if (opts.length === 0) {
                 return (
-                  <TextInput
-                    style={styles.inp}
-                    value={value ?? ''}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    placeholder="Ex. A"
-                    maxLength={8}
-                  />
-                );
-              }
-              return (
-                <View>
-                  <View style={styles.chipRow}>
-                    {opts.map((code) => {
-                      const sel = selUi === code;
-                      return (
-                        <Pressable key={code} onPress={() => onChange(code)} style={[styles.chip, sel && styles.chipOn]}>
-                          <Text style={[styles.chipTxt, sel && styles.chipTxtOn]}>{code}</Text>
-                        </Pressable>
-                      );
-                    })}
-                    <Pressable
-                      onPress={() => onChange('')}
-                      style={[styles.chip, selUi === '__OTHER__' && styles.chipOn]}
-                    >
-                      <Text style={[styles.chipTxt, selUi === '__OTHER__' && styles.chipTxtOn]}>Autre</Text>
-                    </Pressable>
-                  </View>
-                  {selUi === '__OTHER__' ? (
+                  <View>
+                    <Text style={styles.lab}>Volière (nom court)</Text>
                     <TextInput
-                      style={[styles.inp, { marginTop: 8 }]}
+                      style={styles.inp}
                       value={value ?? ''}
                       onChangeText={onChange}
                       onBlur={onBlur}
-                      placeholder="Ex. B"
+                      placeholder="Ex. A"
                       maxLength={8}
                     />
-                  ) : null}
-                </View>
+                  </View>
+                );
+              }
+              return (
+                <MobileLabeledSelect
+                  label="Volière (nom court)"
+                  options={opts.map((code) => ({ value: code, label: code }))}
+                  value={opts.includes(vcTrim) ? vcTrim : opts[0] ?? 'A'}
+                  onChange={onChange}
+                  containerStyle={{ width: '100%' }}
+                />
               );
             }}
           />
@@ -524,7 +519,6 @@ export function CageFormScreen(props: Props) {
 
 const styles = StyleSheet.create({
   scroll: { padding: theme.screenPadding, paddingBottom: 40 },
-  h1: { fontSize: 22, fontWeight: '800', color: theme.slate900, marginBottom: 14 },
   segRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
   seg: { flex: 1, paddingVertical: 10, borderRadius: theme.radiusMd, backgroundColor: theme.slate100, alignItems: 'center' },
   segOn: { backgroundColor: theme.white, borderWidth: 1, borderColor: theme.teal600 },
@@ -564,23 +558,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.teal50,
   },
   genTxt: { fontWeight: '700', color: theme.teal800, fontSize: 14 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: theme.border,
-    backgroundColor: theme.slate50,
-  },
-  chipOn: { borderColor: theme.teal600, backgroundColor: theme.teal50 },
-  chipTxt: { fontWeight: '600', color: theme.slate700, fontSize: 13 },
-  chipTxtOn: { color: theme.teal900 },
-  padRow: { flexDirection: 'row', gap: 6 },
-  padBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: theme.border },
-  padOn: { borderColor: theme.teal600, backgroundColor: theme.teal50 },
-  padTxt: { fontWeight: '600', color: theme.slate600 },
-  padTxtOn: { color: theme.teal900 },
   hint: { fontSize: 13, color: theme.slate600, marginBottom: 12, lineHeight: 18 },
   micro: { fontSize: 12, color: theme.slate500, marginTop: 4, marginBottom: 8 },
   preview: { marginTop: 12, padding: 12, borderRadius: theme.radiusMd, backgroundColor: theme.slate50, borderWidth: 1, borderColor: theme.border },
@@ -597,7 +574,6 @@ const styles = StyleSheet.create({
   btnDis: { opacity: 0.65 },
   errTxt: { color: theme.red600, fontSize: 12, marginTop: 4 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  muted: { marginTop: 8, color: theme.slate500 },
   err: { color: theme.red600, marginBottom: 12 },
   btnGhost: { marginTop: 12, padding: 12 },
   btnGhostTxt: { color: theme.teal700, fontWeight: '700' },

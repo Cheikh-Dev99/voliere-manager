@@ -10,10 +10,11 @@ export default function ReproductionStackLayout() {
         headerStyle: { backgroundColor: theme.white },
         headerShadowVisible: true,
         headerTitleStyle: { color: theme.slate900, fontWeight: '700' },
-        contentStyle: { backgroundColor: theme.slate50 },
+        contentStyle: { backgroundColor: 'transparent' },
       }}
     >
       <Stack.Screen name="nouveau" options={{ title: 'Nouvelle reproduction' }} />
+      <Stack.Screen name="[reproductionId]" options={{ title: 'Fiche reproduction' }} />
     </Stack>
   );
 }

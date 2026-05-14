@@ -1,7 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -9,8 +7,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Heart, Plus } from 'lucide-react-native';
+import { useNavigation, useRouter } from 'expo-router';
+import { Heart } from 'lucide-react-native';
 
 import { useCouples } from '@shared/hooks/useCouples';
 import { usePigeons } from '@shared/hooks/usePigeons';
@@ -18,9 +16,15 @@ import { useCages } from '@shared/hooks/useCages';
 import { rompreCouple } from '@shared/services/couplesService';
 import type { Cage, Couple, Pigeon } from '@shared/types';
 
+import { appFeedback } from '../../../lib/appFeedback';
 import { EmptyStateCard } from '../../../components/layout/EmptyStateCard';
 import { PageHeader } from '../../../components/layout/PageHeader';
-import { PrimaryButton } from '../../../components/ui/PrimaryButton';
+import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
+import {
+  FloatingAddButton,
+  FLOATING_ADD_LIST_PADDING_BOTTOM,
+} from '../../../components/ui/FloatingAddButton';
+import { AppLoadingView } from '../../../components/ui/AppLoadingView';
 import { theme, shadowCard } from '../../../constants/theme';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
@@ -35,11 +39,18 @@ function compareCouplesRow(a: Couple, b: Couple, sortDir: 'asc' | 'desc'): numbe
 
 export default function CouplesTabScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => <TabHeaderTitle Icon={Heart} label="Couples" />,
+    });
+  }, [navigation]);
   const { couples, loading, error, stats } = useCouples(false);
   const { pigeons, loading: lp } = usePigeons(false);
   const { cages, loading: lc } = useCages();
   const [query, setQuery] = useState('');
-  const [filtreStatut, setFiltreStatut] = useState<'ALL' | 'ACTIF' | 'ROMPU'>('ALL');
+  const [filtreStatut, setFiltreStatut] = useState<'ALL' | 'ACTIF' | 'ROMPU'>('ACTIF');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const pigeonById = useMemo(() => {
@@ -70,7 +81,7 @@ export default function CouplesTabScreen() {
   }, [couples, filtreStatut, qNorm, sortDir, pigeonById]);
 
   const onRompre = useCallback((c: Couple) => {
-    Alert.alert('Rompre le couple', 'Cette action libère les cages concernées (selon règles métier). Continuer ?', [
+    appFeedback.alert('Rompre le couple', 'Cette action libère les cages concernées (selon règles métier). Continuer ?', [
       { text: 'Annuler', style: 'cancel' },
       {
         text: 'Rompre',
@@ -80,7 +91,7 @@ export default function CouplesTabScreen() {
             try {
               await rompreCouple(c.id);
             } catch (e) {
-              Alert.alert('Erreur', e instanceof Error ? e.message : 'Échec');
+              appFeedback.alert('Erreur', e instanceof Error ? e.message : 'Échec');
             }
           })();
         },
@@ -92,17 +103,7 @@ export default function CouplesTabScreen() {
 
   const header = (
     <View style={styles.header}>
-      <PageHeader
-        title="Couples"
-        titleAccessory={<Heart size={26} color={theme.teal700} strokeWidth={2.2} />}
-        description="Association mâle + femelle pour la reproduction. Un pigeon ne peut figurer que dans un seul couple actif à la fois. Rompre un couple libère la cage qui lui était dédiée."
-      >
-        <PrimaryButton
-          label="+ Nouveau couple"
-          icon={<Plus size={20} color={theme.white} strokeWidth={2.5} />}
-          onPress={() => router.push('/(app)/couple/nouveau')}
-        />
-      </PageHeader>
+      <PageHeader description="Association mâle + femelle pour la reproduction. Un pigeon ne peut figurer que dans un seul couple actif à la fois. Touche la carte pour la fiche détail ; « Rompre » reste à droite pour les couples actifs. Nouveau couple : bouton + en bas à droite." />
       <TextInput
         style={styles.search}
         placeholder="Rechercher couple…"
@@ -138,37 +139,48 @@ export default function CouplesTabScreen() {
     <View style={styles.root}>
       {loadingAny ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.teal700} />
+          <AppLoadingView
+            variant="embedded"
+            loadingContext="couples"
+            message="Chargement des couples…"
+            subtitle="Pigeons et cages associés."
+          />
         </View>
       ) : error ? (
         <Text style={styles.err}>{error}</Text>
       ) : (
-        <FlatList
-          data={rows}
-          keyExtractor={(c) => c.id}
-          contentContainerStyle={styles.list}
-          ListHeaderComponent={
-            <>
-              {header}
-              {!rows.length ? (
-                <EmptyStateCard
-                  icon={<Heart size={28} color="#e11d48" strokeWidth={2} />}
-                  iconBackgroundColor={theme.rose50}
-                  title="Aucun couple enregistré"
-                  hint="Crée un couple à partir de deux pigeons actifs. Tu pourras ensuite enregistrer des reproductions."
-                  primaryLabel="+ Créer un couple"
-                  onPrimaryPress={() => router.push('/(app)/couple/nouveau')}
-                />
-              ) : null}
-            </>
-          }
+        <>
+          <FlatList
+            data={rows}
+            keyExtractor={(c) => c.id}
+            contentContainerStyle={[styles.list, { paddingBottom: FLOATING_ADD_LIST_PADDING_BOTTOM }]}
+            ListHeaderComponent={
+              <>
+                {header}
+                {!rows.length ? (
+                  <EmptyStateCard
+                    icon={<Heart size={28} color="#e11d48" strokeWidth={2} />}
+                    iconBackgroundColor={theme.rose50}
+                    title="Aucun couple enregistré"
+                    hint="Crée un couple à partir de deux pigeons actifs. Tu pourras ensuite enregistrer des reproductions. Touche le bouton rond + en bas à droite."
+                  />
+                ) : null}
+              </>
+            }
           renderItem={({ item }) => {
             const m = pigeonById.get(item.maleId);
             const f = pigeonById.get(item.femelleId);
             const cage = item.cageId ? cageById.get(item.cageId) : null;
             return (
               <View style={[styles.card, shadowCard]}>
-                <View style={{ flex: 1 }}>
+                <Pressable
+                  style={styles.cardMain}
+                  onPress={() =>
+                    router.push({ pathname: '/couple/[coupleId]', params: { coupleId: item.id } })
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={`Fiche couple ${m?.matricule ?? '?'} et ${f?.matricule ?? '?'}`}
+                >
                   <Text style={styles.title}>
                     {m?.matricule ?? '?'} + {f?.matricule ?? '?'}
                   </Text>
@@ -178,7 +190,7 @@ export default function CouplesTabScreen() {
                   <Text style={[styles.badge, item.statut === 'ROMPU' && styles.badgeOff]}>
                     {item.statut === 'ACTIF' ? 'Actif' : 'Rompu'}
                   </Text>
-                </View>
+                </Pressable>
                 {item.statut === 'ACTIF' ? (
                   <Pressable style={styles.rompre} onPress={() => onRompre(item)}>
                     <Text style={styles.rompreTxt}>Rompre</Text>
@@ -187,14 +199,20 @@ export default function CouplesTabScreen() {
               </View>
             );
           }}
-        />
+          />
+          <FloatingAddButton
+            onPress={() => router.push('/(app)/couple/nouveau')}
+            accessibilityLabel="Nouveau couple"
+            icon={<Heart size={24} color={theme.white} strokeWidth={2.4} />}
+          />
+        </>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: theme.slate50 },
+  root: { flex: 1, backgroundColor: 'transparent' },
   header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
   search: {
     borderWidth: 1,
@@ -230,6 +248,7 @@ const styles = StyleSheet.create({
     borderColor: theme.border,
     alignItems: 'flex-start',
   },
+  cardMain: { flex: 1, minWidth: 0 },
   title: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
   sub: { fontSize: 13, color: theme.slate500, marginTop: 4 },
   badge: {

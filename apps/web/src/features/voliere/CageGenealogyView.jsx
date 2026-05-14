@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { GitBranch, HelpCircle } from 'lucide-react'
+import { buildAncestorRows, generationLabel } from '@shared/utils/genealogyTree'
 import { getPigeonDisplayPhotoSrc } from '../../utils/localPigeonPhoto'
 
 const STATUT_DOT = {
@@ -9,51 +10,18 @@ const STATUT_DOT = {
   PERDU: 'bg-amber-500',
 }
 
-/**
- * Construit les lignes du tableau ascendant : ancêtres les plus lointains en premier,
- * le sujet (profondeur 0) en dernier. `maxGen` = nombre de générations au-dessus du sujet (ex. 2 = parents + grands-parents).
- */
-function buildAncestorRows(rootId, pigeonById, maxGen = 2) {
-  const genById = new Map()
-  const queue = [{ id: rootId, g: 0 }]
-  const seen = new Set()
-
-  while (queue.length) {
-    const { id, g } = queue.shift()
-    if (!id || g > maxGen) continue
-    if (seen.has(id)) continue
-    seen.add(id)
-    genById.set(id, g)
-    const p = pigeonById.get(id)
-    if (!p) continue
-    if (p.pereId) queue.push({ id: p.pereId, g: g + 1 })
-    if (p.mereId) queue.push({ id: p.mereId, g: g + 1 })
-  }
-
-  const maxG = Math.max(0, ...genById.values())
-  const rows = []
-  for (let g = maxG; g >= 0; g -= 1) {
-    const ids = [...genById.entries()]
-      .filter(([, gv]) => gv === g)
-      .map(([id]) => id)
-    ids.sort((a, b) => {
-      const pa = pigeonById.get(a)
-      const pb = pigeonById.get(b)
-      return (pa?.matricule ?? a).localeCompare(pb?.matricule ?? b, 'fr', { numeric: true })
-    })
-    rows.push(ids)
-  }
-  return rows
-}
-
-function generationLabel(depthFromSubject) {
-  if (depthFromSubject === 0) return 'Sujet'
-  if (depthFromSubject === 1) return 'Parents'
-  if (depthFromSubject === 2) return 'Grands-parents'
-  return `Ancêtres (+${depthFromSubject})`
-}
-
 const DEFAULT_PIGEON_DETAIL_LINK_STATE = { back: { path: '/', label: 'Visualisation' } }
+
+function PigeonNotesSection({ title, notes }) {
+  const t = (notes ?? '').trim()
+  if (!t) return null
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50/90 px-3 py-2.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{title}</p>
+      <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{t}</p>
+    </div>
+  )
+}
 
 function PigeonMiniCard({ pigeonId, pigeonById, emphasis, pigeonDetailLinkState }) {
   const p = pigeonById.get(pigeonId)
@@ -211,6 +179,7 @@ export function CageGenealogyView({ mode, pigeon, male, femelle, pigeonById, pig
           Lignée ascendante (jusqu’à <strong>grands-parents</strong> lorsque les fiches sont renseignées). Cliquez une
           fiche pour ouvrir le détail pigeon.
         </p>
+        <PigeonNotesSection title="Note" notes={pigeon.notes} />
         {!hasTree ? (
           <div className="rounded-lg border border-amber-100 bg-amber-50/70 px-3 py-2 text-xs text-amber-950">
             Aucun père ni mère renseigné sur la fiche — complète la généalogie depuis{' '}
@@ -242,6 +211,9 @@ export function CageGenealogyView({ mode, pigeon, male, femelle, pigeonById, pig
             <span className="size-1.5 rounded-full bg-sky-500" aria-hidden />
             Mâle — {male.matricule}
           </p>
+          <div className="mb-2">
+            <PigeonNotesSection title="Note — mâle" notes={male.notes} />
+          </div>
           {!mTree ? (
             <p className="mb-2 text-[11px] text-slate-500">Parents non renseignés.</p>
           ) : null}
@@ -257,6 +229,9 @@ export function CageGenealogyView({ mode, pigeon, male, femelle, pigeonById, pig
             <span className="size-1.5 rounded-full bg-pink-500" aria-hidden />
             Femelle — {femelle.matricule}
           </p>
+          <div className="mb-2">
+            <PigeonNotesSection title="Note — femelle" notes={femelle.notes} />
+          </div>
           {!fTree ? (
             <p className="mb-2 text-[11px] text-slate-500">Parents non renseignés.</p>
           ) : null}

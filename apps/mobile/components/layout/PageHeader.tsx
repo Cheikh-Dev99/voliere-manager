@@ -4,10 +4,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../constants/theme';
 
 type PageHeaderProps = {
-  title: string;
+  /** Omis quand le titre est dans la barre native (Tabs). */
+  title?: string;
   /** Texte d’aide sous le titre (style web). */
   description?: string;
-  /** Titre avec icône à gauche (ex. maison + Volière A). */
+  /** Icône à gauche du titre (inutile si `title` est omis). */
   titleAccessory?: ReactNode;
   /** Bouton pleine largeur ou ligne d’actions sous la description. */
   children?: ReactNode;
@@ -19,12 +20,16 @@ export function PageHeader({
   titleAccessory,
   children,
 }: PageHeaderProps) {
+  const showTitleRow = Boolean(title?.trim()) || titleAccessory != null;
+
   return (
     <View style={styles.wrap}>
-      <View style={styles.titleRow}>
-        {titleAccessory}
-        <Text style={styles.title}>{title}</Text>
-      </View>
+      {showTitleRow ? (
+        <View style={styles.titleRow}>
+          {titleAccessory}
+          {title?.trim() ? <Text style={styles.title}>{title}</Text> : null}
+        </View>
+      ) : null}
       {description ? <Text style={styles.desc}>{description}</Text> : null}
       {children ? <View style={styles.actions}>{children}</View> : null}
     </View>

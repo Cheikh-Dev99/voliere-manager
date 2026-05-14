@@ -865,8 +865,8 @@ export function SortiesPage() {
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+              <div className="overflow-x-auto md:overflow-x-visible">
+                <table className="w-full min-w-[600px] divide-y divide-slate-200 text-left text-sm md:min-w-0">
                   <thead className="border-b border-slate-200 bg-slate-100/90 text-xs font-semibold uppercase tracking-wide text-slate-600">
                     <tr>
                       <th className="whitespace-nowrap px-4 py-3">Date</th>

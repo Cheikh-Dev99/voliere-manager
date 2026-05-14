@@ -13,11 +13,18 @@ import {
   ArrowDownNarrowWide,
   ArrowUpNarrowWide,
   FilterX,
-  Download,
   Stethoscope,
   GitBranch,
+  Download,
 } from 'lucide-react'
+import { useCouples } from '@shared/hooks/useCouples'
 import { usePigeons } from '@shared/hooks/usePigeons'
+import {
+  buildPigeonIdsInActifsCouples,
+  libelleColonneCouplePigeon,
+  libelleStatutListePigeon,
+} from '@shared/utils/pigeonCoupleDisplay'
+import { buildPigeonCsvRows, PIGEON_CSV_HEADERS } from '@shared/utils/pigeonCsv'
 import { modifierPigeon, supprimerPigeon } from '@shared/services/pigeonsService'
 import { clearPigeonLocalPhoto, getPigeonDisplayPhotoSrc } from '../utils/localPigeonPhoto'
 import { downloadCsv } from '../utils/csvDownload'
@@ -32,6 +39,18 @@ const statutClass = {
   MORT: 'bg-zinc-200 text-zinc-800',
   PERDU: 'bg-amber-100 text-amber-900',
 }
+
+const PIGEON_STATUT_LIBELLES = {
+  ACTIF: 'Actif',
+  VENDU: 'Vendu',
+  MORT: 'Mort',
+  PERDU: 'Perdu',
+}
+
+/** Valeur filtre « pigeon actif dans un couple actif » (pas un champ Firestore). */
+const FILTRE_STATUT_EN_COUPLE = 'EN_COUPLE'
+/** Filtre : fiches soft-deleted (`deletedAt`). */
+const FILTRE_STATUT_ARCHIVE = 'ARCHIVE'
 
 const LS_LIST_PREFS = 'voliere-manager:pigeons-list-prefs'
 
@@ -78,17 +97,19 @@ function comparePigeons(a, b, sortBy, sortDir) {
   return a.matricule.localeCompare(b.matricule, 'fr', { numeric: true })
 }
 
-function formatPigeonBirthCsv(ts) {
-  if (!ts || typeof ts.toDate !== 'function') return ''
-  try {
-    return ts.toDate().toLocaleDateString('fr-FR')
-  } catch {
-    return ''
-  }
-}
-
 /** Pastille statut cliquable : liste déroulante native (évite d’être coupée par overflow du tableau). */
 function PigeonStatutSelect({ pigeon, saving, onStatutChange }) {
+  if (pigeon.deletedAt) {
+    return (
+      <span
+        className="inline-flex max-w-[9.5rem] cursor-not-allowed rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600"
+        title="Archivé — plus de modification depuis la liste"
+      >
+        Archivé
+      </span>
+    )
+  }
+  const selectTone = statutClass[pigeon.statut] || 'bg-slate-100'
   return (
     <select
       value={pigeon.statut}
@@ -99,7 +120,7 @@ function PigeonStatutSelect({ pigeon, saving, onStatutChange }) {
         const next = e.target.value
         if (next !== pigeon.statut) onStatutChange(pigeon, next)
       }}
-      className={`inline-flex max-w-[9.5rem] cursor-pointer appearance-none rounded-full border border-black/5 py-0.5 pl-2.5 pr-7 text-xs font-medium shadow-sm outline-none ring-offset-1 transition hover:brightness-95 focus-visible:ring-2 focus-visible:ring-teal-500 disabled:cursor-wait disabled:opacity-60 ${statutClass[pigeon.statut] || 'bg-slate-100'}`}
+      className={`inline-flex max-w-[9.5rem] cursor-pointer appearance-none rounded-full border border-black/5 py-0.5 pl-2.5 pr-7 text-xs font-medium shadow-sm outline-none ring-offset-1 transition hover:brightness-95 focus-visible:ring-2 focus-visible:ring-teal-500 disabled:cursor-wait disabled:opacity-60 ${selectTone}`}
       style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
         backgroundRepeat: 'no-repeat',
@@ -114,7 +135,30 @@ function PigeonStatutSelect({ pigeon, saving, onStatutChange }) {
   )
 }
 
+/** Libellé dérivé : actif dans un couple Firestore ACTIF → « En couple », sinon « Libre ». */
+function PigeonCoupleBadge({ pigeon, pigeonIdsEnCouplesActifs }) {
+  const libelle = libelleColonneCouplePigeon(pigeon, pigeonIdsEnCouplesActifs)
+  if (libelle == null) {
+    return (
+      <span className="text-sm text-slate-400 tabular-nums" aria-hidden>
+        —
+      </span>
+    )
+  }
+  const isEnCouple = libelle === 'En couple'
+  return (
+    <span
+      className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+        isEnCouple ? 'bg-rose-100 text-rose-900 ring-1 ring-rose-200/80' : 'bg-slate-100 text-slate-700 ring-1 ring-slate-200'
+      }`}
+    >
+      {libelle}
+    </span>
+  )
+}
+
 function PigeonActions({ p, onDetail, onDelete }) {
+  const archived = Boolean(p.deletedAt)
   return (
     <div className="flex justify-end gap-1">
       <button
@@ -126,23 +170,27 @@ function PigeonActions({ p, onDetail, onDelete }) {
       >
         <FileText className="size-4" aria-hidden />
       </button>
-      <Link
-        to={`/pigeons/${p.id}/modifier`}
-        className="inline-flex rounded-lg p-2 text-teal-700 hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
-        title="Modifier"
-        aria-label={`Modifier ${p.matricule}`}
-      >
-        <Pencil className="size-4" aria-hidden />
-      </Link>
-      <button
-        type="button"
-        className="inline-flex rounded-lg p-2 text-rose-700 hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600"
-        title="Retirer de l’effectif"
-        aria-label={`Retirer ${p.matricule} de l’effectif`}
-        onClick={() => onDelete(p)}
-      >
-        <Trash2 className="size-4" aria-hidden />
-      </button>
+      {!archived ? (
+        <Link
+          to={`/pigeons/${p.id}/modifier`}
+          className="inline-flex rounded-lg p-2 text-teal-700 hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+          title="Modifier"
+          aria-label={`Modifier ${p.matricule}`}
+        >
+          <Pencil className="size-4" aria-hidden />
+        </Link>
+      ) : null}
+      {!archived ? (
+        <button
+          type="button"
+          className="inline-flex rounded-lg p-2 text-rose-700 hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600"
+          title="Archiver (retirer de l’effectif)"
+          aria-label={`Archiver ${p.matricule}`}
+          onClick={() => onDelete(p)}
+        >
+          <Trash2 className="size-4" aria-hidden />
+        </button>
+      ) : null}
     </div>
   )
 }
@@ -151,7 +199,13 @@ function PigeonActions({ p, onDetail, onDelete }) {
  * Liste des pigeons — recherche, filtres (race, sexe, statut), tri, vues liste / grille.
  */
 export function PigeonsListPage() {
-  const { pigeons, loading, error, stats } = usePigeons(false)
+  const { pigeons, archivedPigeons, loading, error, stats } = usePigeons(false)
+  const { couples, loading: couplesLoading, error: couplesError } = useCouples(false)
+  const listLoading = loading || couplesLoading
+  const listError = error || couplesError
+
+  const pigeonIdsEnCouplesActifs = useMemo(() => buildPigeonIdsInActifsCouples(couples), [couples])
+
   const [query, setQuery] = useState('')
   const [filterRace, setFilterRace] = useState('')
   const [filterSexe, setFilterSexe] = useState('')
@@ -159,6 +213,13 @@ export function PigeonsListPage() {
   const [viewMode, setViewMode] = useState(() => readListPrefs().viewMode)
   const [sortBy, setSortBy] = useState(() => readListPrefs().sortBy)
   const [sortDir, setSortDir] = useState(() => readListPrefs().sortDir)
+
+  const hasAnyPigeon = pigeons.length + archivedPigeons.length > 0
+
+  const listBase = useMemo(
+    () => (filterStatut === FILTRE_STATUT_ARCHIVE ? archivedPigeons : pigeons),
+    [filterStatut, archivedPigeons, pigeons],
+  )
 
   const deleteDialogRef = useRef(null)
   const detailDialogRef = useRef(null)
@@ -196,18 +257,22 @@ export function PigeonsListPage() {
 
   const raceOptions = useMemo(() => {
     const set = new Set()
-    for (const p of pigeons) {
+    for (const p of [...pigeons, ...archivedPigeons]) {
       if (p.race?.trim()) set.add(p.race.trim())
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }))
-  }, [pigeons])
+  }, [pigeons, archivedPigeons])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    let rows = pigeons.filter((p) => {
+    let rows = listBase.filter((p) => {
       if (filterRace && p.race !== filterRace) return false
       if (filterSexe && p.sexe !== filterSexe) return false
-      if (filterStatut && p.statut !== filterStatut) return false
+      if (filterStatut === FILTRE_STATUT_ARCHIVE) {
+        /* listBase est déjà limité aux archivés */
+      } else if (filterStatut === FILTRE_STATUT_EN_COUPLE) {
+        if (!(p.statut === 'ACTIF' && pigeonIdsEnCouplesActifs.has(p.id))) return false
+      } else if (filterStatut && p.statut !== filterStatut) return false
       if (!q) return true
       return (
         p.matricule.toLowerCase().includes(q) ||
@@ -218,41 +283,16 @@ export function PigeonsListPage() {
     })
     rows = [...rows].sort((a, b) => comparePigeons(a, b, sortBy, sortDir))
     return rows
-  }, [pigeons, query, filterRace, filterSexe, filterStatut, sortBy, sortDir])
-
-  const exportPigeonsCsv = useCallback(() => {
-    if (filtered.length === 0) {
-      toast.error('Aucune ligne à exporter.')
-      return
-    }
-    const header = [
-      'Matricule',
-      'Nom',
-      'Sexe',
-      'Race',
-      'Statut',
-      'Couleur',
-      'Date naissance',
-      'Père ID',
-      'Mère ID',
-      'Notes',
-    ]
-    const rows = filtered.map((p) => [
-      p.matricule,
-      p.nom ?? '',
-      p.sexe ?? '',
-      p.race ?? '',
-      p.statut ?? '',
-      p.couleur ?? '',
-      formatPigeonBirthCsv(p.dateNaissance),
-      p.pereId ?? '',
-      p.mereId ?? '',
-      (p.notes ?? '').replace(/\r?\n/g, ' '),
-    ])
-    const stamp = new Date().toISOString().slice(0, 10)
-    downloadCsv(`pigeons_${stamp}.csv`, header, rows)
-    toast.success(`${filtered.length} pigeon(s) exporté(s).`)
-  }, [filtered])
+  }, [
+    listBase,
+    query,
+    filterRace,
+    filterSexe,
+    filterStatut,
+    sortBy,
+    sortDir,
+    pigeonIdsEnCouplesActifs,
+  ])
 
   const hasActiveFilters = Boolean(
     query.trim() || filterRace || filterSexe || filterStatut,
@@ -264,6 +304,20 @@ export function PigeonsListPage() {
     setFilterSexe('')
     setFilterStatut('')
   }, [])
+
+  const handleExportCsv = useCallback(() => {
+    if (filtered.length === 0) {
+      toast.error('Aucune ligne à exporter.')
+      return
+    }
+    const stamp = new Date().toISOString().slice(0, 10)
+    downloadCsv(
+      `pigeons-export-${stamp}.csv`,
+      [...PIGEON_CSV_HEADERS],
+      buildPigeonCsvRows(filtered, pigeonIdsEnCouplesActifs),
+    )
+    toast.success(`Export CSV : ${filtered.length} ligne(s).`)
+  }, [filtered, pigeonIdsEnCouplesActifs])
 
   const openDeleteDialog = (p) => {
     setPendingDelete(p)
@@ -286,6 +340,10 @@ export function PigeonsListPage() {
   }
 
   const handleStatutChange = useCallback(async (pigeon, nextStatut) => {
+    if (pigeon.deletedAt) {
+      toast.error('Impossible de modifier le statut d’un pigeon archivé.')
+      return
+    }
     if (nextStatut === pigeon.statut) return
     setSavingStatutId(pigeon.id)
     try {
@@ -303,7 +361,7 @@ export function PigeonsListPage() {
     try {
       await supprimerPigeon(pendingDelete.id)
       clearPigeonLocalPhoto(pendingDelete.id)
-      toast.success('Pigeon retiré de la liste active (conservé dans l’historique).')
+      toast.success('Pigeon archivé : il disparaît de l’effectif mais reste consultable via le filtre « Archivés ».')
     } catch (e) {
       toast.error(e?.message || 'Suppression impossible')
     } finally {
@@ -323,7 +381,7 @@ export function PigeonsListPage() {
             <span className="whitespace-nowrap">« Détails »</span> ou en cliquant sur{' '}
             <span className="whitespace-nowrap">« Modifier »</span>.
           </p>
-          {!loading && pigeons.length > 0 ? (
+          {!listLoading && hasAnyPigeon ? (
             <p className="mt-2 text-xs text-slate-500" aria-live="polite">
               <span className="font-medium text-slate-700">{stats.total}</span> fiche(s) ·{' '}
               <span className="text-emerald-700">{stats.actifs} actif(s)</span>
@@ -363,11 +421,11 @@ export function PigeonsListPage() {
         </Link>
       </div>
 
-      {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>
+      {listError ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{listError}</div>
       ) : null}
 
-      {!loading && pigeons.length > 0 ? (
+      {!listLoading && hasAnyPigeon ? (
         <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="relative min-w-0 flex-1 lg:max-w-md">
@@ -382,15 +440,6 @@ export function PigeonsListPage() {
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={exportPigeonsCsv}
-                disabled={filtered.length === 0}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Download className="size-4 shrink-0" aria-hidden />
-                Exporter CSV
-              </button>
               <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Affichage</span>
               <div className="inline-flex rounded-lg border border-slate-200 p-0.5" role="group" aria-label="Mode d’affichage">
                 <button
@@ -469,9 +518,11 @@ export function PigeonsListPage() {
               >
                 <option value="">Tous les statuts</option>
                 <option value="ACTIF">Actif</option>
+                <option value={FILTRE_STATUT_EN_COUPLE}>En couple</option>
                 <option value="VENDU">Vendu</option>
                 <option value="MORT">Mort</option>
                 <option value="PERDU">Perdu</option>
+                <option value={FILTRE_STATUT_ARCHIVE}>Archivés</option>
               </select>
             </div>
             <div>
@@ -522,12 +573,24 @@ export function PigeonsListPage() {
               </button>
             </div>
           ) : null}
+
+          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-3">
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              className="inline-flex items-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-sm font-medium text-teal-900 hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              aria-label="Exporter les pigeons affichés au format CSV"
+            >
+              <Download className="size-4 shrink-0" aria-hidden />
+              Exporter CSV (affichage actuel)
+            </button>
+          </div>
         </div>
       ) : null}
 
-      {loading ? (
+      {listLoading ? (
         <AppLoadingScreen variant="embedded" message="Chargement des pigeons…" subtitle="Récupération des données depuis Firestore." />
-      ) : pigeons.length === 0 ? (
+      ) : !hasAnyPigeon ? (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
           <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600">
             <Bird className="size-9" strokeWidth={1.5} aria-hidden />
@@ -578,7 +641,7 @@ export function PigeonsListPage() {
             </p>
           </div>
           {viewMode === 'grid' ? (
-        <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 p-3 sm:gap-4 sm:p-5 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((p) => {
             const photoSrc = getPigeonDisplayPhotoSrc(p)
             return (
@@ -614,6 +677,9 @@ export function PigeonsListPage() {
                     <p className="truncate text-base font-medium text-slate-800">{p.nom}</p>
                     <p className="truncate text-sm text-slate-600">{p.race}</p>
                     <p className="text-xs text-slate-500">{p.sexe === 'MALE' ? 'Mâle' : 'Femelle'}</p>
+                    <div className="mt-1.5">
+                      <PigeonCoupleBadge pigeon={p} pigeonIdsEnCouplesActifs={pigeonIdsEnCouplesActifs} />
+                    </div>
                   </div>
                   <div className="mt-auto space-y-2 border-t border-slate-100 pt-3">
                     <Link
@@ -640,8 +706,8 @@ export function PigeonsListPage() {
           })}
         </div>
           ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+        <div className="overflow-x-auto md:overflow-x-visible">
+          <table className="w-full min-w-[720px] divide-y divide-slate-200 text-left text-sm md:min-w-0">
             <thead className="bg-slate-50 text-slate-600">
               <tr>
                 <th scope="col" className="w-14 px-2 py-3 font-medium">
@@ -658,6 +724,9 @@ export function PigeonsListPage() {
                 </th>
                 <th scope="col" className="px-4 py-3 font-medium">
                   Race
+                </th>
+                <th scope="col" className="px-4 py-3 font-medium">
+                  Couples
                 </th>
                 <th scope="col" className="px-4 py-3 font-medium">
                   Statut
@@ -706,6 +775,9 @@ export function PigeonsListPage() {
                     <td className="px-4 py-3 text-slate-800">{p.nom}</td>
                     <td className="px-4 py-3 text-slate-600">{p.sexe === 'MALE' ? 'Mâle' : 'Femelle'}</td>
                     <td className="px-4 py-3 text-slate-600">{p.race}</td>
+                    <td className="px-4 py-3 align-middle">
+                      <PigeonCoupleBadge pigeon={p} pigeonIdsEnCouplesActifs={pigeonIdsEnCouplesActifs} />
+                    </td>
                     <td className="relative max-w-[11rem] overflow-visible px-4 py-3 align-middle">
                       <PigeonStatutSelect
                         pigeon={p}
@@ -804,12 +876,16 @@ export function PigeonsListPage() {
       >
         <div className="border-b border-slate-100 px-4 py-3">
           <h2 id="delete-pigeon-title" className="text-lg font-semibold">
-            Retirer ce pigeon ?
+            Archiver ce pigeon ?
           </h2>
         </div>
         {pendingDelete ? (
           <p className="px-5 py-3 text-sm text-slate-800">
             <span className="font-mono font-medium">{pendingDelete.matricule}</span> — {pendingDelete.nom}
+            <span className="mt-2 block text-xs text-slate-600">
+              Il disparaît de l’effectif mais reste en base (traçabilité, généalogie). Tu pourras le revoir avec le
+              filtre Statut « Archivés ».
+            </span>
           </p>
         ) : null}
         <div className="flex justify-end gap-2 border-t border-slate-100 px-4 py-3">
@@ -825,7 +901,7 @@ export function PigeonsListPage() {
             className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
             onClick={confirmDelete}
           >
-            Retirer de l’effectif
+            Archiver
           </button>
         </div>
       </dialog>

@@ -10,10 +10,11 @@ export default function CoupleStackLayout() {
         headerStyle: { backgroundColor: theme.white },
         headerShadowVisible: true,
         headerTitleStyle: { color: theme.slate900, fontWeight: '700' },
-        contentStyle: { backgroundColor: theme.slate50 },
+        contentStyle: { backgroundColor: 'transparent' },
       }}
     >
       <Stack.Screen name="nouveau" options={{ title: 'Nouveau couple' }} />
+      <Stack.Screen name="[coupleId]" options={{ title: 'Fiche couple' }} />
     </Stack>
   );
 }

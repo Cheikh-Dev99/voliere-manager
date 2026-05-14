@@ -46,7 +46,15 @@ export default defineConfig(({ mode }) => {
     'process.env.VITE_FIREBASE_APP_ID': JSON.stringify(env.VITE_FIREBASE_APP_ID ?? ''),
   }
 
+  /** GitHub Pages : ex. `VITE_BASE=/voliere-manager/` dans `.env.production` (slash initial obligatoire, slash final recommandé). */
+  const rawBase = (env.VITE_BASE ?? '').trim()
+  const base =
+    !rawBase || rawBase === '/'
+      ? '/'
+      : `${rawBase.startsWith('/') ? '' : '/'}${rawBase.replace(/\/+$/, '')}/`
+
   return {
+  base,
   plugins: [
     tailwindcss(),
     react(),

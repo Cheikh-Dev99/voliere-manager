@@ -24,6 +24,8 @@ export const theme = {
   red600: '#dc2626',
   border: '#e2e8f0',
   screenPadding: 16,
+  /** Hauteur minimale recommandée pour cibles tactiles (accessibilité). */
+  minTap: 44,
   radiusLg: 14,
   radiusMd: 10,
   radiusSm: 8,

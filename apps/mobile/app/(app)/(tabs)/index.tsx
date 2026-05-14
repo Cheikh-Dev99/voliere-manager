@@ -1,32 +1,28 @@
-import { useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Home, LayoutGrid, Plus } from 'lucide-react-native';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useNavigation, useRouter } from 'expo-router';
+import { Home, LayoutGrid, X } from 'lucide-react-native';
 
 import type { Cage, Couple, Pigeon } from '@shared/types';
 import { useCages } from '@shared/hooks/useCages';
 import { useCouples } from '@shared/hooks/useCouples';
 import { usePigeons } from '@shared/hooks/usePigeons';
+import { creerCoupleParGlissement } from '@shared/services/couplesService';
 import {
   cageMatchesQuery,
   compareCages,
 } from '@shared/utils/voliereCageList';
 
+import { appFeedback } from '../../../lib/appFeedback';
+import { CageGridCell } from '../../../components/cages/CageGridCell';
 import { EmptyStateCard } from '../../../components/layout/EmptyStateCard';
 import { PageHeader } from '../../../components/layout/PageHeader';
-import { PrimaryButton } from '../../../components/ui/PrimaryButton';
+import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
+import { MobileLabeledSelect } from '../../../components/ui/MobileLabeledSelect';
 import { SearchField } from '../../../components/ui/SearchField';
+import { AppLoadingView } from '../../../components/ui/AppLoadingView';
+import { theme } from '../../../constants/theme';
 import { useMergedVoliereCodes } from '../../../hooks/useMergedVoliereCodes';
-import { theme, shadowCard } from '../../../constants/theme';
 
 const FILTRES: { id: string; label: string }[] = [
   { id: 'ALL', label: 'Toutes' },
@@ -35,47 +31,9 @@ const FILTRES: { id: string; label: string }[] = [
   { id: 'OCCUPE_COUPLE', label: 'Couples' },
 ];
 
-const STATUT_STYLE: Record<string, { bg: string; border: string; text: string; dot: string }> = {
-  LIBRE: { bg: theme.emerald50, border: '#a7f3d0', text: theme.emerald900, dot: '#22c55e' },
-  OCCUPE_PIGEON: { bg: theme.rose50, border: '#fecdd3', text: theme.rose900, dot: '#f43f5e' },
-  OCCUPE_COUPLE: { bg: theme.amber50, border: '#fde68a', text: theme.amber950, dot: '#f59e0b' },
-};
-
-function CageCard({
-  cage,
-  subtitle,
-  onPress,
-}: {
-  cage: Cage;
-  subtitle: string;
-  onPress: () => void;
-}) {
-  const st = STATUT_STYLE[cage.statut] ?? STATUT_STYLE.LIBRE;
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: st.bg, borderColor: st.border },
-        shadowCard,
-        pressed && styles.cardPressed,
-      ]}
-      accessibilityRole="button"
-      accessibilityLabel={`Cage ${cage.numero}`}
-    >
-      <View style={styles.cardTop}>
-        <Text style={styles.cardNum}>{cage.numero}</Text>
-        <View style={[styles.statusDot, { backgroundColor: st.dot }]} />
-      </View>
-      <Text style={[styles.cardSub, { color: st.text }]} numberOfLines={3}>
-        {subtitle}
-      </Text>
-    </Pressable>
-  );
-}
-
 export default function VoliereTabScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { cages, loading: lc, error: ec } = useCages();
   const { pigeons, loading: lp } = usePigeons(true);
   const { couples, loading: lco } = useCouples(false);
@@ -83,10 +41,22 @@ export default function VoliereTabScreen() {
   const [voliereCode, setVoliereCode] = useState('A');
   const [filtre, setFiltre] = useState('ALL');
   const [query, setQuery] = useState('');
+  const [couplePickOpen, setCouplePickOpen] = useState(false);
+  const [couplePickSourcePid, setCouplePickSourcePid] = useState<string | null>(null);
+  const [couplePickTargets, setCouplePickTargets] = useState<Cage[]>([]);
+  const [coupleSubmitting, setCoupleSubmitting] = useState(false);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => <TabHeaderTitle Icon={Home} label={`Volière ${voliereCode}`} />,
+    });
+  }, [navigation, voliereCode]);
 
   const pigeonById = useMemo(() => {
     const m = new Map<string, Pigeon>();
-    pigeons.forEach((p) => m.set(p.id, p));
+    pigeons.forEach((p) => {
+      m.set(p.id, p);
+    });
     return m;
   }, [pigeons]);
 
@@ -114,7 +84,45 @@ export default function VoliereTabScreen() {
     return m;
   }, [couples, pigeonById]);
 
+  const pigeonDansCoupleActif = useMemo(() => {
+    const s = new Set<string>();
+    for (const c of couples) {
+      if (c.statut !== 'ACTIF') continue;
+      s.add(c.maleId);
+      s.add(c.femelleId);
+    }
+    return s;
+  }, [couples]);
+
+  const canDropPourCouple = useCallback(
+    (dragId: string, cage: Cage) => {
+      if (!dragId || !cage || cage.statut !== 'OCCUPE_PIGEON' || !cage.pigeonId) return false;
+      if (dragId === cage.pigeonId) return false;
+      const a = pigeonById.get(dragId);
+      const b = pigeonById.get(cage.pigeonId);
+      if (!a || !b) return false;
+      if (a.statut !== 'ACTIF' || b.statut !== 'ACTIF') return false;
+      if (a.sexe === b.sexe) return false;
+      if (pigeonDansCoupleActif.has(dragId) || pigeonDansCoupleActif.has(cage.pigeonId)) return false;
+      return true;
+    },
+    [pigeonById, pigeonDansCoupleActif],
+  );
+
   const codesVoliere = useMergedVoliereCodes();
+
+  const voliereSelectOptions = useMemo(
+    () =>
+      codesVoliere.length > 0
+        ? codesVoliere.map((code) => ({ value: code, label: `Volière ${code}` }))
+        : [{ value: 'A', label: 'Volière A' }],
+    [codesVoliere],
+  );
+
+  const filtreSelectOptions = useMemo(
+    () => FILTRES.map((f) => ({ value: f.id, label: f.label })),
+    [],
+  );
 
   useEffect(() => {
     if (codesVoliere.length === 0) return;
@@ -136,40 +144,75 @@ export default function VoliereTabScreen() {
     );
   }, [cages, voliereCode, filtre, qNorm, pigeonById, coupleById, maleByCouple, femelleByCouple]);
 
-  function subtitleFor(cage: Cage): string {
-    if (cage.statut === 'LIBRE') return 'Libre';
-    if (cage.statut === 'OCCUPE_PIGEON' && cage.pigeonId) {
-      const p = pigeonById.get(cage.pigeonId);
-      return p ? `1 pigeon\n${p.matricule} · ${p.nom}` : '1 pigeon';
-    }
-    if (cage.statut === 'OCCUPE_COUPLE' && cage.coupleId) {
-      const cp = coupleById.get(cage.coupleId);
-      if (!cp) return 'Couple (2 pigeons)';
-      const m = maleByCouple.get(cp.id);
-      const f = femelleByCouple.get(cp.id);
-      if (m && f) return `2 pigeons\n${m.matricule} · ${f.matricule}\n${m.nom} / ${f.nom}`;
-      return 'Couple (2 pigeons)';
-    }
-    return cage.statut;
-  }
-
-  const cellW = useMemo(() => {
-    const w = Dimensions.get('window').width;
-    const pad = theme.screenPadding * 2;
-    return (w - pad - 10) / 2;
-  }, []);
-
   const loading = lc || lp || lco;
   const err = ec;
   const count = rows.length;
 
+  const runCoupleMerge = useCallback(
+    async (sourcePid: string, target: Cage) => {
+      if (!canDropPourCouple(sourcePid, target)) return;
+      setCoupleSubmitting(true);
+      try {
+        await creerCoupleParGlissement({
+          pigeonGlissantId: sourcePid,
+          cageCibleId: target.id,
+        });
+        setCouplePickOpen(false);
+        setCouplePickSourcePid(null);
+        setCouplePickTargets([]);
+        appFeedback.alert('Succès', 'Couple créé — la cage cible affiche maintenant le couple.');
+      } catch (e) {
+        appFeedback.alert('Erreur', e instanceof Error ? e.message : 'Impossible de créer le couple');
+      } finally {
+        setCoupleSubmitting(false);
+      }
+    },
+    [canDropPourCouple],
+  );
+
+  const onDragHandleForCage = useCallback(
+    (cage: Cage) => {
+      const pid = cage.pigeonId;
+      if (!pid || cage.statut !== 'OCCUPE_PIGEON') return;
+      const targets = rows.filter((c) => canDropPourCouple(pid, c));
+      if (targets.length === 0) {
+        appFeedback.alert(
+          'Aucune cible',
+          'Aucune autre cage sur cet écran avec un pigeon seul du sexe opposé et libre (non déjà en couple). Utilise le filtre « Toutes » ou change de volière si besoin.',
+        );
+        return;
+      }
+      if (targets.length === 1) {
+        const t = targets[0]!;
+        const src = pigeonById.get(pid);
+        const other = t.pigeonId ? pigeonById.get(t.pigeonId) : null;
+        appFeedback.alert(
+          'Former un couple',
+          `Fusionner ${src?.matricule ?? '…'} avec la cage ${t.numero} (${other?.matricule ?? '…'}) ?`,
+          [
+            { text: 'Annuler', style: 'cancel' },
+            { text: 'Confirmer', onPress: () => void runCoupleMerge(pid, t) },
+          ],
+        );
+        return;
+      }
+      setCouplePickSourcePid(pid);
+      setCouplePickTargets(targets);
+      setCouplePickOpen(true);
+    },
+    [rows, canDropPourCouple, pigeonById, runCoupleMerge],
+  );
+
+  const closeCouplePickModal = useCallback(() => {
+    if (coupleSubmitting) return;
+    setCouplePickOpen(false);
+    setCouplePickSourcePid(null);
+    setCouplePickTargets([]);
+  }, [coupleSubmitting]);
+
   const listHeader = (
     <View style={styles.headerBlock}>
-      <PageHeader
-        title={`Volière ${voliereCode}`}
-        titleAccessory={<Home size={26} color={theme.teal700} strokeWidth={2.2} />}
-        description="Légende : vert libre, rose occupée (1 pigeon), ambre couple. Création de couples : onglet Couples, menu Navigation, ou fiches cage."
-      >
+      <PageHeader description="Légende : vert libre, rose occupée (1 pigeon), ambre couple. Couple rapide : touche la poignée sur une cage « 1 pigeon » — une cible compatible ouvre une confirmation ; plusieurs cibles ouvrent une liste. Nouvelle cage : onglet Cages, bouton + en bas à droite.">
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#22c55e' }]} />
@@ -189,29 +232,22 @@ export default function VoliereTabScreen() {
             ? `Aucune cage dans la volière ${voliereCode}`
             : `${count} cage${count > 1 ? 's' : ''} dans la volière ${voliereCode}`}
         </Text>
-        <PrimaryButton
-          label="+ Nouvelle cage pour cette volière"
-          icon={<Plus size={20} color={theme.white} strokeWidth={2.5} />}
-          onPress={() =>
-            router.push({ pathname: '/(app)/cage/nouveau', params: { voliere: voliereCode } })
-          }
-        />
       </PageHeader>
 
-      <Text style={styles.fieldLab}>Choisir la volière</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsScroll}>
-        {codesVoliere.map((code) => (
-          <Pressable
-            key={code}
-            onPress={() => setVoliereCode(code)}
-            style={[styles.chip, voliereCode === code && styles.chipOn]}
-          >
-            <Text style={[styles.chipTxt, voliereCode === code && styles.chipTxtOn]}>
-              Volière {code}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+      <View style={styles.filtersRow}>
+        <MobileLabeledSelect
+          label="Volière"
+          options={voliereSelectOptions}
+          value={voliereCode}
+          onChange={setVoliereCode}
+        />
+        <MobileLabeledSelect
+          label="Vue"
+          options={filtreSelectOptions}
+          value={filtre}
+          onChange={setFiltre}
+        />
+      </View>
 
       <Text style={[styles.fieldLab, { marginTop: 12 }]}>Recherche</Text>
       <SearchField
@@ -219,19 +255,6 @@ export default function VoliereTabScreen() {
         onChangeText={setQuery}
         placeholder="Rechercher par n° cage, nom, description…"
       />
-
-      <Text style={[styles.fieldLab, { marginTop: 12 }]}>Occupation</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsScroll}>
-        {FILTRES.map((f) => (
-          <Pressable
-            key={f.id}
-            onPress={() => setFiltre(f.id)}
-            style={[styles.chip, filtre === f.id && styles.chipOn]}
-          >
-            <Text style={[styles.chipTxt, filtre === f.id && styles.chipTxtOn]}>{f.label}</Text>
-          </Pressable>
-        ))}
-      </ScrollView>
     </View>
   );
 
@@ -239,51 +262,122 @@ export default function VoliereTabScreen() {
     <View style={styles.root}>
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.teal700} />
-          <Text style={styles.muted}>Chargement de la volière…</Text>
+          <AppLoadingView
+            variant="embedded"
+            loadingContext="cages"
+            message="Chargement de la volière…"
+            subtitle="Grille, occupants et couples."
+          />
         </View>
       ) : err ? (
         <Text style={styles.err}>{err}</Text>
       ) : (
-        <FlatList
-          data={rows}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.colWrap}
-          contentContainerStyle={styles.listPad}
-          ListHeaderComponent={
-            <>
-              {listHeader}
-              {!rows.length ? (
-                <EmptyStateCard
-                  icon={<LayoutGrid size={28} color={theme.teal700} strokeWidth={2} />}
-                  title={`Aucune cage pour cette volière (${voliereCode}).`}
-                  hint="Crée une ou plusieurs cages (y compris par lot) avec le bouton ci-dessus. Tu peux aussi changer de code volière."
-                  primaryLabel="+ Nouvelle cage pour cette volière"
-                  onPrimaryPress={() =>
-                    router.push({ pathname: '/(app)/cage/nouveau', params: { voliere: voliereCode } })
-                  }
-                />
-              ) : null}
-            </>
-          }
-          renderItem={({ item }) => (
-            <View style={{ width: cellW, marginBottom: 12 }}>
-              <CageCard
+        <Fragment>
+          <FlatList
+            data={rows}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            columnWrapperStyle={styles.gridRow}
+            contentContainerStyle={styles.list}
+            removeClippedSubviews={false}
+            keyboardShouldPersistTaps="handled"
+            ListHeaderComponent={
+              <Fragment>
+                {listHeader}
+                {!rows.length ? (
+                  <EmptyStateCard
+                    icon={<LayoutGrid size={28} color={theme.teal700} strokeWidth={2} />}
+                    title={`Aucune cage pour cette volière (${voliereCode}).`}
+                    hint="Va dans l’onglet Cages et touche le bouton + en bas à droite pour créer une cage (y compris par lot). Tu peux aussi changer de code volière dans l’en-tête."
+                  />
+                ) : null}
+              </Fragment>
+            }
+            renderItem={({ item }) => {
+            const pigeon = item.pigeonId ? pigeonById.get(item.pigeonId) ?? null : null;
+            const couple = item.coupleId ? coupleById.get(item.coupleId) ?? null : null;
+            const male = couple ? pigeonById.get(couple.maleId) ?? null : null;
+            const femelle = couple ? pigeonById.get(couple.femelleId) ?? null : null;
+            return (
+              <CageGridCell
                 cage={item}
-                subtitle={subtitleFor(item)}
-                onPress={() => router.push(`/(app)/cage/${item.id}`)}
+                pigeon={pigeon}
+                male={male}
+                femelle={femelle}
+                onPress={() => {
+                  if (coupleSubmitting) return;
+                  router.push(`/(app)/cage/${item.id}`);
+                }}
+                onDragHandlePress={
+                  item.statut === 'OCCUPE_PIGEON' && item.pigeonId
+                    ? () => {
+                        if (coupleSubmitting) return;
+                        onDragHandleForCage(item);
+                      }
+                    : undefined
+                }
               />
+            );
+          }}
+          />
+          <Modal visible={couplePickOpen} animationType="slide" transparent onRequestClose={closeCouplePickModal}>
+            <View style={styles.modalBackdrop}>
+              <View style={styles.modalCard}>
+                <View style={styles.modalHead}>
+                  <Text style={styles.modalTitle}>Cage cible pour le couple</Text>
+                  <Pressable onPress={closeCouplePickModal} accessibilityLabel="Fermer" hitSlop={12}>
+                    <X size={22} color={theme.slate600} />
+                  </Pressable>
+                </View>
+                <Text style={styles.modalHint}>
+                  Choisis la cage qui contient le pigeon du sexe opposé. Le pigeon que tu déplaces quittera sa cage
+                  actuelle.
+                </Text>
+                {coupleSubmitting ? (
+                  <AppLoadingView
+                    variant="inline"
+                    loadingContext="couples"
+                    message="Création du couple…"
+                    style={{ marginVertical: 16, alignSelf: 'center' }}
+                  />
+                ) : (
+                  <FlatList
+                    data={couplePickTargets}
+                    keyExtractor={(c) => c.id}
+                    style={{ maxHeight: 360 }}
+                    keyboardShouldPersistTaps="handled"
+                    renderItem={({ item: c }) => {
+                      const otherPid = c.pigeonId;
+                      const other = otherPid ? pigeonById.get(otherPid) : null;
+                      const srcPid = couplePickSourcePid;
+                      return (
+                        <Pressable
+                          style={styles.pickRow}
+                          onPress={() => {
+                            if (!srcPid) return;
+                            void runCoupleMerge(srcPid, c);
+                          }}
+                        >
+                          <Text style={styles.pickMat}>{c.numero}</Text>
+                          <Text style={styles.pickNom}>
+                            {other ? `${other.matricule} — ${other.nom}` : '—'}
+                          </Text>
+                        </Pressable>
+                      );
+                    }}
+                  />
+                )}
+              </View>
             </View>
-          )}
-        />
+          </Modal>
+        </Fragment>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: theme.slate50 },
+  root: { flex: 1, backgroundColor: 'transparent' },
   headerBlock: { paddingHorizontal: theme.screenPadding, paddingBottom: 8 },
   fieldLab: {
     fontSize: 13,
@@ -306,39 +400,51 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.slate800,
   },
-  chipsScroll: { marginBottom: 0 },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 20,
-    backgroundColor: theme.white,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  chipOn: { backgroundColor: theme.teal50, borderColor: theme.teal600 },
-  chipTxt: { color: theme.slate700, fontWeight: '600', fontSize: 13 },
-  chipTxtOn: { color: theme.teal900 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  muted: { marginTop: 8, color: theme.slate500, textAlign: 'center' },
-  err: { color: theme.red600, padding: 16, textAlign: 'center' },
-  listPad: { paddingBottom: 32, paddingTop: 4 },
-  colWrap: { justifyContent: 'space-between', paddingHorizontal: theme.screenPadding },
-  card: {
-    flex: 1,
-    borderRadius: theme.radiusLg,
-    borderWidth: 1,
-    padding: 12,
-    minHeight: 100,
-  },
-  cardPressed: { opacity: 0.94 },
-  cardTop: {
+  filtersRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'nowrap',
+    width: '100%',
+    gap: 10,
+    alignItems: 'flex-start',
+    marginTop: 4,
+  },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  err: { color: theme.red600, padding: 16, textAlign: 'center' },
+  list: {
+    paddingHorizontal: theme.screenPadding,
+    /** Marge basse sans FAB : évite que la dernière ligne soit masquée par la barre d’onglets. */
+    paddingBottom: 80,
+    paddingTop: 4,
+  },
+  gridRow: { gap: 10, marginBottom: 10, justifyContent: 'space-between' },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    justifyContent: 'flex-end',
+  },
+  modalCard: {
+    backgroundColor: theme.white,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 28,
+    maxHeight: '85%',
+  },
+  modalHead: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
-  cardNum: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
-  statusDot: { width: 10, height: 10, borderRadius: 5 },
-  cardSub: { fontSize: 12, fontWeight: '600', lineHeight: 17 },
+  modalTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
+  modalHint: { fontSize: 13, color: theme.slate600, lineHeight: 18, marginBottom: 12 },
+  pickRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.border,
+  },
+  pickMat: { fontSize: 16, fontWeight: '700', color: theme.slate900 },
+  pickNom: { fontSize: 13, color: theme.slate600, marginTop: 4 },
 });

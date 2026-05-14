@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { obtenirPigeon } from '@shared/services/pigeonsService';
 import type { Pigeon } from '@shared/types';
 
+import { PigeonPhotoAvatar } from '../../../../components/pigeons/PigeonPhotoAvatar';
+import { AppLoadingView } from '../../../../components/ui/AppLoadingView';
 import { theme } from '../../../../constants/theme';
 import { formatFirestoreDate } from '../../../../utils/formatDate';
 
@@ -67,8 +62,12 @@ export default function PigeonDetailScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.teal700} />
-        <Text style={styles.muted}>Chargement…</Text>
+        <AppLoadingView
+          variant="embedded"
+          loadingContext="default"
+          message="Chargement du pigeon…"
+          subtitle="Fiche, parents et statut."
+        />
       </View>
     );
   }
@@ -86,6 +85,9 @@ export default function PigeonDetailScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
+      <View style={styles.photoWrap}>
+        <PigeonPhotoAvatar pigeon={pigeon} size="lg" circle />
+      </View>
       <Text style={styles.mat}>{pigeon.matricule}</Text>
       <Text style={styles.nom}>{pigeon.nom}</Text>
       <View style={styles.pillRow}>
@@ -117,6 +119,17 @@ export default function PigeonDetailScreen() {
         </Pressable>
       </View>
 
+      {pigeon.statut === 'ACTIF' ? (
+        <View style={styles.actions}>
+          <Pressable
+            style={styles.actionBtnSecondary}
+            onPress={() => router.push({ pathname: '/sortie/nouveau', params: { pigeon: pigeon.id } })}
+          >
+            <Text style={styles.actionTxtSecondary}>Sortie (vente, décès…)</Text>
+          </Pressable>
+        </View>
+      ) : null}
+
       <View style={styles.actions}>
         <Pressable
           style={styles.actionBtn}
@@ -147,7 +160,7 @@ function Row({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   scroll: { padding: 16, paddingBottom: 40 },
-  muted: { marginTop: 8, color: theme.slate500 },
+  photoWrap: { alignItems: 'center', marginBottom: 16 },
   err: { color: theme.red600, marginBottom: 12, textAlign: 'center' },
   backBtn: { padding: 12 },
   backTxt: { color: theme.teal700, fontWeight: '700', fontSize: 15 },

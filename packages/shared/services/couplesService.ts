@@ -482,3 +482,18 @@ export const rompreCouple = async (coupleId: string): Promise<RompreCoupleResult
     return { restoredMale, restoredFemelle, skipped }
   })
 }
+
+/**
+ * Charge un couple par id (lecture seule).
+ */
+export async function obtenirCouple(coupleId: string): Promise<Couple | null> {
+  const ownerUid = requireOwnerUid();
+  const ref = doc(db, COLLECTIONS.COUPLES, coupleId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  const row = { id: snap.id, ...(snap.data() as Omit<Couple, 'id'>) } as Couple;
+  if (row.ownerUid && row.ownerUid !== ownerUid) {
+    throw new Error('Ce couple n’appartient pas à ton compte.');
+  }
+  return row;
+}

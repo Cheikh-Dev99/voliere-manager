@@ -304,7 +304,7 @@ export function CageDetailPanel({
 
   return (
     <>
-      <aside className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-xl md:static md:max-w-sm md:shadow-none lg:max-w-md">
+      <aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-xl md:static md:max-w-sm md:shadow-none lg:max-w-md">
         <div className="shrink-0 border-b border-slate-100">
           <div className="flex items-center justify-between px-4 py-3">
             <h2 className="text-lg font-semibold text-slate-900">{titre}</h2>

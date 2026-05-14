@@ -503,8 +503,8 @@ export function CouplesListPage() {
               Cliquez sur un matricule pour ouvrir la fiche pigeon.
             </p>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+          <div className="overflow-x-auto md:overflow-x-visible">
+            <table className="w-full min-w-[640px] divide-y divide-slate-200 text-left text-sm md:min-w-0">
               <thead className="border-b border-slate-200 bg-slate-100/90 text-xs font-semibold uppercase tracking-wide text-slate-600">
                 <tr>
                   <th scope="col" className="whitespace-nowrap px-4 py-3.5">

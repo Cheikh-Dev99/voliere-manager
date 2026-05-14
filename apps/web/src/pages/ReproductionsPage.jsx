@@ -329,8 +329,8 @@ export function ReproductionsPage() {
               </button>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-              <table className="min-w-full text-left text-sm">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm md:overflow-x-visible">
+              <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
                 <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
                   <tr>
                     <th className="px-4 py-3">Date ponte</th>

@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
   Modal,
   Platform,
   Pressable,
@@ -23,7 +21,9 @@ import {
 import { ReproductionSchema } from '@shared/validators/schemas';
 import type { Couple, Pigeon } from '@shared/types';
 
+import { appFeedback } from '../../lib/appFeedback';
 import { theme } from '../../constants/theme';
+import { AppLoadingView } from '../ui/AppLoadingView';
 
 type FormValues = {
   coupleId: string;
@@ -115,14 +115,14 @@ export function ReproductionFormScreen() {
       });
       if (!parsed.success) {
         const msg = parsed.error.issues[0]?.message ?? 'Données invalides';
-        Alert.alert('Formulaire', msg);
+        appFeedback.alert('Formulaire', msg);
         return;
       }
       const cp = couplesActifs.find((x) => x.id === parsed.data.coupleId);
       const male = cp ? pigeonById.get(cp.maleId) : null;
       const femelle = cp ? pigeonById.get(cp.femelleId) : null;
       if (!cp || !male || !femelle) {
-        Alert.alert('Erreur', 'Couple ou pigeons introuvables pour la validation.');
+        appFeedback.alert('Erreur', 'Couple ou pigeons introuvables pour la validation.');
         return;
       }
       try {
@@ -133,7 +133,7 @@ export function ReproductionFormScreen() {
           parsed.data.dateEclosion?.trim() ? new Date(`${parsed.data.dateEclosion.trim()}T12:00:00`) : null,
         );
       } catch (e) {
-        Alert.alert('Dates', e instanceof Error ? e.message : 'Dates incohérentes avec les fiches parents');
+        appFeedback.alert('Dates', e instanceof Error ? e.message : 'Dates incohérentes avec les fiches parents');
         return;
       }
       try {
@@ -147,11 +147,11 @@ export function ReproductionFormScreen() {
           nombrePigeonneaux: parsed.data.nombrePigeonneaux,
           notes: parsed.data.notes ?? '',
         });
-        Alert.alert('Succès', 'Reproduction enregistrée.', [
+        appFeedback.alert('Succès', 'Reproduction enregistrée.', [
           { text: 'OK', onPress: () => router.replace('/(app)/(tabs)/reproductions') },
         ]);
       } catch (e) {
-        Alert.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
+        appFeedback.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
       }
     },
     [couplesActifs, pigeonById, router],
@@ -162,8 +162,12 @@ export function ReproductionFormScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.teal700} />
-        <Text style={styles.muted}>Chargement…</Text>
+        <AppLoadingView
+          variant="embedded"
+          loadingContext="reproduction"
+          message="Chargement du formulaire…"
+          subtitle="Couples et pigeons."
+        />
       </View>
     );
   }
@@ -287,7 +291,6 @@ export function ReproductionFormScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  muted: { marginTop: 8, color: theme.slate500 },
   scroll: { padding: theme.screenPadding, paddingBottom: 40 },
   h1: { fontSize: 22, fontWeight: '800', color: theme.slate900 },
   lead: { fontSize: 14, color: theme.slate600, marginTop: 8, marginBottom: 16, lineHeight: 20 },

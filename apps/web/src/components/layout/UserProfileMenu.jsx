@@ -132,11 +132,11 @@ export function UserProfileMenu() {
   const elevage = (profile?.nomElevage ?? '').trim() || 'Ma volière'
 
   return (
-    <div className="relative flex w-full shrink-0 sm:w-auto" ref={wrapRef}>
+    <div className="relative flex min-w-0 shrink-0 max-w-[min(13rem,42vw)] sm:max-w-none sm:w-auto" ref={wrapRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition-colors hover:border-teal-200 hover:bg-teal-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:ring-offset-2 sm:min-w-[12rem] sm:justify-start"
+        className="inline-flex w-full max-w-full items-center justify-between gap-2 rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition-colors hover:border-teal-200 hover:bg-teal-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:ring-offset-2 sm:min-w-[12rem] sm:justify-start"
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-controls="user-profile-panel"
@@ -151,7 +151,7 @@ export function UserProfileMenu() {
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate font-semibold text-slate-900">{nameLine}</span>
-            <span className="block truncate text-xs font-normal text-slate-500">{elevage}</span>
+            <span className="hidden max-w-full truncate text-xs font-normal text-slate-500 sm:block">{elevage}</span>
           </span>
         </span>
         <ChevronDown

@@ -10,12 +10,12 @@ export default function CageStackLayout() {
         headerStyle: { backgroundColor: theme.white },
         headerShadowVisible: true,
         headerTitleStyle: { color: theme.slate900, fontWeight: '700' },
-        contentStyle: { backgroundColor: theme.slate50 },
+        contentStyle: { backgroundColor: 'transparent' },
       }}
     >
       <Stack.Screen name="nouveau" options={{ title: 'Nouvelle cage' }} />
       <Stack.Screen name="edit/[cageId]" options={{ title: 'Modifier la cage' }} />
-      <Stack.Screen name="[cageId]" options={{ title: 'Détail cage' }} />
+      <Stack.Screen name="[cageId]" options={{ headerShown: false, title: 'Cage' }} />
     </Stack>
   );
 }

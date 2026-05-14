@@ -10,7 +10,7 @@ import {
 import { db } from '../firebase/config';
 import { requireOwnerUid } from '../firebase/requireOwnerUid';
 import { COLLECTIONS } from '../firebase/collections';
-import type { Couple, Pigeon, ReproductionFormData } from '../types';
+import type { Couple, Pigeon, Reproduction, ReproductionFormData } from '../types';
 
 /** Comparaison au jour calendaire (UTC) pour dates métier saisies en local. */
 function calendarDayUtcMs(d: Date): number {
@@ -154,3 +154,18 @@ export const ajouterPigeonneau = async (reproductionId: string, pigeonneauId: st
     pigeonneauxIds: ids,
   });
 };
+
+/**
+ * Charge une reproduction par id (lecture seule).
+ */
+export async function obtenirReproduction(reproductionId: string): Promise<Reproduction | null> {
+  const ownerUid = requireOwnerUid();
+  const ref = doc(db, COLLECTIONS.REPRODUCTIONS, reproductionId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  const row = { id: snap.id, ...(snap.data() as Omit<Reproduction, 'id'>) } as Reproduction;
+  if (row.ownerUid && row.ownerUid !== ownerUid) {
+    throw new Error('Cette reproduction n’appartient pas à ton compte.');
+  }
+  return row;
+}
