@@ -24,7 +24,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "sn.bakeli.voliere.manager"
+      "package": "sn.bakeli.voliere.manager",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -40,6 +43,13 @@
         }
       ],
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5e5e5f33-7ddc-44b3-9479-e726806b0e9a"
+      }
+    },
+    "owner": "cheikhdev99"
   }
 }
