@@ -23,12 +23,11 @@ export function CoupleFormPage() {
   const navigate = useNavigate()
   const { pigeons, loading: loadPigeons } = usePigeons(false)
   const { cages, loading: loadCages } = useCages()
-  const { couples, loading: loadCouples } = useCouples(false)
+  const { couples, loading: loadCouples } = useCouples(true)
 
   const idsDansCoupleActif = useMemo(() => {
     const s = new Set()
     for (const c of couples) {
-      if (c.statut !== 'ACTIF') continue
       s.add(c.maleId)
       s.add(c.femelleId)
     }

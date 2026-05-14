@@ -77,7 +77,7 @@ export default function PigeonsTabScreen() {
     });
   }, [navigation]);
   const { pigeons, archivedPigeons, loading, error, stats } = usePigeons(false);
-  const { couples, loading: couplesLoading, error: couplesError } = useCouples(false);
+  const { couples, loading: couplesLoading, error: couplesError } = useCouples(true);
   const listLoading = loading || couplesLoading;
   const listError = error ?? couplesError;
 

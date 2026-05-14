@@ -1,23 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import {
-  Bird,
-  ChevronDown,
-  Heart,
-  LayoutGrid,
-  Loader2,
-  LogOut,
-  MapPinned,
-  PencilLine,
-  Save,
-  UserRound,
-  X,
-} from 'lucide-react'
-import { usePigeons } from '@shared/hooks/usePigeons'
+import { ChevronDown, Loader2, LogOut, Maximize2, PencilLine, Save, UserRound, X } from 'lucide-react'
 import { useCages } from '@shared/hooks/useCages'
-import { useCouples } from '@shared/hooks/useCouples'
 import { useUserProfile } from '@shared/hooks/useUserProfile'
-import { mergeProfileVoliereCodesWithCages } from '@shared/utils/voliereCodesMerge'
+import { ElevageStatsSection } from '../profile/ElevageStatsSection'
 import { VoliereCodesPanel } from '../settings/VoliereCodesPanel'
 import { updateUserProfile } from '@shared/services/usersProfileService'
 import useAuthStore from '../../stores/authStore'
@@ -54,9 +41,7 @@ export function UserProfileMenu() {
   const email = user?.email ?? ''
 
   const { profile, loading: profileLoading } = useUserProfile(email)
-  const { pigeons, loading: lp } = usePigeons(false)
   const { cages, loading: lc } = useCages()
-  const { couples, loading: lco } = useCouples(false)
 
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -66,14 +51,6 @@ export function UserProfileMenu() {
   const [draftNom, setDraftNom] = useState('')
   const [draftElevage, setDraftElevage] = useState('')
   const wrapRef = useRef(null)
-
-  const couplesActifs = useMemo(() => couples.filter((c) => c.statut === 'ACTIF').length, [couples])
-  const nbVolieres = useMemo(
-    () => mergeProfileVoliereCodesWithCages(profile?.voliereCodes, cages).length,
-    [profile?.voliereCodes, cages],
-  )
-
-  const statsLoading = lp || lc || lco
 
   useEffect(() => {
     if (!profile) return
@@ -168,26 +145,39 @@ export function UserProfileMenu() {
           className="absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-[min(32rem,85vh)] w-[min(22rem,calc(100vw-1.5rem))] origin-top-right overflow-y-auto rounded-2xl border border-slate-200/90 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/[0.06]"
         >
           <div className="border-b border-slate-100 bg-gradient-to-br from-teal-600 via-teal-600 to-teal-700 px-4 py-4 text-white">
-            <div className="flex items-start gap-3">
-              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white/15 text-lg font-bold shadow-inner ring-1 ring-white/20">
-                {inn}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex min-w-0 flex-1 items-start gap-3">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white/15 text-lg font-bold shadow-inner ring-1 ring-white/20">
+                  {inn}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold leading-snug">{nameLine}</p>
+                  <p className="mt-0.5 truncate text-sm text-teal-100">{elevage}</p>
+                  <p className="mt-2 truncate text-xs text-teal-200/95">{email}</p>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-semibold leading-snug">{nameLine}</p>
-                <p className="mt-0.5 truncate text-sm text-teal-100">{elevage}</p>
-                <p className="mt-2 truncate text-xs text-teal-200/95">{email}</p>
-              </div>
+              <Link
+                to="/profil"
+                onClick={() => setOpen(false)}
+                className="shrink-0 rounded-lg bg-white/15 p-2 text-white ring-1 ring-white/25 transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                aria-label="Ouvrir le profil en plein écran"
+                title="Profil plein écran"
+              >
+                <Maximize2 className="size-4" aria-hidden />
+              </Link>
             </div>
           </div>
 
           <div className="space-y-3 px-3 py-3">
             <p className="px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Mon élevage</p>
-            <div className="grid grid-cols-2 gap-2">
-              <StatChip icon={Bird} label="Pigeons" value={statsLoading ? '…' : String(pigeons.length)} tone="slate" />
-              <StatChip icon={LayoutGrid} label="Cages" value={statsLoading ? '…' : String(cages.length)} tone="slate" />
-              <StatChip icon={MapPinned} label="Volières" value={statsLoading ? '…' : String(nbVolieres)} tone="teal" />
-              <StatChip icon={Heart} label="Couples actifs" value={statsLoading ? '…' : String(couplesActifs)} tone="rose" />
-            </div>
+            <ElevageStatsSection
+              cages={cages}
+              cagesLoading={lc}
+              profile={profile}
+              variant="menu"
+              maxTiles={4}
+              onNavigate={() => setOpen(false)}
+            />
           </div>
 
           <div className="border-t border-slate-100 px-3 py-3">
@@ -304,27 +294,6 @@ export function UserProfileMenu() {
           </div>
         </div>
       ) : null}
-    </div>
-  )
-}
-
-function StatChip({ icon: Icon, label, value, tone }) {
-  const ring =
-    tone === 'teal'
-      ? 'border-teal-100 bg-teal-50/80 text-teal-900'
-      : tone === 'rose'
-        ? 'border-rose-100 bg-rose-50/90 text-rose-950'
-        : 'border-slate-100 bg-slate-50 text-slate-900'
-  const iconCls =
-    tone === 'teal' ? 'text-teal-600' : tone === 'rose' ? 'text-rose-600' : 'text-slate-600'
-
-  return (
-    <div className={`flex flex-col rounded-xl border px-2.5 py-2 ${ring}`}>
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide opacity-80">
-        <Icon className={`size-3.5 shrink-0 ${iconCls}`} aria-hidden />
-        {label}
-      </div>
-      <p className="mt-1 tabular-nums text-xl font-bold leading-none">{value}</p>
     </div>
   )
 }

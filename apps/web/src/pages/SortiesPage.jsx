@@ -150,7 +150,7 @@ export function SortiesPage() {
 
   const { pigeons, pigeonsActifs, loading: loadPigeons } = usePigeons(false)
   const { cages, loading: loadCages } = useCages()
-  const { couples, loading: loadCouples } = useCouples(false)
+  const { couples, loading: loadCouples } = useCouples(true)
   const { sorties, loading: loadSorties, error: sortiesError, stats } = useSorties()
 
   const [query, setQuery] = useState('')
@@ -524,7 +524,7 @@ export function SortiesPage() {
                     → sera libérée
                   </li>
                 ) : (
-                  <li>Aucune cage en occupation « pigeon seul » pour ce matricule.</li>
+                  <li>Aucune cage avec un pigeon seul pour ce matricule.</li>
                 )}
                 {contexte.couple ? (
                   <>

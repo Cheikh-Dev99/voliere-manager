@@ -6,6 +6,10 @@ import type { Couple } from '../types';
 import { sortCouplesByDateDebutDesc } from './firestoreClientSort';
 import { useFirestoreUid } from './useFirestoreUid';
 
+/**
+ * Abonnement temps réel aux couples du compte.
+ * @param actifsSeulement Si `true`, ne conserve que les couples au statut ACTIF (en cours, non rompus).
+ */
 export const useCouples = (actifsSeulement = false) => {
   const uid = useFirestoreUid();
   const [couples, setCouples] = useState<Couple[]>([]);

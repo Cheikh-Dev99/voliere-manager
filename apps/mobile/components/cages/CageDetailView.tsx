@@ -18,6 +18,7 @@ import {
   History,
   LayoutGrid,
   MoveRight,
+  ScrollText,
   Unlock,
   UserPlus,
   X,
@@ -238,7 +239,7 @@ export function CageDetailView({ cage, onReload }: Props) {
       icon: <Egg size={16} color={theme.teal800} />,
       show: showReproductionTab,
     },
-    { id: 'history', label: 'Occupation', icon: <History size={16} color={theme.slate700} />, show: true },
+    { id: 'history', label: 'Historique', icon: <History size={16} color={theme.slate700} />, show: true },
   ];
 
   return (
@@ -477,8 +478,17 @@ export function CageDetailView({ cage, onReload }: Props) {
       {panelTab === 'history' ? (
         <View style={styles.panel}>
           <Text style={styles.help}>
-            Mouvements et affectations (pas le carnet santé). Aperçu des 40 derniers événements.
+            Mouvements et affectations (pas le carnet santé). Aperçu des 40 derniers événements. Ouvre l’écran dédié
+            pour jusqu’à 500 entrées, filtres et suppression.
           </Text>
+          <Pressable
+            style={[styles.historyFullBtn, busy && styles.opacityDim]}
+            onPress={() => router.push(`/(app)/cage/${cage.id}/historique`)}
+            disabled={busy}
+          >
+            <ScrollText size={18} color={theme.slate800} />
+            <Text style={styles.historyFullBtnTxt}>Afficher l’historique complet</Text>
+          </Pressable>
           {occError ? <Text style={styles.errTxt}>{occError}</Text> : null}
           {occLoading ? (
             <AppLoadingView
@@ -679,6 +689,20 @@ const styles = StyleSheet.create({
   editOutlineTxt: { fontSize: 15, fontWeight: '700', color: theme.slate800 },
   opacityDim: { opacity: 0.55 },
   help: { fontSize: 13, color: theme.slate600, lineHeight: 20, marginBottom: 12 },
+  historyFullBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: theme.radiusLg,
+    borderWidth: 2,
+    borderColor: theme.slate200,
+    backgroundColor: theme.white,
+  },
+  historyFullBtnTxt: { fontSize: 15, fontWeight: '700', color: theme.slate800 },
   linkRow: {
     paddingVertical: 14,
     paddingHorizontal: 12,

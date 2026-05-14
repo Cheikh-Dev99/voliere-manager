@@ -570,11 +570,11 @@ export function VolierePage() {
 
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             <div>
-              <label htmlFor="voliere-filter-occupation" className="mb-1 block text-xs font-medium text-slate-600">
-                Occupation
+              <label htmlFor="voliere-filter-situation" className="mb-1 block text-xs font-medium text-slate-600">
+                Situation des cages
               </label>
               <select
-                id="voliere-filter-occupation"
+                id="voliere-filter-situation"
                 value={filtre}
                 onChange={(e) => setFiltre(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"

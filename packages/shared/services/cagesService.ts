@@ -22,7 +22,7 @@ import { COLLECTIONS } from '../firebase/collections';
 import type { Cage, CageFormData, CageOccupancyEvent, CageOccupancyKind, Pigeon, Couple } from '../types';
 import { CageSchema } from '../validators/schemas';
 
-/** Sous-collection : `cages/{cageId}/evenements` — journal d’occupation. */
+/** Sous-collection : `cages/{cageId}/evenements` — historique des mouvements. */
 export const CAGE_OCCUPANCY_EVENTS = 'evenements' as const;
 
 function cageLabel(c: Pick<Cage, 'numero' | 'voliereCode'>): string {
@@ -36,7 +36,7 @@ function occupancyCol(cageId: string) {
 const FETCH_OCC_MAX = 1000;
 
 /**
- * Charge une page d’événements d’occupation (lecture seule), du plus récent au plus ancien.
+ * Charge une page d’événements d’historique cage (lecture seule), du plus récent au plus ancien.
  * Utile pour un modal « historique complet » sans multiplier les listeners temps réel.
  */
 export const fetchCageOccupancyEvents = async (
@@ -50,6 +50,36 @@ export const fetchCageOccupancyEvents = async (
     id: d.id,
     ...(d.data() as Omit<CageOccupancyEvent, 'id'>),
   }));
+};
+
+const DELETE_OCC_BATCH = 500;
+
+/** Supprime une entrée de l’historique (`cages/{cageId}/evenements/{eventId}`). */
+export const deleteCageOccupancyEvent = async (cageId: string, eventId: string): Promise<void> => {
+  requireOwnerUid();
+  await deleteDoc(doc(db, COLLECTIONS.CAGES, cageId, CAGE_OCCUPANCY_EVENTS, eventId));
+};
+
+/**
+ * Supprime toutes les entrées de l’historique des mouvements de la cage (par lots).
+ * @returns nombre de documents supprimés
+ */
+export const deleteAllCageOccupancyEvents = async (cageId: string): Promise<number> => {
+  requireOwnerUid();
+  let deleted = 0;
+  for (;;) {
+    const q = query(occupancyCol(cageId), limit(DELETE_OCC_BATCH));
+    const snap = await getDocs(q);
+    if (snap.empty) break;
+    const batch = writeBatch(db);
+    snap.docs.forEach((d) => {
+      batch.delete(d.ref);
+    });
+    await batch.commit();
+    deleted += snap.docs.length;
+    if (snap.docs.length < DELETE_OCC_BATCH) break;
+  }
+  return deleted;
 };
 
 type OccPayload = {

@@ -47,7 +47,7 @@ export function ReproductionFormScreen() {
   const { coupleId: coupleIdParam } = useLocalSearchParams<{ coupleId?: string }>();
   const coupleIdFromUrl = (Array.isArray(coupleIdParam) ? coupleIdParam[0] : coupleIdParam)?.trim() ?? '';
 
-  const { couples, loading: loadCouples } = useCouples(false);
+  const { couples, loading: loadCouples } = useCouples(true);
   const { pigeons, loading: loadPigeons } = usePigeons(false);
   const [pickCouple, setPickCouple] = useState(false);
   const [urlCoupleApplied, setUrlCoupleApplied] = useState(false);
@@ -57,8 +57,6 @@ export function ReproductionFormScreen() {
     pigeons.forEach((p) => m.set(p.id, p));
     return m;
   }, [pigeons]);
-
-  const couplesActifs = useMemo(() => couples.filter((c) => c.statut === 'ACTIF'), [couples]);
 
   const {
     handleSubmit,
@@ -85,21 +83,21 @@ export function ReproductionFormScreen() {
 
   useEffect(() => {
     if (urlCoupleApplied || !coupleIdFromUrl || loadCouples) return;
-    const ok = couplesActifs.some((c) => c.id === coupleIdFromUrl);
+    const ok = couples.some((c) => c.id === coupleIdFromUrl);
     if (ok) {
       setValue('coupleId', coupleIdFromUrl);
       setUrlCoupleApplied(true);
     }
-  }, [coupleIdFromUrl, couplesActifs, loadCouples, setValue, urlCoupleApplied]);
+  }, [coupleIdFromUrl, couples, loadCouples, setValue, urlCoupleApplied]);
 
   const coupleSel = useMemo(
-    () => (coupleId ? couplesActifs.find((x) => x.id === coupleId) : undefined),
-    [coupleId, couplesActifs],
+    () => (coupleId ? couples.find((x) => x.id === coupleId) : undefined),
+    [coupleId, couples],
   );
 
   const labelCouple = () => {
     if (!coupleId) return '— Choisir un couple —';
-    const c = couplesActifs.find((x) => x.id === coupleId);
+    const c = couples.find((x) => x.id === coupleId);
     return c ? formatCoupleLabel(c, pigeonById) : '—';
   };
 
@@ -118,7 +116,7 @@ export function ReproductionFormScreen() {
         appFeedback.alert('Formulaire', msg);
         return;
       }
-      const cp = couplesActifs.find((x) => x.id === parsed.data.coupleId);
+      const cp = couples.find((x) => x.id === parsed.data.coupleId);
       const male = cp ? pigeonById.get(cp.maleId) : null;
       const femelle = cp ? pigeonById.get(cp.femelleId) : null;
       if (!cp || !male || !femelle) {
@@ -154,7 +152,7 @@ export function ReproductionFormScreen() {
         appFeedback.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
       }
     },
-    [couplesActifs, pigeonById, router],
+    [couples, pigeonById, router],
   );
 
   const loading = loadCouples || loadPigeons;
@@ -181,10 +179,10 @@ export function ReproductionFormScreen() {
 
       <View style={styles.card}>
         <Text style={styles.lab}>Couple *</Text>
-        <Pressable style={styles.pickBtn} onPress={() => setPickCouple(true)} disabled={couplesActifs.length === 0}>
+        <Pressable style={styles.pickBtn} onPress={() => setPickCouple(true)} disabled={couples.length === 0}>
           <Text style={styles.pickTxt}>{labelCouple()}</Text>
         </Pressable>
-        {couplesActifs.length === 0 ? (
+        {couples.length === 0 ? (
           <Text style={styles.warn}>Aucun couple actif. Crée d’abord un couple depuis le menu ou l’onglet Couples.</Text>
         ) : null}
 
@@ -251,9 +249,9 @@ export function ReproductionFormScreen() {
       </View>
 
       <Pressable
-        style={[styles.submit, (isSubmitting || couplesActifs.length === 0) && styles.submitDis]}
+        style={[styles.submit, (isSubmitting || couples.length === 0) && styles.submitDis]}
         onPress={handleSubmit(onSubmit)}
-        disabled={isSubmitting || couplesActifs.length === 0}
+        disabled={isSubmitting || couples.length === 0}
       >
         <Text style={styles.submitTxt}>{isSubmitting ? 'Enregistrement…' : 'Enregistrer'}</Text>
       </Pressable>
@@ -266,7 +264,7 @@ export function ReproductionFormScreen() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Choisir le couple</Text>
             <ScrollView style={{ maxHeight: 400 }}>
-              {couplesActifs.map((c) => (
+              {couples.map((c) => (
                 <Pressable
                   key={c.id}
                   style={styles.modalRow}

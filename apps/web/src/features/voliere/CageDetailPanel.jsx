@@ -15,7 +15,6 @@ import {
   X,
 } from 'lucide-react'
 import { useReproductionsByCouple } from '@shared/hooks/useReproductionsByCouple'
-import { fetchCageOccupancyEvents } from '@shared/services/cagesService'
 import { getPigeonDisplayPhotoSrc } from '../../utils/localPigeonPhoto'
 import { CageGenealogyView } from './CageGenealogyView'
 
@@ -154,10 +153,6 @@ export function CageDetailPanel({
   const [moveReason, setMoveReason] = useState('')
   const [moveDetail, setMoveDetail] = useState('')
   const [pendingAction, setPendingAction] = useState(false)
-  const [showHistoryModal, setShowHistoryModal] = useState(false)
-  const [fullHistoryEvents, setFullHistoryEvents] = useState([])
-  const [fullHistoryLoading, setFullHistoryLoading] = useState(false)
-  const [fullHistoryError, setFullHistoryError] = useState(null)
   const [panelTab, setPanelTab] = useState('detail')
 
   const showGenealogyTab =
@@ -191,35 +186,12 @@ export function CageDetailPanel({
   const closeRompreModal = useCallback(() => setShowRompreModal(false), [])
   const closePigeonModal = useCallback(() => setShowPigeonModal(false), [])
   const closeCoupleModal = useCallback(() => setShowCoupleModal(false), [])
-  const closeHistoryModal = useCallback(() => {
-    setShowHistoryModal(false)
-    setFullHistoryEvents([])
-    setFullHistoryError(null)
-  }, [])
 
   const libererDialogRef = useModalA11y(showLibererModal, closeLibererModal)
   const moveDialogRef = useModalA11y(showMoveModal, closeMoveModal)
   const rompreDialogRef = useModalA11y(showRompreModal, closeRompreModal)
   const pigeonDialogRef = useModalA11y(showPigeonModal, closePigeonModal)
   const coupleDialogRef = useModalA11y(showCoupleModal, closeCoupleModal)
-  const historyDialogRef = useModalA11y(showHistoryModal, closeHistoryModal)
-
-  const handleOpenFullHistory = useCallback(async () => {
-    const id = cage?.id
-    if (!id) return
-    setShowHistoryModal(true)
-    setFullHistoryLoading(true)
-    setFullHistoryError(null)
-    setFullHistoryEvents([])
-    try {
-      const rows = await fetchCageOccupancyEvents(id, 500)
-      setFullHistoryEvents(rows)
-    } catch (e) {
-      setFullHistoryError(e?.message ?? 'Impossible de charger l’historique')
-    } finally {
-      setFullHistoryLoading(false)
-    }
-  }, [cage?.id])
 
   if (!cage) return null
 
@@ -392,7 +364,7 @@ export function CageDetailPanel({
                   }`}
                 >
                   <History className="size-4 shrink-0 opacity-90" aria-hidden />
-                  <span className="min-w-0 truncate text-center">Occupation</span>
+                  <span className="min-w-0 truncate text-center">Historique</span>
                 </button>
               </div>
             </div>
@@ -482,23 +454,23 @@ export function CageDetailPanel({
           ) : null}
 
           {panelTab === 'history' ? (
-            <section className="mb-2" aria-label="Historique d’occupation de la cage">
+            <section className="mb-2" aria-label="Historique des mouvements de la cage">
               <h3 className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <History className="size-4" aria-hidden />
-                Occupation de la cage
+                Historique de la cage
               </h3>
               <p className="mb-3 text-xs leading-snug text-slate-500">
-                Mouvements et affectations (pas le carnet santé). Aperçu des derniers événements (40 max). Ouvre la
-                fenêtre pour parcourir jusqu’à <strong>500 entrées</strong>.
+                Mouvements et affectations (pas le carnet santé). Aperçu des derniers événements (40 max). Ouvre l’écran
+                dédié pour parcourir jusqu’à <strong>500 entrées</strong>, filtrer ou supprimer des lignes.
               </p>
-              <button
-                type="button"
-                onClick={handleOpenFullHistory}
+              <Link
+                to={`/cages/${cage.id}/historique`}
+                state={{ back: { path: '/', label: 'Visualisation' } }}
                 className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50"
               >
                 <ScrollText className="size-4 shrink-0" aria-hidden />
                 Afficher l’historique complet
-              </button>
+              </Link>
               {occupancyError ? (
                 <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800">{occupancyError}</p>
               ) : null}
@@ -999,72 +971,6 @@ export function CageDetailPanel({
                 onClick={handleAssignCouple}
               >
                 Confirmer
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {showHistoryModal ? (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 p-4 sm:items-center"
-          role="presentation"
-          onClick={closeHistoryModal}
-        >
-          <div
-            ref={historyDialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="voliere-dialog-history-title"
-            tabIndex={-1}
-            className="flex max-h-[min(90vh,52rem)] w-full max-w-lg flex-col rounded-2xl bg-white p-4 shadow-xl outline-none"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 id="voliere-dialog-history-title" className="text-lg font-semibold text-slate-900">
-              Historique complet — Cage {cage.numero}
-            </h3>
-            <p className="mt-1 text-sm text-slate-500">
-              Jusqu’à 500 entrées, du plus récent au plus ancien.
-            </p>
-            <div className="mt-3 min-h-0 flex-1 overflow-y-auto border-t border-slate-100 pt-3">
-              {fullHistoryLoading ? (
-                <div className="space-y-2 py-6" aria-busy="true">
-                  <div className="h-10 animate-pulse rounded-lg bg-slate-100" />
-                  <div className="h-10 animate-pulse rounded-lg bg-slate-100" />
-                </div>
-              ) : null}
-              {fullHistoryError ? (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">{fullHistoryError}</p>
-              ) : null}
-              {!fullHistoryLoading && !fullHistoryError && fullHistoryEvents.length === 0 ? (
-                <p className="py-6 text-center text-sm text-slate-500">Aucun événement enregistré pour cette cage.</p>
-              ) : null}
-              {!fullHistoryLoading && !fullHistoryError && fullHistoryEvents.length > 0 ? (
-                <ul className="space-y-2 text-sm text-slate-600">
-                  {fullHistoryEvents.map((ev) => (
-                    <li key={ev.id} className="rounded-lg border border-slate-100 bg-slate-50/90 px-3 py-2">
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                        {formatEventTime(ev.createdAt)}
-                      </p>
-                      <p className="text-slate-800">{ev.summary}</p>
-                      {reasonDisplay(ev.reasonCode, ev.reasonDetail)}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-            <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
-              <p className="text-xs text-slate-500">
-                {!fullHistoryLoading && !fullHistoryError
-                  ? `${fullHistoryEvents.length} événement(s) affiché(s)`
-                  : null}
-              </p>
-              <button
-                type="button"
-                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900"
-                onClick={closeHistoryModal}
-              >
-                Fermer
               </button>
             </div>
           </div>

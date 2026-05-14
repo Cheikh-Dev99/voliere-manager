@@ -6,9 +6,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { obtenirCage } from '@shared/services/cagesService';
 import type { Cage } from '@shared/types';
 
-import { CageDetailView } from '../../../components/cages/CageDetailView';
-import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme } from '../../../constants/theme';
+import { CageDetailView } from '../../../../components/cages/CageDetailView';
+import { AppLoadingView } from '../../../../components/ui/AppLoadingView';
+import { theme } from '../../../../constants/theme';
 
 export default function CageDetailScreen() {
   const { cageId: cageIdParam } = useLocalSearchParams<{ cageId: string }>();
@@ -50,7 +50,7 @@ export default function CageDetailScreen() {
           variant="embedded"
           loadingContext="cages"
           message="Chargement de la cage…"
-          subtitle="Occupation et détails."
+          subtitle="Historique et détails."
         />
       </View>
     );

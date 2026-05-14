@@ -8,7 +8,7 @@ import type { CageOccupancyEvent } from '../types';
 const MAX = 40;
 
 /**
- * Journal d’occupation d’une cage (`cages/{cageId}/evenements`).
+ * Historique des mouvements d’une cage (`cages/{cageId}/evenements`).
  */
 export const useCageHistory = (cageId: string | null | undefined) => {
   const [events, setEvents] = useState<CageOccupancyEvent[]>([]);

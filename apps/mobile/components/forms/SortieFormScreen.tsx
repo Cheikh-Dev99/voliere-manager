@@ -59,7 +59,7 @@ export function SortieFormScreen() {
 
   const { pigeons, pigeonsActifs, loading: loadPigeons } = usePigeons(false);
   const { cages, loading: loadCages } = useCages();
-  const { couples, loading: loadCouples } = useCouples(false);
+  const { couples, loading: loadCouples } = useCouples(true);
 
   const [pickPigeon, setPickPigeon] = useState(false);
   const [pigeonFilter, setPigeonFilter] = useState('');

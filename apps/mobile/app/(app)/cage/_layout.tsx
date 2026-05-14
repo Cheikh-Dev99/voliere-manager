@@ -15,7 +15,8 @@ export default function CageStackLayout() {
     >
       <Stack.Screen name="nouveau" options={{ title: 'Nouvelle cage' }} />
       <Stack.Screen name="edit/[cageId]" options={{ title: 'Modifier la cage' }} />
-      <Stack.Screen name="[cageId]" options={{ headerShown: false, title: 'Cage' }} />
+      <Stack.Screen name="[cageId]/index" options={{ headerShown: false, title: 'Cage' }} />
+      <Stack.Screen name="[cageId]/historique" options={{ headerShown: false, title: 'Historique' }} />
     </Stack>
   );
 }

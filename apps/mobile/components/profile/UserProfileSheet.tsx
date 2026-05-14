@@ -91,7 +91,7 @@ export function UserProfileSheet({ visible, onClose }: Props) {
   const { profile, loading: profileLoading } = useUserProfile(email || undefined);
   const { pigeons, loading: lp } = usePigeons(false);
   const { cages, loading: lc } = useCages();
-  const { couples, loading: lco } = useCouples(false);
+  const { couples, loading: lco } = useCouples(true);
 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -101,7 +101,7 @@ export function UserProfileSheet({ visible, onClose }: Props) {
   const [draftElevage, setDraftElevage] = useState('');
   const [saveBanner, setSaveBanner] = useState<string | null>(null);
 
-  const couplesActifs = useMemo(() => couples.filter((c) => c.statut === 'ACTIF').length, [couples]);
+  const couplesActifs = couples.length;
   const nbVolieres = useMemo(
     () => mergeProfileVoliereCodesWithCages(profile?.voliereCodes, cages).length,
     [profile?.voliereCodes, cages],

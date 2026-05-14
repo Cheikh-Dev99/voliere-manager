@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AppLayout } from './layout/AppLayout'
 import { LoginPage } from './pages/LoginPage'
 import { VolierePage } from './pages/VolierePage'
@@ -14,6 +14,8 @@ import { ReproductionsPage } from './pages/ReproductionsPage'
 import { ReproductionFormPage } from './pages/ReproductionFormPage'
 import { PigeonHealthPage } from './pages/PigeonHealthPage'
 import { PigeonGenealogyPage } from './pages/PigeonGenealogyPage'
+import { UserProfileFullPage } from './pages/UserProfileFullPage'
+import { CageHistoryFullPage } from './pages/CageHistoryFullPage'
 import { GuestRoute } from './router/GuestRoute'
 import { ProtectedRoute } from './router/ProtectedRoute'
 
@@ -31,10 +33,13 @@ export default function App() {
       <Route
         element={
           <ProtectedRoute>
-            <AppLayout />
+            <Outlet />
           </ProtectedRoute>
         }
       >
+        <Route path="profil" element={<UserProfileFullPage />} />
+        <Route path="cages/:cageId/historique" element={<CageHistoryFullPage />} />
+        <Route element={<AppLayout />}>
         <Route index element={<VolierePage />} />
         <Route path="pigeons" element={<PigeonsListPage />} />
         <Route path="pigeons/nouveau" element={<PigeonFormPage />} />
@@ -50,6 +55,7 @@ export default function App() {
         <Route path="cages" element={<CagesListPage />} />
         <Route path="cages/nouveau" element={<CageFormPage />} />
         <Route path="cages/:cageId/modifier" element={<CageFormPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

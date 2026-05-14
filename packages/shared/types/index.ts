@@ -8,7 +8,7 @@ export type PigeonSexe   = 'MALE' | 'FEMALE';
 export type PigeonStatut = 'ACTIF' | 'VENDU' | 'MORT' | 'PERDU';
 export type CageStatut   = 'LIBRE' | 'OCCUPE_PIGEON' | 'OCCUPE_COUPLE';
 
-/** Journal d’occupation d’une cage (`cages/{cageId}/evenements`). */
+/** Historique des mouvements d’une cage (`cages/{cageId}/evenements`). */
 export type CageOccupancyKind =
   | 'assign_pigeon'
   | 'assign_couple'
@@ -152,7 +152,7 @@ export interface Sortie {
   circonstance : string | null;    // pour PERTE
   notes        : string;
   createdAt    : Timestamp;
-  /** Cage en occupation pigeon seul libérée (si applicable) */
+  /** Cage avec un pigeon seul libérée (si applicable) */
   cageSoloIdLiberee?: string | null;
   /** Cage du couple rompu libérée (si applicable) */
   cageCoupleIdLiberee?: string | null;

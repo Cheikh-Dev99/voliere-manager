@@ -31,7 +31,7 @@ export function ReproductionFormPage() {
   const [searchParams] = useSearchParams()
   const coupleIdFromUrl = searchParams.get('coupleId')?.trim() || ''
 
-  const { couples, loading: loadCouples } = useCouples(false)
+  const { couples, loading: loadCouples } = useCouples(true)
   const { pigeons, loading: loadPigeons } = usePigeons(false)
 
   const pigeonById = useMemo(() => {
@@ -39,8 +39,6 @@ export function ReproductionFormPage() {
     for (const p of pigeons) m.set(p.id, p)
     return m
   }, [pigeons])
-
-  const couplesActifs = useMemo(() => couples.filter((c) => c.statut === 'ACTIF'), [couples])
 
   const {
     register,
@@ -63,12 +61,12 @@ export function ReproductionFormPage() {
 
   useEffect(() => {
     if (urlCoupleApplied || !coupleIdFromUrl || loadCouples) return
-    const ok = couplesActifs.some((c) => c.id === coupleIdFromUrl)
+    const ok = couples.some((c) => c.id === coupleIdFromUrl)
     if (ok) {
       setValue('coupleId', coupleIdFromUrl)
       setUrlCoupleApplied(true)
     }
-  }, [coupleIdFromUrl, couplesActifs, loadCouples, setValue, urlCoupleApplied])
+  }, [coupleIdFromUrl, couples, loadCouples, setValue, urlCoupleApplied])
 
   const loading = loadCouples || loadPigeons
 
@@ -83,7 +81,7 @@ export function ReproductionFormPage() {
       toast.error(parsed.error.issues[0]?.message ?? 'Données invalides')
       return
     }
-    const coupleSel = couplesActifs.find((x) => x.id === parsed.data.coupleId)
+    const coupleSel = couples.find((x) => x.id === parsed.data.coupleId)
     const male = coupleSel ? pigeonById.get(coupleSel.maleId) : null
     const femelle = coupleSel ? pigeonById.get(coupleSel.femelleId) : null
     if (!coupleSel || !male || !femelle) {
@@ -149,17 +147,17 @@ export function ReproductionFormPage() {
             id="rep-couple"
             {...register('coupleId')}
             className={fieldClass(errors.coupleId)}
-            disabled={couplesActifs.length === 0}
+            disabled={couples.length === 0}
           >
             <option value="">— Choisir un couple —</option>
-            {couplesActifs.map((c) => (
+            {couples.map((c) => (
               <option key={c.id} value={c.id}>
                 {formatCoupleLabel(c, pigeonById)}
               </option>
             ))}
           </select>
           {errors.coupleId ? <p className="mt-1 text-xs text-red-600">{errors.coupleId.message}</p> : null}
-          {couplesActifs.length === 0 ? (
+          {couples.length === 0 ? (
             <p className="mt-2 text-xs text-amber-800">
               Aucun couple actif.{' '}
               <Link to="/couples/nouveau" className="font-medium underline">
@@ -172,7 +170,7 @@ export function ReproductionFormPage() {
         {coupleId ? (
           <div className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600">
             {(() => {
-              const c = couplesActifs.find((x) => x.id === coupleId)
+              const c = couples.find((x) => x.id === coupleId)
               if (!c) return null
               const m = pigeonById.get(c.maleId)
               const f = pigeonById.get(c.femelleId)
@@ -246,7 +244,7 @@ export function ReproductionFormPage() {
         <div className="flex flex-wrap gap-2 pt-2">
           <button
             type="submit"
-            disabled={isSubmitting || couplesActifs.length === 0}
+            disabled={isSubmitting || couples.length === 0}
             className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
           >
             {isSubmitting ? 'Enregistrement…' : 'Enregistrer'}

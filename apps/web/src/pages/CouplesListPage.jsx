@@ -124,7 +124,8 @@ export function CouplesListPage() {
   const { pigeons, loading: loadPigeons } = usePigeons(false)
   const { cages, loading: loadCages } = useCages()
 
-  const [filtreStatut, setFiltreStatut] = useState('ALL')
+  /** Par défaut : couples encore en cours (non rompus). */
+  const [filtreStatut, setFiltreStatut] = useState('ACTIF')
   const [query, setQuery] = useState('')
   const [filterCage, setFilterCage] = useState('')
   const [filterRace, setFilterRace] = useState('')
@@ -233,7 +234,7 @@ export function CouplesListPage() {
 
   const hasActiveFilters = Boolean(
     query.trim() ||
-      filtreStatut !== 'ALL' ||
+      filtreStatut !== 'ACTIF' ||
       filterCage ||
       filterRace ||
       filterVoliere ||
@@ -243,7 +244,7 @@ export function CouplesListPage() {
 
   const resetFilters = useCallback(() => {
     setQuery('')
-    setFiltreStatut('ALL')
+    setFiltreStatut('ACTIF')
     setFilterCage('')
     setFilterRace('')
     setFilterVoliere('')
@@ -301,7 +302,7 @@ export function CouplesListPage() {
               ) : null}
               {filtered.length !== couples.length ||
               query.trim() ||
-              filtreStatut !== 'ALL' ||
+              filtreStatut !== 'ACTIF' ||
               filterCage ||
               filterRace ||
               filterVoliere ? (
