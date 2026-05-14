@@ -1,18 +1,13 @@
-# Projet de validation — DTS Développeur Web ou Mobile
+# Projet de validation Web & Mobile
 
-> **Reproduction fidèle** du document PDF officiel *PROJET DE VALIDATION — DTS* (Bakeli), pour consultation dans le dépôt.  
-> Fichier source PDF : `../PROJET DE VALIDATION — DTS .pdf` (à la racine du dossier `voliere-manager/`, à côté de `package.json`).
-
----
-
-## Page de garde (synthèse)
+## Synthèse
 
 **Intitulé du projet**  
 Conception, réalisation et déploiement d’une application web responsive de gestion d’une volière avec visualisation virtuelle des cages.
 
 ---
 
-<a id="dts-1"></a>
+
 
 ## 1. OBJECTIF DE L'ÉPREUVE
 
@@ -27,7 +22,7 @@ Le candidat devra démontrer sa capacité à concevoir, réaliser et déployer u
 
 ---
 
-<a id="dts-2"></a>
+
 
 ## 2. CONTEXTE PROFESSIONNEL
 
@@ -55,7 +50,7 @@ Baay Piteq souhaite donc disposer d’une application web responsive permettant 
 
 ---
 
-<a id="dts-3"></a>
+
 
 ## 3. COMPRÉHENSION APPROFONDIE DU DOMAINE
 
@@ -116,13 +111,15 @@ Pourquoi l’éleveur a-t-il besoin de savoir quelle cage est libre ?
 
 L’éleveur ne veut pas une simple liste de cages : il veut voir sa volière. Le principe est similaire à la réservation de places dans un cinéma, un bus ou un avion.
 
-| Élément réel | Analogie dans l’application |
-|--------------|-----------------------------|
-| Cages | Sièges / places |
-| Pigeons | Passagers |
-| Cage libre | Siège libre (vert) |
-| Cage occupée par un pigeon | Siège occupé (rouge) |
-| Cage avec un couple | Siège occupé par 2 passagers (orange) |
+
+| Élément réel               | Analogie dans l’application           |
+| -------------------------- | ------------------------------------- |
+| Cages                      | Sièges / places                       |
+| Pigeons                    | Passagers                             |
+| Cage libre                 | Siège libre (vert)                    |
+| Cage occupée par un pigeon | Siège occupé (rouge)                  |
+| Cage avec un couple        | Siège occupé par 2 passagers (orange) |
+
 
 L’utilisateur doit pouvoir cliquer sur une cage pour :
 
@@ -134,19 +131,21 @@ L’utilisateur doit pouvoir cliquer sur une cage pour :
 
 ## 4. GLOSSAIRE MÉTIER
 
-| Terme | Définition |
-|-------|------------|
-| **Colombophile** | Éleveur de pigeons. |
-| **Volière** | Structure abritant plusieurs cages à pigeons. |
-| **Cage / compartiment** | Espace individuel destiné à un pigeon seul ou à un couple. |
-| **Bague** | Anneau à la patte du pigeon contenant son identifiant unique. |
-| **Pigeonneau** | Jeune pigeon (avant 6 mois). |
-| **Portée** | Ensemble des petits nés d’un même couple en une fois (souvent 2). |
-| **Sortie** | Événement qui retire le pigeon de l’effectif actif (vente, décès, perte). |
+
+| Terme                   | Définition                                                                |
+| ----------------------- | ------------------------------------------------------------------------- |
+| **Colombophile**        | Éleveur de pigeons.                                                       |
+| **Volière**             | Structure abritant plusieurs cages à pigeons.                             |
+| **Cage / compartiment** | Espace individuel destiné à un pigeon seul ou à un couple.                |
+| **Bague**               | Anneau à la patte du pigeon contenant son identifiant unique.             |
+| **Pigeonneau**          | Jeune pigeon (avant 6 mois).                                              |
+| **Portée**              | Ensemble des petits nés d’un même couple en une fois (souvent 2).         |
+| **Sortie**              | Événement qui retire le pigeon de l’effectif actif (vente, décès, perte). |
+
 
 ---
 
-<a id="dts-5"></a>
+
 
 ## 5. TRAVAIL DEMANDÉ
 
@@ -207,7 +206,7 @@ Le candidat devra :
 
 ---
 
-<a id="dts-6"></a>
+
 
 ## 6. CONTRAINTES TECHNIQUES
 
@@ -219,18 +218,18 @@ Le candidat devra :
 
 ---
 
-<a id="dts-7"></a>
+
 
 ## 7. LIVRABLES
 
-1. **Cahier des charges** (3 pages maximum) : objectifs, règles métier, fonctionnalités.  
-2. **Code source complet** déposé sur GitHub / GitLab avec un **README** clair.  
-3. **Application déployée** ou **APK** mis à disposition.  
+1. **Cahier des charges** (3 pages maximum) : objectifs, règles métier, fonctionnalités.
+2. **Code source complet** déposé sur GitHub / GitLab avec un **README** clair.
+3. **Application déployée** ou **APK** mis à disposition.
 4. **Présentation orale** : 5 min de démo + 5 min de questions.
 
 ---
 
-<a id="dts-9"></a>
+
 
 ## 8. CONSIGNES AUX CANDIDATS
 
@@ -238,11 +237,12 @@ Ce document contient toutes les explications métier dont vous avez besoin pour 
 
 Vous devez prioriser dans cet ordre :
 
-1. La **logique métier** (ce que l’éleveur fait vraiment chaque jour).  
-2. La **structuration des données** (MCD propre).  
-3. Le fonctionnement de la **visualisation des cages** (élément différenciant).  
+1. La **logique métier** (ce que l’éleveur fait vraiment chaque jour).
+2. La **structuration des données** (MCD propre).
+3. Le fonctionnement de la **visualisation des cages** (élément différenciant).
 4. La **cohérence générale** (un pigeon vendu n’a plus de cage).
 
 Une solution simple mais entièrement fonctionnelle est préférable à une solution complexe mais incomplète.
 
 ---
+

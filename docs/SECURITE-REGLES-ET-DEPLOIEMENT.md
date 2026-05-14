@@ -1,12 +1,12 @@
-# 5. Sécurité, règles Firestore et déploiement
+# Sécurité, règles Firestore et déploiement
 
-## 5.1 Modèle de confiance
+## 1. Modèle de confiance
 
 - **Authentification** : Firebase Auth (identité utilisateur = `request.auth.uid`).
 - **Autorisation** : règles **Firestore** qui n’autorisent l’accès qu’aux documents portant le même **`ownerUid`** que l’utilisateur connecté (sauf cas documentés, ex. lecture profil utilisateur selon règles `users/{userId}`).
 - **Client web** : ne fait pas confiance à l’UI pour la sécurité ; les règles serveur sont la **source de vérité** pour lecture / écriture.
 
-## 5.2 Principes des règles (`firebase/firestore.rules`)
+## 2. Principes des règles (`firebase/firestore.rules`)
 
 Extraits du modèle (voir fichier complet dans le dépôt) :
 
@@ -16,17 +16,18 @@ Extraits du modèle (voir fichier complet dans le dépôt) :
 
 Toute tentative d’accès à un document d’un autre utilisateur est **rejetée** par Firestore.
 
-## 5.3 Secrets et fichiers sensibles
+## 3. Secrets et fichiers sensibles
 
 Ne jamais committer :
 
 - **`apps/web/.env.local`** (clés Firebase web — exposées au navigateur mais liées à des restrictions de domaine et règles Firestore).
+- **`apps/mobile/.env`** (variables `EXPO_PUBLIC_FIREBASE_*` pour Expo) : ne pas committer ; les fichiers `.env` / `.env.*` sont exclus par **`.gitignore`** (les `.env.example` restent versionnés).
 - **Comptes de service** `*-firebase-adminsdk*.json`, `serviceAccount*.json` (scripts admin).
 - **Keystores** Android / certificats iOS pour publication mobile.
 
 Référence : **`.gitignore`** à la racine `voliere-manager`.
 
-## 5.4 Déploiement des règles
+## 4. Déploiement des règles
 
 Depuis la machine avec Firebase CLI configurée sur le bon projet :
 
@@ -37,18 +38,18 @@ firebase deploy --only firestore:rules
 
 Le fichier **`firebase.json`** à la racine du monorepo pointe vers `firebase/firestore.rules` et `firebase/firestore.indexes.json`. Idem pour **Storage** (`firebase/storage.rules`) si tu déploies les règles Storage.
 
-## 5.5 Déploiement du front web
+## 5. Déploiement du front web
 
 1. **`yarn build`** dans `apps/web` → artefacts dans **`dist/`**.
 2. Héberger les fichiers statiques (Firebase Hosting, etc.).
 3. Configurer les **réécritures SPA** : toutes les routes non fichiers → `index.html` pour que React Router gère `/pigeons`, `/cages/...`, etc.
 4. Ajouter l’**URL de production** aux domaines autorisés Firebase (Auth + éventuellement Storage CORS si utilisé).
 
-## 5.6 Données existantes sans `ownerUid`
+## 6. Données existantes sans `ownerUid`
 
 Les règles supposent **`ownerUid`** sur les documents métier. Pour des données historiques, utiliser les scripts documentés en racine (ex. `migrate:owner-uid`) — voir commentaires en tête de `firestore.rules`.
 
-## 5.7 Bonnes pratiques avant mise en production
+## 7. Bonnes pratiques avant mise en production
 
 - Vérifier les **règles Firestore** en simulateur ou sur environnement de staging.
 - Activer la **facturation** uniquement si nécessaire (Blaze pour certaines fonctions Storage / outbound).

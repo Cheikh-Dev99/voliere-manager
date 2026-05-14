@@ -1,6 +1,6 @@
-# 6. Tests, qualité et évolutions
+# Tests, qualité et évolutions
 
-## 6.1 Tests automatisés (package partagé)
+## 1. Tests automatisés (package partagé)
 
 La logique métier et utilitaires dans **`packages/shared`** sont couverts par des tests **Vitest** (configuration `vitest.config.ts`).
 
@@ -16,7 +16,7 @@ Cela exécute `yarn workspace @voliere/shared test` (voir `package.json` racine)
 
 > Pour le dossier DTS : indiquer le **nombre de tests** et un **extrait de résultat** (capture terminal ou rapport CI) dans les annexes du rendu.
 
-## 6.2 Qualité statique — Web
+## 2. Qualité statique — Web
 
 Dans **`apps/web`** :
 
@@ -26,18 +26,19 @@ yarn lint
 
 ESLint avec plugins React / hooks (voir `package.json` du workspace web). Corriger les avertissements avant livraison jury si exigé.
 
-## 6.3 Typage
+## 3. Typage
 
 - Le workspace **web** utilise principalement **JavaScript** (`.jsx`) avec JSDoc ponctuel.
+- Le workspace **mobile** utilise **TypeScript** (`.tsx`) ; contrôle rapide : `cd apps/mobile && npx tsc --noEmit`.
 - Le workspace **shared** utilise **TypeScript** pour les services et types exportés.
 
-## 6.4 Limites connues et dette documentaire
+## 4. Limites connues et dette documentaire
 
-- **Historique cage** (sous-collection `evenements`) : prévu dans les règles Firestore pour `cages/{id}/evenements` ; l’exposition complète dans l’UI peut être itérative (cf. `CONCEPTION.md`).
+- **Historique cage** (sous-collection `evenements`) : prévu dans les règles Firestore pour `cages/{id}/evenements` ; l’exposition complète dans l’UI peut être itérative (cf. [Conception](./CONCEPTION.md)).
 - **Couverture de tests** : concentrée sur `packages/shared` ; les pages React peuvent être enrichies avec **Testing Library** si le cahier DTS l’exige explicitement.
 - **Accessibilité** : amélioration continue (ARIA sur composants clés, contrastes) — relevé utile pour une grille d’évaluation « qualité UI ».
 
-## 6.5 Pistes d’évolution
+## 5. Pistes d’évolution
 
 | Piste | Description |
 |-------|-------------|
@@ -45,11 +46,11 @@ ESLint avec plugins React / hooks (voir `package.json` du workspace web). Corrig
 | i18n | Internationalisation (fr/en) si public élargi. |
 | Mode hors-ligne | Cache Firestore persistant (complexité accrue). |
 | Rôles | Gérant / propriétaire multi-boutiques (hors modèle actuel mono-`ownerUid`). |
-| Rapports PDF | Export inventaire, généalogie pour associations.
+| Rapports PDF | Export inventaire, généalogie pour associations. |
 
-## 6.6 Checklist « prêt pour jury »
+## 6. Checklist « prêt pour jury »
 
-- [ ] `yarn install` propre sur machine vierge + `yarn build` web OK.
+- [ ] `yarn install` propre sur machine vierge + `yarn build` web OK + `npx tsc --noEmit` dans `apps/mobile` OK.
 - [ ] `.env.example` à jour ; aucun secret dans Git.
 - [ ] Règles Firestore déployées sur le projet de démo.
 - [ ] Compte de démo ou vidéo screencast du parcours utilisateur.
