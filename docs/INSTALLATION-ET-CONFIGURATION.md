@@ -170,12 +170,10 @@ Les fichiers statiques sont générés dans `apps/web/dist/`.
 
 **Publication GitHub Pages** (démo jury) :
 
-```bash
-# depuis la racine voliere-manager/
-yarn deploy:pages
-```
+- **Automatique** : push sur `main` (fichiers web / `@shared`) → workflow [Deploy GitHub Pages](../.github/workflows/deploy-pages.yml) (secrets Actions requis — voir doc).
+- **Manuelle** : `yarn deploy:pages` depuis la racine.
 
-Procédure complète (réglages GitHub, Firebase, dépannage) : [Déploiement — démo et production](./DEPLOYEMENT-DEMO-ET-PROD.md).
+Procédure complète (secrets CI, réglages GitHub, dépannage) : [Déploiement — démo et production](./DEPLOYEMENT-DEMO-ET-PROD.md).
 
 Pour **Firebase Hosting** ou autre hébergeur statique, configurer le fallback vers `index.html` (routage SPA React Router).
 

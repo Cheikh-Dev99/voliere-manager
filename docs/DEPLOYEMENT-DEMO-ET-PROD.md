@@ -68,50 +68,62 @@ Dans le dépôt GitHub : **Settings → Pages**
 
 Attendre 1 à 2 minutes après chaque publication, puis tester l’URL avec un rechargement forcé (**Ctrl+Shift+R**).
 
-### 3.3 Publier l’application
+### 3.3 Déploiement automatique (GitHub Actions)
 
-Depuis la racine du monorepo :
+Le workflow **`.github/workflows/deploy-pages.yml`** publie le site à chaque **push sur `main`** qui modifie le web ou le code partagé (`apps/web/`, `packages/shared/`, etc.).
+
+1. **Configurer les secrets** (une seule fois) : **Settings → Environments → github-pages → Environment secrets** (recommandé), ou **Secrets and variables → Actions** (secrets du dépôt). Créer :
+
+| Secret | Valeur (identique à `.env.production`) |
+|--------|----------------------------------------|
+| `VITE_FIREBASE_API_KEY` | Clé API Firebase Web |
+| `VITE_FIREBASE_AUTH_DOMAIN` | ex. `voliere-manager.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID` | ex. `voliere-manager` |
+| `VITE_FIREBASE_STORAGE_BUCKET` | ex. `voliere-manager.firebasestorage.app` |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | ID expéditeur |
+| `VITE_FIREBASE_APP_ID` | ID application web |
+| `VITE_FIREBASE_GOOGLE_WEB_CLIENT_ID` | Client OAuth Web (connexion Google) |
+
+`VITE_BASE=/voliere-manager/` est défini dans le workflow (adapter le workflow si le dépôt est renommé).
+
+2. **Pousser sur `main`** : l’onglet **Actions** affiche le job *Deploy GitHub Pages*. En cas de succès, la branche `gh-pages` est mise à jour sous 1 à 2 minutes.
+
+3. **Lancer à la main** : Actions → *Deploy GitHub Pages* → **Run workflow** (utile après avoir ajouté les secrets).
+
+> Les secrets ne sont **pas** lus depuis `.env.production` (fichier local non versionné). Ils doivent exister côté GitHub pour la CI.
+
+### 3.4 Publication manuelle (optionnel)
+
+Si vous préférez déployer depuis votre machine (sans attendre la CI) :
 
 ```bash
 yarn deploy:pages
 ```
 
-Étapes exécutées par la commande :
+Étapes : build avec `apps/web/.env.production`, copie `404.html`, push de `dist/` sur `gh-pages`.
 
-1. `vite build` en mode production (lit `.env.production`).
-2. Copie `index.html` → `404.html` (routes SPA au rechargement).
-3. Push **complet** de `apps/web/dist/` sur la branche **`gh-pages`** (uniquement le build, sans `apps/`, `packages/`, etc.).
-
-Équivalent manuel :
-
-```bash
-cd apps/web
-yarn build
-node ../../scripts/deploy-github-pages.mjs
-```
-
-### 3.4 Firebase Authentication
+### 3.5 Firebase Authentication
 
 Console Firebase → **Authentication** → **Paramètres** → **Domaines autorisés** :
 
 - `cheikh-dev99.github.io` (ou votre domaine `*.github.io`)
 - `localhost` (développement local)
 
-### 3.5 Connexion Google (optionnel)
+### 3.6 Connexion Google (optionnel)
 
 Google Cloud Console → identifiants OAuth 2.0 (client Web) → **Origines JavaScript autorisées** :
 
 - `http://localhost:5173`
 - `https://cheikh-dev99.github.io`
 
-### 3.6 Vérifications après déploiement
+### 3.7 Vérifications après déploiement
 
 1. Ouvrir [https://cheikh-dev99.github.io/voliere-manager/](https://cheikh-dev99.github.io/voliere-manager/) : écran de **connexion** Volière Manager (thème **clair** par défaut).
 2. Onglet **Réseau** (F12) : les fichiers `/voliere-manager/assets/index-*.js` et `.css` répondent **200**.
 3. Console : pas d’erreur `Firebase: Error (auth/invalid-api-key)`.
 4. Ne pas confondre avec la page du dépôt : `https://github.com/Cheikh-Dev99/voliere-manager` (README GitHub).
 
-### 3.7 Dépannage
+### 3.8 Dépannage
 
 | Symptôme | Cause probable | Action |
 |----------|----------------|--------|
@@ -120,6 +132,8 @@ Google Cloud Console → identifiants OAuth 2.0 (client Web) → **Origines Java
 | Assets 404 (`/assets/...` sans préfixe) | Build sans `VITE_BASE` | Ajouter `VITE_BASE=/voliere-manager/` et rebuild |
 | Ancienne version en cache | CDN / navigateur | Ctrl+Shift+R ou navigation privée |
 | 404 sur `/voliere-manager/pigeons` au F5 | Limite GitHub Pages (SPA) | Navigation depuis l’accueil, ou héberger sur Firebase Hosting |
+| CI en échec au build | Secret Actions manquant ou mal nommé | Vérifier les 7 secrets § 3.3 et les logs du job *Build web* |
+| Push sur `main` sans mise à jour du site | Fichiers hors `paths` du workflow | Modifier `apps/web` ou lancer *Run workflow* manuellement |
 
 ## 4. Production Firebase Hosting
 
