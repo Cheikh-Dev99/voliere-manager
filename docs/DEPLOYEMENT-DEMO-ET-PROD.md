@@ -133,6 +133,7 @@ Google Cloud Console → identifiants OAuth 2.0 (client Web) → **Origines Java
 | Ancienne version en cache | CDN / navigateur | Ctrl+Shift+R ou navigation privée |
 | 404 sur `/voliere-manager/pigeons` au F5 | Limite GitHub Pages (SPA) | Navigation depuis l’accueil, ou héberger sur Firebase Hosting |
 | CI en échec au build | Secret Actions manquant ou mal nommé | Vérifier les 7 secrets § 3.3 et les logs du job *Build web* |
+| `YN0028` / lockfile modifié | `yarn.lock` pas commité après changement de `package.json` | En local : `yarn install`, puis `git add yarn.lock` et push sur `main` |
 | Push sur `main` sans mise à jour du site | Fichiers hors `paths` du workflow | Modifier `apps/web` ou lancer *Run workflow* manuellement |
 
 ## 4. Production Firebase Hosting
