@@ -7,7 +7,8 @@ import type { Pigeon } from '@shared/types';
 
 import { PigeonPhotoAvatar } from '../../../../components/pigeons/PigeonPhotoAvatar';
 import { AppLoadingView } from '../../../../components/ui/AppLoadingView';
-import { theme } from '../../../../constants/theme';
+import type { ThemeColors } from '../../../../constants/palettes';
+import { useThemedStyles } from '../../../../lib/useThemedStyles';
 import { formatFirestoreDate } from '../../../../utils/formatDate';
 
 const STATUT_LABEL: Record<string, string> = {
@@ -18,6 +19,7 @@ const STATUT_LABEL: Record<string, string> = {
 };
 
 export default function PigeonDetailScreen() {
+  const styles = useThemedStyles(createStyles);
   const { pigeonId } = useLocalSearchParams<{ pigeonId: string }>();
   const router = useRouter();
   const [pigeon, setPigeon] = useState<Pigeon | null>(null);
@@ -96,11 +98,11 @@ export default function PigeonDetailScreen() {
       </View>
 
       <View style={styles.block}>
-        <Row label="Race" value={pigeon.race} />
-        <Row label="Naissance" value={formatFirestoreDate(pigeon.dateNaissance, 'long')} />
-        <Row label="Couleur" value={pigeon.couleur} />
-        <Row label="Père" value={pere ? `${pere.matricule} — ${pere.nom}` : '—'} />
-        <Row label="Mère" value={mere ? `${mere.matricule} — ${mere.nom}` : '—'} />
+        <Row styles={styles} label="Race" value={pigeon.race} />
+        <Row styles={styles} label="Naissance" value={formatFirestoreDate(pigeon.dateNaissance, 'long')} />
+        <Row styles={styles} label="Couleur" value={pigeon.couleur} />
+        <Row styles={styles} label="Père" value={pere ? `${pere.matricule} — ${pere.nom}` : '—'} />
+        <Row styles={styles} label="Mère" value={mere ? `${mere.matricule} — ${mere.nom}` : '—'} />
       </View>
 
       {pigeon.notes ? (
@@ -131,16 +133,10 @@ export default function PigeonDetailScreen() {
       ) : null}
 
       <View style={styles.actions}>
-        <Pressable
-          style={styles.actionBtn}
-          onPress={() => router.push(`/(app)/pigeon/${pigeon.id}/sante`)}
-        >
+        <Pressable style={styles.actionBtn} onPress={() => router.push(`/(app)/pigeon/${pigeon.id}/sante`)}>
           <Text style={styles.actionTxt}>Santé</Text>
         </Pressable>
-        <Pressable
-          style={styles.actionBtn}
-          onPress={() => router.push(`/(app)/pigeon/${pigeon.id}/genealogie`)}
-        >
+        <Pressable style={styles.actionBtn} onPress={() => router.push(`/(app)/pigeon/${pigeon.id}/genealogie`)}>
           <Text style={styles.actionTxt}>Généalogie</Text>
         </Pressable>
       </View>
@@ -148,7 +144,15 @@ export default function PigeonDetailScreen() {
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({
+  label,
+  value,
+  styles,
+}: {
+  label: string;
+  value: string;
+  styles: ReturnType<typeof createStyles>;
+}) {
   return (
     <View style={styles.row}>
       <Text style={styles.rowLab}>{label}</Text>
@@ -157,35 +161,72 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  scroll: { padding: 16, paddingBottom: 40 },
-  photoWrap: { alignItems: 'center', marginBottom: 16 },
-  err: { color: theme.red600, marginBottom: 12, textAlign: 'center' },
-  backBtn: { padding: 12 },
-  backTxt: { color: theme.teal700, fontWeight: '700', fontSize: 15 },
-  mat: { fontSize: 26, fontWeight: '900', color: theme.slate900 },
-  nom: { fontSize: 18, color: theme.slate700, marginTop: 4 },
-  pillRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  pill: { backgroundColor: theme.emerald50, color: theme.emerald900, fontWeight: '800', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, overflow: 'hidden' },
-  pillOutline: { borderWidth: 1, borderColor: theme.border, color: theme.slate700, fontWeight: '700', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
-  block: { marginTop: 20, backgroundColor: theme.white, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: theme.border },
-  section: { fontSize: 14, fontWeight: '800', color: theme.slate800, marginBottom: 8 },
-  notes: { fontSize: 15, color: theme.slate600, lineHeight: 22 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.slate200 },
-  rowLab: { fontSize: 14, color: theme.slate500, fontWeight: '600', flex: 1 },
-  rowVal: { fontSize: 14, color: theme.slate900, fontWeight: '600', flex: 1, textAlign: 'right' },
-  actions: { flexDirection: 'row', gap: 12, marginTop: 16 },
-  actionBtn: { flex: 1, backgroundColor: theme.teal600, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
-  actionTxt: { color: theme.white, fontWeight: '800', fontSize: 15 },
-  actionBtnSecondary: {
-    flex: 1,
-    backgroundColor: theme.white,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.teal600,
-  },
-  actionTxtSecondary: { color: theme.teal700, fontWeight: '800', fontSize: 15 },
-});
+function createStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+    scroll: { padding: 16, paddingBottom: 40 },
+    photoWrap: { alignItems: 'center', marginBottom: 16 },
+    err: { color: theme.red600, marginBottom: 12, textAlign: 'center' },
+    backBtn: { padding: 12 },
+    backTxt: { color: theme.teal700, fontWeight: '700', fontSize: 15 },
+    mat: { fontSize: 26, fontWeight: '900', color: theme.slate900 },
+    nom: { fontSize: 18, color: theme.slate700, marginTop: 4 },
+    pillRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
+    pill: {
+      backgroundColor: theme.emerald50,
+      color: theme.emerald900,
+      fontWeight: '800',
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 10,
+      overflow: 'hidden',
+    },
+    pillOutline: {
+      borderWidth: 1,
+      borderColor: theme.border,
+      color: theme.slate700,
+      fontWeight: '700',
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 10,
+    },
+    block: {
+      marginTop: 20,
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: 12,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    section: { fontSize: 14, fontWeight: '800', color: theme.slate800, marginBottom: 8 },
+    notes: { fontSize: 15, color: theme.slate600, lineHeight: 22 },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 8,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.slate200,
+    },
+    rowLab: { fontSize: 14, color: theme.slate500, fontWeight: '600', flex: 1 },
+    rowVal: { fontSize: 14, color: theme.slate900, fontWeight: '600', flex: 1, textAlign: 'right' },
+    actions: { flexDirection: 'row', gap: 12, marginTop: 16 },
+    actionBtn: {
+      flex: 1,
+      backgroundColor: theme.teal600,
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    actionTxt: { color: theme.white, fontWeight: '800', fontSize: 15 },
+    actionBtnSecondary: {
+      flex: 1,
+      backgroundColor: theme.surfaceElevated,
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: theme.teal600,
+    },
+    actionTxtSecondary: { color: theme.teal700, fontWeight: '800', fontSize: 15 },
+  });
+}

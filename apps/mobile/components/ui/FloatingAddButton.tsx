@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 
-import type { ThemeColors } from '../../constants/palettes';
+import type { ShadowStyle, ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
+import { AnimatedPressable } from './AnimatedPressable';
 
 /** Diamètre du bouton flottant. */
 export const FLOATING_ADD_BUTTON_SIZE = 56;
@@ -19,7 +20,7 @@ export const FLOATING_ADD_LIST_PADDING_BOTTOM = 108;
 /** Hauteur approximative zone onglets + marge au-dessus du FAB. */
 const TAB_BAR_CLEARANCE = 54;
 
-function createFabStyles(theme: ThemeColors) {
+function createFabStyles(theme: ThemeColors, floatingShadow: ShadowStyle) {
   return StyleSheet.create({
     fab: {
       position: 'absolute',
@@ -31,15 +32,7 @@ function createFabStyles(theme: ThemeColors) {
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 50,
-      shadowColor: '#0f172a',
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.28,
-      shadowRadius: 10,
-      elevation: 8,
-    },
-    fabPressed: {
-      opacity: 0.92,
-      transform: [{ scale: 0.96 }],
+      ...floatingShadow,
     },
     ring: {
       width: FLOATING_ADD_BUTTON_SIZE - 4,
@@ -72,22 +65,23 @@ export function FloatingAddButton({
   icon,
   bottomExtra = 0,
 }: FloatingAddButtonProps) {
-  const { colors: theme } = useAppTheme();
-  const styles = useMemo(() => createFabStyles(theme), [theme]);
+  const { colors: theme, shadows } = useAppTheme();
+  const styles = useMemo(() => createFabStyles(theme, shadows.floating), [theme, shadows.floating]);
   const insets = useSafeAreaInsets();
   const bottom = TAB_BAR_CLEARANCE + insets.bottom + bottomExtra;
 
   return (
-    <Pressable
+    <AnimatedPressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [styles.fab, { bottom }, pressed && styles.fabPressed]}
+      style={[styles.fab, { bottom }]}
       hitSlop={10}
+      pressScale={0.96}
     >
       <View style={styles.ring}>
         {icon ?? <Plus size={26} color={theme.white} strokeWidth={2.5} />}
       </View>
-    </Pressable>
+    </AnimatedPressable>
   );
 }

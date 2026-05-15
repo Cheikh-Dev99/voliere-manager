@@ -2,19 +2,11 @@ import { useMemo } from 'react';
 import { Stack } from 'expo-router';
 
 import { useAppTheme } from '../../../context/AppThemeContext';
+import { stackScreenOptions } from '../../../lib/navigationMotion';
 
 export default function PigeonStackLayout() {
   const { colors } = useAppTheme();
-  const screenOptions = useMemo(
-    () => ({
-      headerTintColor: colors.teal700,
-      headerStyle: { backgroundColor: colors.surfaceElevated },
-      headerShadowVisible: true,
-      headerTitleStyle: { fontWeight: '600' as const, color: colors.slate900 },
-      contentStyle: { backgroundColor: 'transparent' },
-    }),
-    [colors],
-  );
+  const screenOptions = useMemo(() => stackScreenOptions(colors), [colors]);
 
   return (
     <Stack screenOptions={screenOptions}>

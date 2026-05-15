@@ -9,9 +9,11 @@ import type { Pigeon } from '@shared/types';
 import { PigeonSoloAncestorBlock } from '../../../../components/genealogy/GenealogyForRootView';
 import { PigeonPhotoAvatar } from '../../../../components/pigeons/PigeonPhotoAvatar';
 import { AppLoadingView } from '../../../../components/ui/AppLoadingView';
-import { theme } from '../../../../constants/theme';
+import type { ThemeColors } from '../../../../constants/palettes';
+import { useThemedStyles } from '../../../../lib/useThemedStyles';
 
 export default function PigeonGenealogieScreen() {
+  const styles = useThemedStyles(createStyles);
   const { pigeonId: pigeonIdParam } = useLocalSearchParams<{ pigeonId: string }>();
   const pigeonId = Array.isArray(pigeonIdParam) ? pigeonIdParam[0] : pigeonIdParam;
   const router = useRouter();
@@ -121,30 +123,32 @@ export default function PigeonGenealogieScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { padding: 16, paddingBottom: 40, backgroundColor: 'transparent' },
-  heroRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 },
-  heroText: { flex: 1, minWidth: 0 },
-  childRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  childText: { flex: 1, minWidth: 0 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
-  err: { color: theme.red600, textAlign: 'center', marginBottom: 12 },
-  back: { padding: 12 },
-  backTxt: { color: theme.teal700, fontWeight: '800' },
-  title: { fontSize: 20, fontWeight: '900', color: theme.slate900 },
-  sub: { fontSize: 15, color: theme.slate600, marginTop: 4, marginBottom: 8 },
-  sep: { height: 1, backgroundColor: theme.slate200, marginVertical: 20 },
-  section: { fontSize: 15, fontWeight: '800', color: theme.slate800, marginBottom: 6 },
-  descHint: { fontSize: 12, color: theme.slate500, marginBottom: 12, lineHeight: 17 },
-  muted: { fontSize: 14, color: theme.slate500 },
-  card: {
-    backgroundColor: theme.white,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  mat: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
-  nom: { fontSize: 14, color: theme.slate600, marginTop: 2 },
-});
+function createStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    scroll: { padding: 16, paddingBottom: 40, backgroundColor: 'transparent' },
+    heroRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 8 },
+    heroText: { flex: 1, minWidth: 0 },
+    childRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    childText: { flex: 1, minWidth: 0 },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
+    err: { color: theme.red600, textAlign: 'center', marginBottom: 12 },
+    back: { padding: 12 },
+    backTxt: { color: theme.teal700, fontWeight: '800' },
+    title: { fontSize: 20, fontWeight: '900', color: theme.slate900 },
+    sub: { fontSize: 15, color: theme.slate600, marginTop: 4, marginBottom: 8 },
+    sep: { height: 1, backgroundColor: theme.slate200, marginVertical: 20 },
+    section: { fontSize: 15, fontWeight: '800', color: theme.slate800, marginBottom: 6 },
+    descHint: { fontSize: 12, color: theme.slate500, marginBottom: 12, lineHeight: 17 },
+    muted: { fontSize: 14, color: theme.slate500 },
+    card: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: 12,
+      padding: 14,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    mat: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
+    nom: { fontSize: 14, color: theme.slate600, marginTop: 2 },
+  });
+}

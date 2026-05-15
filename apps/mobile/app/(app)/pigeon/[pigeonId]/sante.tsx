@@ -21,8 +21,10 @@ import { PigeonPhotoAvatar } from '../../../../components/pigeons/PigeonPhotoAva
 import { EmptyStateCard } from '../../../../components/layout/EmptyStateCard';
 import { HealthEventDatePicker } from '../../../../components/forms/HealthEventDatePicker';
 import { AppLoadingView } from '../../../../components/ui/AppLoadingView';
-import { theme, shadowCard } from '../../../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../../../constants/palettes';
 import { appFeedback } from '../../../../lib/appFeedback';
+import { useAppTheme } from '../../../../context/AppThemeContext';
+import { useThemedStyles } from '../../../../lib/useThemedStyles';
 import { formatFirestoreDate } from '../../../../utils/formatDate';
 
 function normalizePigeonId(raw: string | string[] | undefined): string | undefined {
@@ -33,6 +35,8 @@ function normalizePigeonId(raw: string | string[] | undefined): string | undefin
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default function PigeonSanteScreen() {
+  const { colors: theme } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   const params = useLocalSearchParams<{ pigeonId: string | string[] }>();
   const pigeonId = useMemo(() => normalizePigeonId(params.pigeonId), [params.pigeonId]);
@@ -253,95 +257,97 @@ export default function PigeonSanteScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: 'transparent' },
-  scroll: { padding: theme.screenPadding, paddingBottom: 40 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
-  err: { color: theme.red600, textAlign: 'center', fontSize: 15, marginBottom: 16 },
-  errBox: {
-    backgroundColor: '#fef2f2',
-    borderRadius: theme.radiusMd,
-    padding: 12,
-    color: theme.red600,
-    fontSize: 13,
-    marginBottom: 12,
-  },
-  backBtn: { paddingVertical: 10, paddingHorizontal: 20 },
-  backTxt: { color: theme.teal700, fontWeight: '700', fontSize: 16 },
-  hero: { marginBottom: 16 },
-  heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 14 },
-  heroTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  heroText: { flex: 1, minWidth: 0 },
-  heroTitle: { fontSize: 20, fontWeight: '800', color: theme.slate900, letterSpacing: -0.3, flex: 1, minWidth: 0 },
-  mat: { marginTop: 4, fontSize: 15, fontWeight: '700', color: theme.teal900, fontVariant: ['tabular-nums'] },
-  sub: { marginTop: 2, fontSize: 14, color: theme.slate600 },
-  intro: { marginTop: 12, fontSize: 14, lineHeight: 21, color: theme.slate600 },
-  heroActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 14 },
-  linkBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: theme.radiusMd,
-    backgroundColor: theme.teal600,
-  },
-  linkBtnTxt: { color: theme.white, fontWeight: '700', fontSize: 14 },
-  linkBtnOutline: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-    borderColor: theme.teal100,
-    backgroundColor: theme.white,
-  },
-  linkBtnOutlineTxt: { color: theme.teal800, fontWeight: '700', fontSize: 14 },
-  pressed: { opacity: 0.88 },
-  card: {
-    backgroundColor: theme.white,
-    borderRadius: theme.radiusLg,
-    borderWidth: 1,
-    borderColor: theme.border,
-    padding: 16,
-    marginBottom: 20,
-    ...shadowCard,
-  },
-  cardTitle: { fontSize: 15, fontWeight: '800', color: theme.slate900, marginBottom: 14 },
-  lab: { fontSize: 12, fontWeight: '600', color: theme.slate600, marginBottom: 6 },
-  input: {
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: theme.radiusMd,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-    color: theme.slate900,
-    marginBottom: 14,
-    backgroundColor: theme.white,
-  },
-  textarea: { minHeight: 96, paddingTop: 10 },
-  submit: {
-    marginTop: 4,
-    minHeight: theme.minTap,
-    borderRadius: theme.radiusMd,
-    backgroundColor: theme.teal600,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  submitDisabled: { opacity: 0.45 },
-  submitTxt: { color: theme.white, fontWeight: '800', fontSize: 16 },
-  sectionTit: { fontSize: 15, fontWeight: '800', color: theme.slate800, marginBottom: 10 },
-  eventsLoading: { paddingVertical: 24, alignItems: 'center' },
-  evCard: {
-    backgroundColor: theme.white,
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-    borderColor: theme.border,
-    padding: 14,
-    marginBottom: 10,
-    ...shadowCard,
-  },
-  evDate: { fontSize: 12, fontWeight: '700', color: theme.teal800 },
-  evSum: { fontSize: 16, fontWeight: '800', color: theme.slate900, marginTop: 4 },
-  evDet: { fontSize: 14, color: theme.slate600, marginTop: 6, lineHeight: 20 },
-});
+function createStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
+    flex: { flex: 1, backgroundColor: 'transparent' },
+    scroll: { padding: theme.screenPadding, paddingBottom: 40 },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
+    err: { color: theme.red600, textAlign: 'center', fontSize: 15, marginBottom: 16 },
+    errBox: {
+      backgroundColor: theme.rose50,
+      borderRadius: theme.radiusMd,
+      padding: 12,
+      color: theme.red600,
+      fontSize: 13,
+      marginBottom: 12,
+    },
+    backBtn: { paddingVertical: 10, paddingHorizontal: 20 },
+    backTxt: { color: theme.teal700, fontWeight: '700', fontSize: 16 },
+    hero: { marginBottom: 16 },
+    heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 14 },
+    heroTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    heroText: { flex: 1, minWidth: 0 },
+    heroTitle: { fontSize: 20, fontWeight: '800', color: theme.slate900, letterSpacing: -0.3, flex: 1, minWidth: 0 },
+    mat: { marginTop: 4, fontSize: 15, fontWeight: '700', color: theme.teal900, fontVariant: ['tabular-nums'] },
+    sub: { marginTop: 2, fontSize: 14, color: theme.slate600 },
+    intro: { marginTop: 12, fontSize: 14, lineHeight: 21, color: theme.slate600 },
+    heroActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 14 },
+    linkBtn: {
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: theme.radiusMd,
+      backgroundColor: theme.teal600,
+    },
+    linkBtnTxt: { color: theme.white, fontWeight: '700', fontSize: 14 },
+    linkBtnOutline: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+      borderColor: theme.teal100,
+      backgroundColor: theme.surfaceElevated,
+    },
+    linkBtnOutlineTxt: { color: theme.teal800, fontWeight: '700', fontSize: 14 },
+    pressed: { opacity: 0.88 },
+    card: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: theme.radiusLg,
+      borderWidth: 1,
+      borderColor: theme.border,
+      padding: 16,
+      marginBottom: 20,
+      ...shadowCard,
+    },
+    cardTitle: { fontSize: 15, fontWeight: '800', color: theme.slate900, marginBottom: 14 },
+    lab: { fontSize: 12, fontWeight: '600', color: theme.slate600, marginBottom: 6 },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: theme.radiusMd,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 15,
+      color: theme.slate900,
+      marginBottom: 14,
+      backgroundColor: theme.surfaceHighlight,
+    },
+    textarea: { minHeight: 96, paddingTop: 10 },
+    submit: {
+      marginTop: 4,
+      minHeight: theme.minTap,
+      borderRadius: theme.radiusMd,
+      backgroundColor: theme.teal600,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    submitDisabled: { opacity: 0.45 },
+    submitTxt: { color: theme.white, fontWeight: '800', fontSize: 16 },
+    sectionTit: { fontSize: 15, fontWeight: '800', color: theme.slate800, marginBottom: 10 },
+    eventsLoading: { paddingVertical: 24, alignItems: 'center' },
+    evCard: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+      borderColor: theme.border,
+      padding: 14,
+      marginBottom: 10,
+      ...shadowCard,
+    },
+    evDate: { fontSize: 12, fontWeight: '700', color: theme.teal800 },
+    evSum: { fontSize: 16, fontWeight: '800', color: theme.slate900, marginTop: 4 },
+    evDet: { fontSize: 14, color: theme.slate600, marginTop: 6, lineHeight: 20 },
+  });
+}

@@ -22,9 +22,13 @@ import {
 } from '@shared/services/cagesService';
 import type { CageOccupancyEvent, CageOccupancyKind } from '@shared/types';
 
+import type { ShadowCardStyle, ThemeColors } from '../../../../constants/palettes';
+import { useAppTheme } from '../../../../context/AppThemeContext';
 import { appFeedback } from '../../../../lib/appFeedback';
-import { theme, shadowCard } from '../../../../constants/theme';
+import { useThemedStyles } from '../../../../lib/useThemedStyles';
 import { formatEventTime } from '../../../../components/cages/cageDetailUtils';
+import { HealthEventDatePicker } from '../../../../components/forms/HealthEventDatePicker';
+import { FadeInView } from '../../../../components/ui/FadeInView';
 
 const OCC_KIND_LABELS: Record<CageOccupancyKind, string> = {
   assign_pigeon: 'Affectation (1 pigeon)',
@@ -86,6 +90,8 @@ const KIND_OPTIONS: Array<{ id: 'ALL' | CageOccupancyKind; label: string }> = [
 ];
 
 export default function CageHistoriqueScreen() {
+  const { colors: theme } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
   const { cageId: cageIdParam } = useLocalSearchParams<{ cageId: string }>();
   const cageId = Array.isArray(cageIdParam) ? cageIdParam[0] : cageIdParam;
   const router = useRouter();
@@ -228,7 +234,7 @@ export default function CageHistoriqueScreen() {
     kindFilter === 'ALL' ? 'Tous les types' : OCC_KIND_LABELS[kindFilter] ?? kindFilter;
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <FadeInView style={[styles.root, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
@@ -293,25 +299,31 @@ export default function CageHistoriqueScreen() {
               </Pressable>
               <View style={styles.dateRow}>
                 <View style={styles.dateCol}>
-                  <Text style={styles.filterK}>Du (AAAA-MM-JJ)</Text>
-                  <TextInput
+                  <Text style={styles.filterK}>Du</Text>
+                  <HealthEventDatePicker
                     value={dateFrom}
-                    onChangeText={setDateFrom}
-                    placeholder="2025-01-01"
-                    placeholderTextColor={theme.slate500}
-                    style={styles.input}
-                    autoCapitalize="none"
+                    onChange={setDateFrom}
+                    compact
+                    showHint={false}
+                    displayFormat="short"
+                    allowClear
+                    sheetTitle="Date de début"
+                    placeholderChoose="Choisir"
+                    accessibilityLabel="Filtrer à partir du"
                   />
                 </View>
                 <View style={styles.dateCol}>
                   <Text style={styles.filterK}>Au</Text>
-                  <TextInput
+                  <HealthEventDatePicker
                     value={dateTo}
-                    onChangeText={setDateTo}
-                    placeholder="2025-12-31"
-                    placeholderTextColor={theme.slate500}
-                    style={styles.input}
-                    autoCapitalize="none"
+                    onChange={setDateTo}
+                    compact
+                    showHint={false}
+                    displayFormat="short"
+                    allowClear
+                    sheetTitle="Date de fin"
+                    placeholderChoose="Choisir"
+                    accessibilityLabel="Filtrer jusqu’au"
                   />
                 </View>
               </View>
@@ -400,11 +412,12 @@ export default function CageHistoriqueScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-    </View>
+    </FadeInView>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
   root: { flex: 1, backgroundColor: theme.slate50 },
   listFlex: { flex: 1 },
   header: {
@@ -414,8 +427,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: theme.slate200,
-    backgroundColor: theme.white,
+    borderBottomColor: theme.border,
+    backgroundColor: theme.surfaceElevated,
   },
   backRow: { flexDirection: 'row', alignItems: 'center', gap: 4, padding: 8 },
   backTxt: { fontSize: 15, fontWeight: '700', color: theme.slate800 },
@@ -426,34 +439,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: theme.radiusMd,
-    backgroundColor: '#fee2e2',
+    backgroundColor: theme.rose50,
     borderWidth: 1,
-    borderColor: '#fecaca',
+    borderColor: theme.border,
   },
-  purgeTxt: { fontSize: 12, fontWeight: '800', color: '#991b1b' },
+  purgeTxt: { fontSize: 12, fontWeight: '800', color: theme.rose900 },
   opacityDim: { opacity: 0.45 },
-  filters: { paddingBottom: 16, marginBottom: 4, backgroundColor: theme.slate50 },
+  filters: { paddingBottom: 16, marginBottom: 4 },
   filterK: { fontSize: 12, fontWeight: '700', color: theme.slate600, marginBottom: 6 },
   input: {
     borderWidth: 1,
-    borderColor: theme.slate200,
+    borderColor: theme.border,
     borderRadius: theme.radiusMd,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
     color: theme.slate900,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceHighlight,
   },
   kindPick: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: theme.slate200,
+    borderColor: theme.border,
     borderRadius: theme.radiusMd,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceHighlight,
   },
   kindPickTxt: { flex: 1, fontSize: 15, fontWeight: '600', color: theme.slate800 },
   kindPickHint: { fontSize: 13, color: theme.teal700, fontWeight: '700' },
@@ -482,9 +495,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
     padding: 14,
     borderRadius: theme.radiusLg,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderWidth: 1,
-    borderColor: theme.slate100,
+    borderColor: theme.border,
     ...shadowCard,
   },
   cardBody: { flex: 1, minWidth: 0 },
@@ -496,14 +509,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: theme.radiusMd,
     borderWidth: 1,
-    borderColor: '#fecaca',
-    backgroundColor: '#fff1f2',
+    borderColor: theme.border,
+    backgroundColor: theme.rose50,
   },
   footerInline: {
     marginTop: 16,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: theme.slate200,
+    borderTopColor: theme.border,
   },
   footerTxt: { fontSize: 12, color: theme.slate600, fontWeight: '600' },
   modalBackdrop: {
@@ -513,7 +526,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   modalCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     padding: 16,
     maxHeight: '70%',
@@ -524,11 +537,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: theme.radiusMd,
     marginBottom: 6,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
-  kindRowOn: { backgroundColor: '#ccfbf1', borderWidth: 1, borderColor: theme.teal100 },
+  kindRowOn: { backgroundColor: theme.teal50, borderWidth: 1, borderColor: theme.teal100 },
   kindRowTxt: { fontSize: 15, color: theme.slate800 },
   kindRowTxtOn: { fontWeight: '800', color: theme.teal900 },
   modalClose: { marginTop: 12, paddingVertical: 12, alignItems: 'center' },
   modalCloseTxt: { fontSize: 16, fontWeight: '700', color: theme.teal700 },
-});
+  });
+}

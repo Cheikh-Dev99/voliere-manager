@@ -13,12 +13,22 @@ import { Calendar } from 'lucide-react-native';
 
 import type { ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
+import { AnimatedPressable } from '../ui/AnimatedPressable';
+import { IconPressable } from '../ui/IconPressable';
 
 type Props = {
   value: string;
   onChange: (isoYmd: string) => void;
   /** Texte sous le déclencheur (défaut : carnet santé). */
   hint?: string;
+  /** Afficher le texte d’aide sous le champ (défaut : true). */
+  showHint?: boolean;
+  /** Style réduit pour filtres côte à côte (défaut : false). */
+  compact?: boolean;
+  /** Format d’affichage sur le déclencheur. */
+  displayFormat?: 'long' | 'short';
+  /** Bouton pour effacer la date (filtres optionnels). */
+  allowClear?: boolean;
   /** Titre de la feuille iOS (défaut : date événement). */
   sheetTitle?: string;
   /** Libellé quand aucune date valide (déclencheur). */
@@ -50,11 +60,18 @@ function toIsoYmd(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function formatFrLong(isoYmd: string): string {
+function formatFr(isoYmd: string, mode: 'long' | 'short'): string {
   const t = isoYmd?.trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return '';
   const d = parseYmd(t);
   try {
+    if (mode === 'short') {
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }).format(d);
+    }
     return new Intl.DateTimeFormat('fr-FR', {
       weekday: 'long',
       day: 'numeric',
@@ -70,12 +87,16 @@ export function HealthEventDatePicker({
   value,
   onChange,
   hint = DEFAULT_HINT,
+  showHint = true,
+  compact = false,
+  displayFormat = 'long',
+  allowClear = false,
   sheetTitle = DEFAULT_SHEET_TITLE,
   accessibilityLabel = "Choisir la date de l'événement",
   placeholderChoose = DEFAULT_PLACEHOLDER,
 }: Props) {
   const { colors: c, resolved } = useAppTheme();
-  const styles = useMemo(() => createHealthDateStyles(c), [c]);
+  const styles = useMemo(() => createHealthDateStyles(c, compact), [c, compact]);
   const [iosOpen, setIosOpen] = useState(false);
   const [iosTemp, setIosTemp] = useState(() => parseYmd(value));
 
@@ -104,10 +125,8 @@ export function HealthEventDatePicker({
     setIosOpen(true);
   }, [value, applyDate]);
 
-  const displayLine =
-    value.trim() && /^\d{4}-\d{2}-\d{2}$/.test(value.trim())
-      ? formatFrLong(value.trim())
-      : placeholderChoose;
+  const hasValidDate = value.trim() !== '' && /^\d{4}-\d{2}-\d{2}$/.test(value.trim());
+  const displayLine = hasValidDate ? formatFr(value.trim(), displayFormat) : placeholderChoose;
 
   if (Platform.OS === 'web') {
     return (
@@ -119,30 +138,46 @@ export function HealthEventDatePicker({
           placeholder="AAAA-MM-JJ"
           placeholderTextColor={c.slate500}
         />
-        <Text style={styles.hint}>Sur le web Expo, saisis la date au format AAAA-MM-JJ.</Text>
+        {showHint ? (
+          <Text style={styles.hint}>Sur le web Expo, saisis la date au format AAAA-MM-JJ.</Text>
+        ) : null}
       </View>
     );
   }
 
   return (
     <View style={styles.wrap}>
-      <Pressable
+      <View style={styles.triggerRow}>
+      <AnimatedPressable
         onPress={openPicker}
         style={styles.trigger}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
       >
-        <Calendar size={20} color={c.teal700} />
-        <View style={styles.triggerTextCol}>
-          <Text style={[styles.triggerMain, !value.trim() && styles.triggerPlaceholder]} numberOfLines={2}>
-            {displayLine}
-          </Text>
-          {value.trim() && /^\d{4}-\d{2}-\d{2}$/.test(value.trim()) ? (
-            <Text style={styles.triggerSub}>({value.trim()})</Text>
-          ) : null}
-        </View>
-      </Pressable>
-      <Text style={styles.hint}>{hint}</Text>
+          <Calendar size={compact ? 18 : 20} color={c.teal700} />
+          <View style={styles.triggerTextCol}>
+            <Text
+              style={[styles.triggerMain, !hasValidDate && styles.triggerPlaceholder]}
+              numberOfLines={compact ? 1 : 2}
+            >
+              {displayLine}
+            </Text>
+            {hasValidDate && !compact ? (
+              <Text style={styles.triggerSub}>({value.trim()})</Text>
+            ) : null}
+          </View>
+        </AnimatedPressable>
+        {allowClear && hasValidDate ? (
+          <IconPressable
+            onPress={() => onChange('')}
+            style={styles.clearBtn}
+            accessibilityLabel="Effacer la date"
+          >
+            <Text style={styles.clearBtnTxt}>×</Text>
+          </IconPressable>
+        ) : null}
+      </View>
+      {showHint && hint ? <Text style={styles.hint}>{hint}</Text> : null}
 
       {Platform.OS === 'ios' ? (
         <Modal visible={iosOpen} animationType="slide" transparent onRequestClose={() => setIosOpen(false)}>
@@ -184,9 +219,20 @@ export function HealthEventDatePicker({
   );
 }
 
-function createHealthDateStyles(theme: ThemeColors) {
+function createHealthDateStyles(theme: ThemeColors, compact: boolean) {
   return StyleSheet.create({
-    wrap: { marginBottom: 14 },
+    wrap: { marginBottom: compact ? 0 : 14 },
+    triggerRow: { flexDirection: 'row', alignItems: 'stretch', gap: 8 },
+    clearBtn: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      minWidth: 44,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: theme.radiusMd,
+      backgroundColor: theme.surfaceHighlight,
+    },
+    clearBtnTxt: { fontSize: 22, lineHeight: 24, fontWeight: '600', color: theme.slate600 },
     webInp: {
       borderWidth: 1,
       borderColor: theme.border,
@@ -198,16 +244,17 @@ function createHealthDateStyles(theme: ThemeColors) {
       color: theme.slate900,
     },
     trigger: {
+      flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: compact ? 8 : 12,
       borderWidth: 1,
       borderColor: theme.border,
       borderRadius: theme.radiusMd,
-      paddingHorizontal: 14,
-      paddingVertical: 14,
-      backgroundColor: theme.surfaceElevated,
-      minHeight: 52,
+      paddingHorizontal: compact ? 10 : 14,
+      paddingVertical: compact ? 10 : 14,
+      backgroundColor: theme.surfaceHighlight,
+      minHeight: compact ? 44 : 52,
     },
     triggerTextCol: { flex: 1, minWidth: 0 },
     triggerMain: { fontSize: 16, fontWeight: '600', color: theme.slate900 },

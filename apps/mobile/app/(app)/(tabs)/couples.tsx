@@ -19,6 +19,7 @@ import type { Cage, Couple, Pigeon } from '@shared/types';
 import { appFeedback } from '../../../lib/appFeedback';
 import { EmptyStateCard } from '../../../components/layout/EmptyStateCard';
 import { PageHeader } from '../../../components/layout/PageHeader';
+import { TabScreenFade } from '../../../components/layout/TabScreenFade';
 import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
 import {
   FloatingAddButton,
@@ -139,6 +140,7 @@ export default function CouplesTabScreen() {
   );
 
   return (
+    <TabScreenFade>
     <View style={styles.root}>
       {loadingAny ? (
         <View style={styles.center}>
@@ -211,6 +213,7 @@ export default function CouplesTabScreen() {
         </>
       )}
     </View>
+    </TabScreenFade>
   );
 }
 

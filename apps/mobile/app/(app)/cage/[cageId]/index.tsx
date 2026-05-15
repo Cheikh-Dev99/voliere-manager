@@ -7,8 +7,11 @@ import { obtenirCage } from '@shared/services/cagesService';
 import type { Cage } from '@shared/types';
 
 import { CageDetailView } from '../../../../components/cages/CageDetailView';
+import { TabScreenFade } from '../../../../components/layout/TabScreenFade';
 import { AppLoadingView } from '../../../../components/ui/AppLoadingView';
 import { theme } from '../../../../constants/theme';
+
+type LoadSignal = { cancelled: boolean };
 
 export default function CageDetailScreen() {
   const { cageId: cageIdParam } = useLocalSearchParams<{ cageId: string }>();
@@ -19,29 +22,44 @@ export default function CageDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const reload = useCallback(async () => {
-    if (!cageId) {
-      setCage(null);
-      setError('Identifiant de cage manquant.');
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const c = await obtenirCage(cageId);
-      setCage(c);
-      if (!c) setError('Cage introuvable.');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erreur');
-    } finally {
-      setLoading(false);
-    }
-  }, [cageId]);
+  const loadCage = useCallback(
+    async (signal?: LoadSignal) => {
+      const cancelled = () => signal?.cancelled === true;
+      if (!cageId) {
+        if (!cancelled()) {
+          setCage(null);
+          setError('Identifiant de cage manquant.');
+          setLoading(false);
+        }
+        return;
+      }
+      if (!cancelled()) {
+        setLoading(true);
+        setError(null);
+      }
+      try {
+        const c = await obtenirCage(cageId);
+        if (cancelled()) return;
+        setCage(c);
+        if (!c) setError('Cage introuvable.');
+      } catch (e) {
+        if (!cancelled()) setError(e instanceof Error ? e.message : 'Erreur');
+      } finally {
+        if (!cancelled()) setLoading(false);
+      }
+    },
+    [cageId],
+  );
+
+  const reload = useCallback(() => loadCage(), [loadCage]);
 
   useEffect(() => {
-    void reload();
-  }, [reload]);
+    const signal: LoadSignal = { cancelled: false };
+    void loadCage(signal);
+    return () => {
+      signal.cancelled = true;
+    };
+  }, [loadCage]);
 
   if (loading) {
     return (
@@ -68,9 +86,11 @@ export default function CageDetailScreen() {
   }
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
-      <CageDetailView cage={cage} onReload={reload} />
-    </View>
+    <TabScreenFade>
+      <View style={[styles.root, { paddingTop: insets.top }]}>
+        <CageDetailView cage={cage} onReload={reload} />
+      </View>
+    </TabScreenFade>
   );
 }
 

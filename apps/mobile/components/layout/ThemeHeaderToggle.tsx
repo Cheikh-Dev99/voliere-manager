@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Moon, Sun } from 'lucide-react-native';
 
 import type { ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
+import { AnimatedPressable } from '../ui/AnimatedPressable';
 
-function createStyles(theme: ThemeColors) {
+function createStyles(theme: ThemeColors, shadowCard: ReturnType<typeof import('../../constants/palettes').shadowCardFor>) {
   return StyleSheet.create({
     btn: {
       width: 40,
@@ -16,6 +17,7 @@ function createStyles(theme: ThemeColors) {
       backgroundColor: theme.surfaceElevated,
       alignItems: 'center',
       justifyContent: 'center',
+      ...shadowCard,
     },
   });
 }
@@ -25,13 +27,13 @@ function createStyles(theme: ThemeColors) {
  * Clair / Auto / Sombre reste dans la feuille profil (Apparence).
  */
 export function ThemeHeaderToggle() {
-  const { resolved, setPreference, colors: theme } = useAppTheme();
+  const { resolved, setPreference, colors: theme, shadowCard } = useAppTheme();
   const isDark = resolved === 'dark';
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme, shadowCard), [theme, shadowCard]);
 
   return (
-    <Pressable
-      style={({ pressed }) => [styles.btn, pressed && { opacity: 0.88 }]}
+    <AnimatedPressable
+      style={styles.btn}
       onPress={() => setPreference(isDark ? 'light' : 'dark')}
       accessibilityRole="button"
       accessibilityLabel={isDark ? 'Passer en thème clair' : 'Passer en thème sombre'}
@@ -42,6 +44,6 @@ export function ThemeHeaderToggle() {
       ) : (
         <Sun size={20} color="#d97706" strokeWidth={2.2} />
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }

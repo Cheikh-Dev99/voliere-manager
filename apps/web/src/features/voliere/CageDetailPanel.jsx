@@ -17,6 +17,7 @@ import {
 import { useReproductionsByCouple } from '@shared/hooks/useReproductionsByCouple'
 import { getPigeonDisplayPhotoSrc } from '../../utils/localPigeonPhoto'
 import { CageGenealogyView } from './CageGenealogyView'
+import { vmElevation4, vmTransitionInteractive } from '../../theme/voliereMotionUi'
 
 const CAGE_TAB_IDS = {
   detail: { tab: 'cage-tab-detail', panel: 'cage-tabpanel-detail' },
@@ -281,14 +282,16 @@ export function CageDetailPanel({
 
   return (
     <>
-      <aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 md:static md:max-w-sm md:shadow-none lg:max-w-md">
+      <aside
+        className={`vm-panel-enter fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 ${vmElevation4} md:static md:max-w-sm md:shadow-none lg:max-w-md`}
+      >
         <div className="shrink-0 border-b border-slate-100 dark:border-slate-700">
           <div className="flex items-center justify-between px-4 py-3">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{titre}</h2>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+              className={`rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 ${vmTransitionInteractive}`}
               aria-label="Fermer le panneau"
             >
               <X className="size-5" />

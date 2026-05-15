@@ -106,35 +106,29 @@ eas secret:create --scope project --name EXPO_PUBLIC_FIREBASE_API_KEY --value "V
 ```
 
 3. Google Cloud : sur le client OAuth **Web**, ajouter `voliere-manager://oauthredirect` (APK / build natif).
-4. Générer l’APK:
+4. Générer l’APK (Android) et/ou l’IPA (iOS) :
 
 ```bash
 cd apps/mobile
 eas build --profile preview --platform android
+# ou iOS (compte Apple / certificats requis sur EAS) :
+# eas build --profile preview --platform ios
+# ou les deux :
+# eas build --profile preview --platform all
 ```
 
-5. Télécharger l’APK (remplacer `BUILD_ID` par l’identifiant affiché sur [expo.dev](https://expo.dev)) :
+5. Télécharger l’artefact (remplacer `BUILD_ID` par l’identifiant affiché sur [expo.dev](https://expo.dev)) :
 
 ```bash
 eas build:download --build-id BUILD_ID
 ```
 
-6. **APK** — placer le fichier à la **racine du monorepo** (même niveau que `README.md`) :
+Le fichier **`.apk`** (ou **`.ipa`**) est créé dans le répertoire courant ; renomme-le si besoin, puis publie-le en [GitHub Release](./RELEASES-MOBILES.md).
 
-| Élément | Chemin |
-| --- | --- |
-| Fichier | [`Volière Manager.apk`](../Volière%20Manager.apk) |
-| Emplacement | racine du monorepo (`voliere-manager/Volière Manager.apk`, au même niveau que `README.md`) |
+6. **Publier pour le jury / les testeurs** — ne pas committer l’APK à la racine du dépôt. Utiliser une **GitHub Release** :
 
-Exemple après téléchargement EAS :
-
-```bash
-mv ~/Downloads/VOTRE_BUILD.apk "../../Volière Manager.apk"
-```
-
-(Adapter le chemin source ; depuis `apps/mobile/`, la racine du monorepo est `../..`.)
-
-Tu peux **renommer** le fichier (extension `.apk` obligatoire) sans casser l’installation. Pour une nouvelle version, remplacer ce fichier à la racine et mettre à jour le dépôt Git.
+   - Guide complet : [**Releases mobiles (GitHub + EAS)**](./RELEASES-MOBILES.md) (workflow *Release mobile* dans Actions, ou commandes `gh release create` / `gh release upload`).
+   - Lien permanent type « dernière build » : [releases/latest](https://github.com/cheikh-dev99/voliere-manager/releases/latest).
 
 7. Tester sur appareil réel : copier l’APK sur le téléphone, installer (sources inconnues si demandé), puis vérifier connexion e-mail, Google et grille volière.
 

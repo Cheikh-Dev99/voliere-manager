@@ -6,16 +6,25 @@ import type { User } from 'firebase/auth';
 import { ThemeProvider } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 
-import { AppLoadingView } from '../components/ui/AppLoadingView';
+import { LaunchSplashView } from '../components/ui/LaunchSplashView';
 import { AppFeedbackProvider } from '../components/providers/AppFeedbackProvider';
 import { AppThemeProvider, useAppTheme } from '../context/AppThemeContext';
 import { onAuthChange } from '@shared/firebase/auth';
 
+/** Durée minimale d’affichage du splash avant d’ouvrir le login (utilisateur non connecté). */
+const LAUNCH_SPLASH_MIN_MS = 1600;
+
 function RootLayoutContent() {
   const { navigationTheme, colors, resolved } = useAppTheme();
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [splashMinDone, setSplashMinDone] = useState(false);
   const segments = useSegments();
   const router = useRouter();
+
+  useEffect(() => {
+    const t = setTimeout(() => setSplashMinDone(true), LAUNCH_SPLASH_MIN_MS);
+    return () => clearTimeout(t);
+  }, []);
 
   const navForRoot = useMemo(
     () => ({
@@ -40,10 +49,8 @@ function RootLayoutContent() {
         foreground: {
           flex: 1,
         },
-        boot: {
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
+        shellSplash: {
+          backgroundColor: '#ffffff',
         },
       }),
     [colors.slate100],
@@ -60,6 +67,7 @@ function RootLayoutContent() {
     const inAuth = root === '(auth)';
 
     if (user === null) {
+      if (!splashMinDone) return;
       if (!inAuth) router.replace('/(auth)/login');
       return;
     }
@@ -67,21 +75,14 @@ function RootLayoutContent() {
     if (inAuth) {
       router.replace('/(app)/(tabs)');
     }
-  }, [user, segments, router]);
+  }, [user, segments, router, splashMinDone]);
 
   return (
     <>
       <StatusBar style={resolved === 'dark' ? 'light' : 'dark'} />
-      {user === undefined ? (
-        <View style={styles.shell}>
-          <View style={styles.boot}>
-            <AppLoadingView
-              variant="fullscreen"
-              loadingContext="default"
-              message="Chargement…"
-              subtitle="Volière Manager"
-            />
-          </View>
+      {user === undefined || (user === null && !splashMinDone) ? (
+        <View style={[styles.shell, styles.shellSplash]}>
+          <LaunchSplashView />
         </View>
       ) : (
         <View style={styles.shell}>

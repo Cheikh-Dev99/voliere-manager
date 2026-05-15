@@ -3,7 +3,8 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Pigeon } from '@shared/types';
 
 import { usePigeonDisplayPhoto } from '../../hooks/usePigeonDisplayPhoto';
-import { theme, shadowCard } from '../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../constants/palettes';
+import { useThemedStyles } from '../../lib/useThemedStyles';
 import { ageDepuisNaissance } from './cageDetailUtils';
 
 type Props = {
@@ -21,8 +22,9 @@ export function PigeonPreviewCard({
   onPressHealth,
   healthLinkLabel = 'Ouvrir le carnet de santé',
 }: Props) {
+  const styles = useThemedStyles(createStyles);
   const uri = usePigeonDisplayPhoto(pigeon);
-  const roleColor = pigeon.sexe === 'MALE' ? '#0369a1' : '#be185d';
+  const roleColor = pigeon.sexe === 'MALE' ? '#38bdf8' : '#f472b6';
 
   const thumb = uri ? (
     <Image source={{ uri }} style={styles.thumb} accessibilityIgnoresInvertColors />
@@ -85,40 +87,42 @@ export function PigeonPreviewCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: theme.radiusLg,
-    borderWidth: 1,
-    borderColor: theme.slate100,
-    backgroundColor: 'rgba(248, 250, 252, 0.95)',
-    padding: 12,
-    ...shadowCard,
-  },
-  mainPress: { flexDirection: 'row', gap: 12 },
-  mainPressIn: { opacity: 0.9 },
-  mainRow: { flexDirection: 'row', gap: 12 },
-  thumb: { width: 56, height: 56, borderRadius: theme.radiusMd, backgroundColor: theme.slate200 },
-  thumbPlaceholder: {
-    width: 56,
-    height: 56,
-    borderRadius: theme.radiusMd,
-    backgroundColor: theme.slate200,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 4,
-  },
-  thumbPhTxt: { fontSize: 10, fontWeight: '600', color: theme.slate500, textAlign: 'center' },
-  textCol: { flex: 1, minWidth: 0 },
-  role: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
-  line: { fontSize: 14, color: theme.slate800, marginBottom: 2 },
-  lineMeta: { fontSize: 14, color: theme.slate600, marginBottom: 2 },
-  muted: { color: theme.slate500 },
-  strong: { fontWeight: '700', color: theme.slate800 },
-  healthWrap: { marginTop: 10, paddingLeft: 68 },
-  healthLink: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: theme.teal700,
-    textDecorationLine: 'underline',
-  },
-});
+function createStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
+    card: {
+      borderRadius: theme.radiusLg,
+      borderWidth: 1,
+      borderColor: theme.border,
+      backgroundColor: theme.surfaceElevated,
+      padding: 12,
+      ...shadowCard,
+    },
+    mainPress: { flexDirection: 'row', gap: 12 },
+    mainPressIn: { opacity: 0.9 },
+    mainRow: { flexDirection: 'row', gap: 12 },
+    thumb: { width: 56, height: 56, borderRadius: theme.radiusMd, backgroundColor: theme.slate200 },
+    thumbPlaceholder: {
+      width: 56,
+      height: 56,
+      borderRadius: theme.radiusMd,
+      backgroundColor: theme.slate200,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 4,
+    },
+    thumbPhTxt: { fontSize: 10, fontWeight: '600', color: theme.slate500, textAlign: 'center' },
+    textCol: { flex: 1, minWidth: 0 },
+    role: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
+    line: { fontSize: 14, color: theme.slate800, marginBottom: 2 },
+    lineMeta: { fontSize: 14, color: theme.slate600, marginBottom: 2 },
+    muted: { color: theme.slate500 },
+    strong: { fontWeight: '700', color: theme.slate900 },
+    healthWrap: { marginTop: 10, paddingLeft: 68 },
+    healthLink: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: theme.teal700,
+      textDecorationLine: 'underline',
+    },
+  });
+}

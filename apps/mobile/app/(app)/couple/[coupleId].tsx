@@ -10,21 +10,14 @@ import type { Cage, Couple, Pigeon } from '@shared/types';
 import { PigeonPhotoAvatar } from '../../../components/pigeons/PigeonPhotoAvatar';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
 import { appFeedback } from '../../../lib/appFeedback';
-import { theme, shadowCard } from '../../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
+import { useThemedStyles } from '../../../lib/useThemedStyles';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
 function normalizeId(raw: string | string[] | undefined): string | undefined {
   if (raw == null) return undefined;
   return Array.isArray(raw) ? raw[0] : raw;
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLab}>{label}</Text>
-      <Text style={styles.rowVal}>{value || '—'}</Text>
-    </View>
-  );
 }
 
 function cageLabel(c: Cage | undefined): string {
@@ -33,6 +26,8 @@ function cageLabel(c: Cage | undefined): string {
 }
 
 export default function CoupleDetailScreen() {
+  const { shadowCard } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   const { coupleId: coupleIdParam } = useLocalSearchParams<{ coupleId: string | string[] }>();
   const coupleId = useMemo(() => normalizeId(coupleIdParam), [coupleIdParam]);
@@ -175,14 +170,15 @@ export default function CoupleDetailScreen() {
 
       <View style={[styles.block, shadowCard]}>
         <Text style={styles.section}>Informations</Text>
-        <Row label="Début" value={formatFirestoreDate(couple.dateDebut, 'long')} />
+        <Row styles={styles} label="Début" value={formatFirestoreDate(couple.dateDebut, 'long')} />
         <Row
+          styles={styles}
           label="Fin"
           value={couple.dateFin ? formatFirestoreDate(couple.dateFin, 'long') : '—'}
         />
-        <Row label="Cage" value={cageLabel(cage)} />
-        <Row label="Notes" value={couple.notes ?? ''} />
-        <Row label="Créé le" value={formatFirestoreDate(couple.createdAt, 'long')} />
+        <Row styles={styles} label="Cage" value={cageLabel(cage)} />
+        <Row styles={styles} label="Notes" value={couple.notes ?? ''} />
+        <Row styles={styles} label="Créé le" value={formatFirestoreDate(couple.createdAt, 'long')} />
       </View>
 
       <View style={styles.actions}>
@@ -215,14 +211,32 @@ export default function CoupleDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function Row({
+  label,
+  value,
+  styles,
+}: {
+  label: string;
+  value: string;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  return (
+    <View style={styles.row}>
+      <Text style={styles.rowLab}>{label}</Text>
+      <Text style={styles.rowVal}>{value || '—'}</Text>
+    </View>
+  );
+}
+
+function createStyles(theme: ThemeColors, _shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
   err: { color: theme.red600, textAlign: 'center', marginBottom: 12, fontSize: 15 },
   backBtn: { padding: 12 },
   backTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
   scroll: { padding: theme.screenPadding, paddingBottom: 40, backgroundColor: 'transparent' },
   headCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -249,7 +263,7 @@ const styles = StyleSheet.create({
   statutTxt: { fontSize: 13, fontWeight: '800', color: theme.emerald900 },
   statutTxtOff: { color: theme.slate700 },
   block: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -286,4 +300,5 @@ const styles = StyleSheet.create({
   },
   dangerBtnDis: { opacity: 0.6 },
   dangerTxt: { color: '#b91c1c', fontWeight: '800', fontSize: 15 },
-});
+  });
+}

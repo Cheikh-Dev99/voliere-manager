@@ -164,7 +164,7 @@ Les photos pigeons (Storage) ne sont lisibles que par l’utilisateur authentifi
 ## 5. Mobile (rappel)
 
 - **Expo EAS Build** pour APK/AAB ou builds iOS ; variables `EXPO_PUBLIC_FIREBASE_*` (voir [Installation et configuration — § 5.2](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas)).
-- **APK** : [`Volière Manager.apk`](../Volière%20Manager.apk) à la racine du monorepo.
+- **APK / IPA** : publiés en [**GitHub Releases**](https://github.com/cheikh-dev99/voliere-manager/releases/latest) — voir [Releases mobiles](./RELEASES-MOBILES.md) (pas de fichier à la racine du dépôt).
 - L’export CSV utilise `expo-sharing` : tester sur appareil réel si besoin.
 
 ---

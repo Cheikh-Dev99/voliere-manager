@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Link, useNavigation, useRouter } from 'expo-router';
 import { Egg } from 'lucide-react-native';
 
@@ -10,11 +10,13 @@ import type { Couple, Pigeon } from '@shared/types';
 
 import { EmptyStateCard } from '../../../components/layout/EmptyStateCard';
 import { PageHeader } from '../../../components/layout/PageHeader';
+import { TabScreenFade } from '../../../components/layout/TabScreenFade';
 import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
 import {
   FloatingAddButton,
   FLOATING_ADD_LIST_PADDING_BOTTOM,
 } from '../../../components/ui/FloatingAddButton';
+import { AnimatedPressable } from '../../../components/ui/AnimatedPressable';
 import { SearchField } from '../../../components/ui/SearchField';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
 import type { ThemeColors } from '../../../constants/palettes';
@@ -75,6 +77,7 @@ export default function ReproductionsTabScreen() {
   );
 
   return (
+    <TabScreenFade>
     <View style={styles.root}>
       {loading ? (
         <View style={styles.center}>
@@ -117,7 +120,7 @@ export default function ReproductionsTabScreen() {
                 asChild
                 accessibilityLabel={`Fiche reproduction ${label}`}
               >
-                <Pressable style={({ pressed }) => [styles.cardPressable, pressed && styles.cardPressed]}>
+                <AnimatedPressable style={styles.cardPressable}>
                   <View style={[styles.card, shadowCard]}>
                     <Text style={styles.title}>{label}</Text>
                     <Text style={styles.sub}>
@@ -130,7 +133,7 @@ export default function ReproductionsTabScreen() {
                       </Text>
                     ) : null}
                   </View>
-                </Pressable>
+                </AnimatedPressable>
               </Link>
             );
           }}
@@ -143,6 +146,7 @@ export default function ReproductionsTabScreen() {
         </>
       )}
     </View>
+    </TabScreenFade>
   );
 }
 

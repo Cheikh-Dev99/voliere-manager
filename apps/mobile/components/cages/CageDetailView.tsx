@@ -40,8 +40,11 @@ import { rompreCouple } from '@shared/services/couplesService';
 import type { Cage, CageOccupancyEvent, Couple, Pigeon } from '@shared/types';
 
 import { appFeedback } from '../../lib/appFeedback';
-import { theme, shadowCard } from '../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
+import { useThemedStyles } from '../../lib/useThemedStyles';
 import { AppLoadingView } from '../ui/AppLoadingView';
+import { FadeInView } from '../ui/FadeInView';
 import { CageGenealogyTree } from '../genealogy/CageGenealogyTree';
 import { formatCalendarDate, formatEventTime } from './cageDetailUtils';
 import { PigeonPreviewCard } from './PigeonPreviewCard';
@@ -61,6 +64,8 @@ type Props = {
 };
 
 export function CageDetailView({ cage, onReload }: Props) {
+  const { colors: theme } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   const { pigeons } = usePigeons(true);
   const { couples } = useCouples(false);
@@ -243,6 +248,7 @@ export function CageDetailView({ cage, onReload }: Props) {
   ];
 
   return (
+    <FadeInView style={{ flex: 1 }}>
     <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" nestedScrollEnabled style={{ flex: 1 }}>
       <View style={styles.titleRow}>
         <Text style={styles.title}>{titre}</Text>
@@ -589,10 +595,12 @@ export function CageDetailView({ cage, onReload }: Props) {
         </View>
       </Modal>
     </ScrollView>
+    </FadeInView>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
   scroll: { padding: 16, paddingBottom: 48 },
   titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
   title: { flex: 1, fontSize: 22, fontWeight: '800', color: theme.slate900 },
@@ -608,11 +616,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: theme.radiusMd,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
     borderWidth: 1,
-    borderColor: theme.slate200,
+    borderColor: theme.border,
   },
-  tabOn: { backgroundColor: theme.white, borderColor: theme.slate200, ...shadowCard },
+  tabOn: { backgroundColor: theme.surfaceElevated, borderColor: theme.border, ...shadowCard },
   tabTxt: { fontSize: 13, fontWeight: '600', color: theme.slate600, maxWidth: 120 },
   tabTxtOn: { color: theme.slate900 },
   panel: { marginTop: 4 },
@@ -665,15 +673,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 14,
   },
-  actionPigeon: { borderWidth: 2, borderColor: '#0ea5e9', backgroundColor: theme.white },
+  actionPigeon: { borderWidth: 2, borderColor: '#0ea5e9', backgroundColor: theme.surfaceElevated },
   actionPigeonTxt: { fontSize: 15, fontWeight: '700', color: '#0369a1' },
-  actionCouple: { borderWidth: 2, borderColor: '#f59e0b', backgroundColor: theme.white },
+  actionCouple: { borderWidth: 2, borderColor: '#f59e0b', backgroundColor: theme.surfaceElevated },
   actionCoupleTxt: { fontSize: 15, fontWeight: '700', color: '#92400e' },
   actionRompre: { borderWidth: 2, borderColor: '#d97706', backgroundColor: '#fffbeb' },
   actionRompreTxt: { fontSize: 15, fontWeight: '700', color: '#78350f' },
-  actionMove: { borderWidth: 2, borderColor: theme.teal600, backgroundColor: theme.white },
+  actionMove: { borderWidth: 2, borderColor: theme.teal600, backgroundColor: theme.surfaceElevated },
   actionMoveTxt: { fontSize: 15, fontWeight: '700', color: theme.teal800 },
-  actionLib: { borderWidth: 2, borderColor: '#fb7185', backgroundColor: theme.white },
+  actionLib: { borderWidth: 2, borderColor: '#fb7185', backgroundColor: theme.surfaceElevated },
   actionLibTxt: { fontSize: 15, fontWeight: '700', color: '#be123c' },
   actionRepro: { borderWidth: 2, borderColor: theme.teal100, backgroundColor: theme.teal50 },
   actionReproTxt: { fontSize: 15, fontWeight: '700', color: theme.teal900 },
@@ -684,7 +692,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radiusLg,
     paddingVertical: 14,
     alignItems: 'center',
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   editOutlineTxt: { fontSize: 15, fontWeight: '700', color: theme.slate800 },
   opacityDim: { opacity: 0.55 },
@@ -700,7 +708,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radiusLg,
     borderWidth: 2,
     borderColor: theme.slate200,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   historyFullBtnTxt: { fontSize: 15, fontWeight: '700', color: theme.slate800 },
   linkRow: {
@@ -717,7 +725,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radiusMd,
     borderWidth: 1,
     borderColor: theme.slate100,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
     padding: 12,
   },
   reproK: { fontSize: 11, fontWeight: '700', color: theme.slate500, letterSpacing: 0.5 },
@@ -728,7 +736,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radiusMd,
     borderWidth: 1,
     borderColor: theme.slate100,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
     padding: 10,
   },
   occTime: { fontSize: 11, fontWeight: '600', color: theme.slate500 },
@@ -742,7 +750,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   modalCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     padding: 16,
@@ -757,4 +765,5 @@ const styles = StyleSheet.create({
   },
   pickMat: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
   pickNom: { fontSize: 14, color: theme.slate600, marginTop: 2 },
-});
+  });
+}

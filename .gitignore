@@ -61,6 +61,11 @@ firestore-debug.log
 ui-debug.log
 dataconnect-debug.log
 
+# --- Binaires mobiles (APK / IPA) : publiés via GitHub Releases, pas à la racine du dépôt ---
+*.apk
+*.ipa
+/Volière Manager.apk
+
 # --- Expo / React Native ---
 .expo/
 web-build/

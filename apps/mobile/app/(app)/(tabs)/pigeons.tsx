@@ -22,6 +22,7 @@ import { buildPigeonsCsvDelimited } from '@shared/utils/pigeonCsv';
 import { PigeonPhotoAvatar } from '../../../components/pigeons/PigeonPhotoAvatar';
 import { EmptyStateCard } from '../../../components/layout/EmptyStateCard';
 import { PageHeader } from '../../../components/layout/PageHeader';
+import { TabScreenFade } from '../../../components/layout/TabScreenFade';
 import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
 import {
   FloatingAddButton,
@@ -195,6 +196,7 @@ export default function PigeonsTabScreen() {
   );
 
   return (
+    <TabScreenFade>
     <View style={styles.root}>
       {listLoading ? (
         <View style={styles.center}>
@@ -386,6 +388,7 @@ export default function PigeonsTabScreen() {
         </>
       )}
     </View>
+    </TabScreenFade>
   );
 }
 

@@ -11,7 +11,14 @@ import {
 import { useColorScheme } from 'react-native';
 import { DarkTheme, DefaultTheme, type Theme as NavTheme } from '@react-navigation/native';
 
-import { darkPalette, lightPalette, shadowCardFor, type ThemeColors } from '../constants/palettes';
+import {
+  darkPalette,
+  lightPalette,
+  shadowCardFor,
+  shadowsFor,
+  type ThemeColors,
+  type ThemeShadows,
+} from '../constants/palettes';
 
 const STORAGE_KEY = 'voliere-manager:theme-preference';
 
@@ -23,6 +30,7 @@ type AppThemeValue = {
   resolved: 'light' | 'dark';
   colors: ThemeColors;
   shadowCard: ReturnType<typeof shadowCardFor>;
+  shadows: ThemeShadows;
   navigationTheme: NavTheme;
 };
 
@@ -62,6 +70,7 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
   );
 
   const shadowCard = useMemo(() => shadowCardFor(colors, resolved), [colors, resolved]);
+  const shadows = useMemo(() => shadowsFor(colors, resolved), [colors, resolved]);
 
   const navigationTheme = useMemo((): NavTheme => {
     const base = resolved === 'dark' ? DarkTheme : DefaultTheme;
@@ -91,9 +100,10 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
       resolved,
       colors,
       shadowCard,
+      shadows,
       navigationTheme,
     }),
-    [preference, setPreference, resolved, colors, shadowCard, navigationTheme],
+    [preference, setPreference, resolved, colors, shadowCard, shadows, navigationTheme],
   );
 
   return <AppThemeContext.Provider value={value}>{children}</AppThemeContext.Provider>;

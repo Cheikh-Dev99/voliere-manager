@@ -28,6 +28,7 @@ import {
   dmDataTableHeader,
   dmDataTableSub,
   dmDataTableTitle,
+  dmInteractiveCard,
   dmTableClass,
   dmTableWrap,
   dmThead,
@@ -384,7 +385,7 @@ export function PigeonsListPage() {
         return (
           <article
             key={p.id}
-            className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-sm transition-shadow hover:shadow-md"
+            className={dmInteractiveCard}
           >
             <div className="relative aspect-[4/3] bg-slate-100 dark:bg-slate-800">
               {photoSrc ? (

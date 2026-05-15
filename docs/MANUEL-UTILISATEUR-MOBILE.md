@@ -10,7 +10,7 @@ Stack technique, dossiers `app/` et variables d’environnement : [Architecture 
 
 ### 1.1 Accès à l’authentification
 
-- **APK** : télécharger [`Volière Manager.apk`](../Volière%20Manager.apk) à la racine du dépôt, l’installer sur un téléphone Android (autoriser les sources inconnues si demandé), puis ouvrir l’application **Volière Manager**.
+- **APK Android** : télécharger le fichier **`.apk`** depuis la [**dernière release GitHub**](https://github.com/cheikh-dev99/voliere-manager/releases/latest), l’installer sur un téléphone Android (autoriser les sources inconnues si demandé), puis ouvrir l’application **Volière Manager**. Voir [Releases mobiles](./RELEASES-MOBILES.md) pour régénérer ou publier une build.
 - **Développement** : lancer l’app avec Expo Go ou `yarn start` dans `apps/mobile/`.
 - Si tu n’es pas connecté, l’écran **`(auth)/login`** s’affiche.
 

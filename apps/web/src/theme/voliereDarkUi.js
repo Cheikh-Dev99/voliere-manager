@@ -1,11 +1,22 @@
 /**
  * Classes UI alignées sur la page Sorties (référence contraste mode sombre).
  * @see apps/web/src/pages/SortiesPage.jsx
+ * @see apps/web/src/theme/voliereMotionUi.js (élévation + transitions)
  */
+
+import {
+  vmChromeHeader,
+  vmElevation1,
+  vmElevation2,
+  vmElevation4,
+  vmInteractiveCard,
+  vmTransitionColors,
+  vmTransitionInteractive,
+} from './voliereMotionUi.js'
 
 /** Champ formulaire (input, select, textarea). */
 export function dmFieldClass(err) {
-  return `w-full rounded-lg border bg-white px-3 py-2 text-slate-900 outline-none focus:ring-2 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 ${
+  return `w-full rounded-lg border bg-white px-3 py-2 text-slate-900 outline-none focus:ring-2 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 ${
     err
       ? 'border-red-400 focus:border-red-500 focus:ring-red-200 dark:border-red-500'
       : 'border-slate-300 focus:border-teal-500 focus:ring-teal-500/30'
@@ -13,23 +24,18 @@ export function dmFieldClass(err) {
 }
 
 /** Panneau filtres (liste / historique). */
-export const dmFilterCard =
-  'space-y-4 rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-3 shadow-sm sm:p-4'
+export const dmFilterCard = `space-y-4 rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-3 sm:p-4 ${vmElevation1} ${vmTransitionInteractive}`
 
 /** Formulaire principal type Sorties (colonne gauche). */
-export const dmFormCard =
-  'space-y-4 rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm sm:p-5'
+export const dmFormCard = `space-y-4 rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 sm:p-5 ${vmElevation1} ${vmTransitionInteractive}`
 
 /** Coque formulaire page dédiée (création / édition). */
-export const dmFormShell =
-  'space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900'
+export const dmFormShell = `space-y-4 rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900 ${vmElevation1} ${vmTransitionInteractive}`
 
 /** Coque formulaire sans space-y (grille interne). */
-export const dmFormShellCompact =
-  'rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900'
+export const dmFormShellCompact = `rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900 ${vmElevation1} ${vmTransitionInteractive}`
 
-export const dmDataTableCard =
-  'overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-md shadow-slate-900/5 ring-1 ring-slate-900/[0.04]'
+export const dmDataTableCard = `overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-slate-700 dark:bg-slate-900 ${vmElevation2} ${vmTransitionInteractive}`
 
 export const dmDataTableHeader =
   'border-b border-teal-100 bg-gradient-to-r from-teal-50/90 via-white to-slate-50/80 px-4 py-3 dark:border-slate-700 dark:from-slate-800/90 dark:via-slate-900 dark:to-slate-900'
@@ -50,30 +56,41 @@ export const dmThead =
 
 export const dmTbody = 'divide-y divide-slate-100 dark:divide-slate-700'
 
-export const dmTrStriped =
-  'transition-colors odd:bg-white even:bg-slate-50/50 hover:bg-teal-50/40 dark:odd:bg-slate-900 dark:even:bg-slate-800/50 dark:hover:bg-teal-950/40'
+export const dmTrStriped = `${vmTransitionColors} odd:bg-white even:bg-slate-50/50 hover:bg-teal-50/40 dark:odd:bg-slate-900 dark:even:bg-slate-800/50 dark:hover:bg-teal-950/40`
 
-export const dmTrStripedAlt =
-  'transition-colors odd:bg-white even:bg-slate-50/60 hover:bg-teal-50/50 dark:odd:bg-slate-900 dark:even:bg-slate-800/60 dark:hover:bg-teal-950/40'
+export const dmTrStripedAlt = `${vmTransitionColors} odd:bg-white even:bg-slate-50/60 hover:bg-teal-50/50 dark:odd:bg-slate-900 dark:even:bg-slate-800/60 dark:hover:bg-teal-950/40`
 
 export const dmInputSearch =
-  'w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30'
+  'w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-white py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30'
 
 export const dmInputSearchCompact =
-  'w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 py-2 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30'
+  'w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-white py-2 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30'
 
 export const dmSelect =
-  'w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30'
+  'w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30'
 
 export const dmLabelXs = 'mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400'
 
 export const dmLabelSm = 'mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300'
 
-export const dmSortDirButton =
-  'inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700'
+export const dmSortDirButton = `inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 ${vmTransitionInteractive} active:scale-[0.98]`
 
 export const dmFilterResetRow =
   'flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 dark:border-slate-700'
 
-export const dmGhostButton =
-  'inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700'
+export const dmGhostButton = `inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 ${vmTransitionInteractive} active:scale-[0.98]`
+
+/** Carte cliquable (grille pigeons, tuiles). */
+export const dmInteractiveCard = `flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 ${vmInteractiveCard}`
+
+/** Surface modale / panneau formulaire. */
+export const dmDialogSurface = `rounded-2xl border border-slate-200 bg-white p-4 outline-none dark:border-slate-600 dark:bg-slate-900 ${vmElevation4} ${vmTransitionInteractive}`
+
+/** Ligne événement (historique cage, timeline). */
+export const dmEventCard = `flex gap-3 rounded-xl border border-slate-100 bg-slate-50/90 px-3 py-3 dark:border-slate-600 dark:bg-slate-800/80 sm:px-4 ${vmElevation1} ${vmTransitionInteractive} hover:shadow-md motion-reduce:hover:shadow-sm`
+
+/** Bouton icône header (thème, menu). */
+export const dmIconButton = `inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-700 ${vmElevation1} ${vmTransitionInteractive} hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/45 active:scale-[0.97] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700`
+
+/** En-tête page plein écran (hors AppLayout). */
+export const dmStandaloneHeader = `sticky top-0 z-20 w-full shrink-0 border-b border-slate-200/90 bg-white/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-slate-700 dark:bg-slate-900/95 dark:supports-[backdrop-filter]:bg-slate-900/90 ${vmChromeHeader}`

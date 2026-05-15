@@ -2,7 +2,7 @@
 
 Ce document décrit l’app **Expo** (`apps/mobile/`), son **empilement technique** et l’intégration **`@shared`** (`packages/shared`).
 
-**Documents liés** : [APK](../Volière%20Manager.apk) · [Installation — build APK](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas) · [Déploiement](./DEPLOYEMENT-DEMO-ET-PROD.md)
+**Documents liés** : [Releases mobiles (APK / IPA)](./RELEASES-MOBILES.md) · [Installation — build EAS](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas) · [Déploiement](./DEPLOYEMENT-DEMO-ET-PROD.md)
 
 - **Parcours utilisateur** (connexion, onglets, actions) : [Manuel utilisateur — Mobile](./MANUEL-UTILISATEUR-MOBILE.md).
 - **Comparaison avec le web** (routes, layout) : [Architecture technique — Web](./ARCHITECTURE-WEB.md).
@@ -78,7 +78,7 @@ npx tsc --noEmit
 ## 7. Déploiement et exports
 
 - Builds store : **EAS Build** (comptes Apple / Google Play hors périmètre de ce dépôt).
-- **APK de démonstration** (profil EAS `preview`) : [`Volière Manager.apk`](../Volière%20Manager.apk) à la racine du monorepo (à côté de `README.md`). Voir [Installation et configuration — § 5.2](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas) pour régénérer ou télécharger un build.
+- **APK / IPA de démonstration** (profil EAS `preview`) : publiés en [**GitHub Releases**](https://github.com/cheikh-dev99/voliere-manager/releases/latest). Voir [Releases mobiles](./RELEASES-MOBILES.md) et [Installation — § 5.2](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas).
 - Export **CSV** pigeons : fichier généré via `@shared/utils/pigeonCsv` puis partagé avec **`expo-sharing`** ; tester sur appareil ou émulateur avec services adaptés.
 
 ---

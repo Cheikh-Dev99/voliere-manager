@@ -4,16 +4,14 @@ import { StyleSheet, View } from 'react-native';
 
 import { MergedVoliereCodesProvider } from '../../contexts/MergedVoliereCodesContext';
 import { useAppTheme } from '../../context/AppThemeContext';
+import { stackScreenOptions } from '../../lib/navigationMotion';
 
 export default function AppStackLayout() {
   const { colors } = useAppTheme();
 
   const screenOptions = useMemo(
     () => ({
-      headerTintColor: colors.teal700,
-      headerStyle: { backgroundColor: colors.surfaceElevated },
-      headerShadowVisible: true,
-      headerTitleStyle: { color: colors.slate900, fontWeight: '600' as const },
+      ...stackScreenOptions(colors),
       contentStyle: { backgroundColor: colors.slate100 },
     }),
     [colors],

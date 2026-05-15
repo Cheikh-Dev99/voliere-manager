@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { GitBranch, HelpCircle } from 'lucide-react'
 import { buildAncestorRows, generationLabel } from '@shared/utils/genealogyTree'
 import { getPigeonDisplayPhotoSrc } from '../../utils/localPigeonPhoto'
+import { PigeonGenealogyNote } from './PigeonGenealogyNote'
 
 const STATUT_DOT = {
   ACTIF: 'bg-emerald-500',
@@ -11,17 +12,6 @@ const STATUT_DOT = {
 }
 
 const DEFAULT_PIGEON_DETAIL_LINK_STATE = { back: { path: '/', label: 'Visualisation' } }
-
-function PigeonNotesSection({ title, notes }) {
-  const t = (notes ?? '').trim()
-  if (!t) return null
-  return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50/90 px-3 py-2.5 dark:border-slate-600 dark:bg-slate-800/80">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{title}</p>
-      <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-200">{t}</p>
-    </div>
-  )
-}
 
 function PigeonMiniCard({ pigeonId, pigeonById, emphasis, pigeonDetailLinkState }) {
   const p = pigeonById.get(pigeonId)
@@ -181,7 +171,7 @@ export function CageGenealogyView({ mode, pigeon, male, femelle, pigeonById, pig
           Lignée ascendante (jusqu’à <strong>grands-parents</strong> lorsque les fiches sont renseignées). Cliquez une
           fiche pour ouvrir le détail pigeon.
         </p>
-        <PigeonNotesSection title="Note" notes={pigeon.notes} />
+        <PigeonGenealogyNote label={`Note · ${pigeon.matricule}`} notes={pigeon.notes} />
         {!hasTree ? (
           <div className="rounded-lg border border-amber-100 bg-amber-50/70 px-3 py-2 text-xs text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
             Aucun père ni mère renseigné sur la fiche — complète la généalogie depuis{' '}
@@ -213,9 +203,7 @@ export function CageGenealogyView({ mode, pigeon, male, femelle, pigeonById, pig
             <span className="size-1.5 rounded-full bg-sky-500" aria-hidden />
             Mâle — {male.matricule}
           </p>
-          <div className="mb-2">
-            <PigeonNotesSection title="Note — mâle" notes={male.notes} />
-          </div>
+          <PigeonGenealogyNote label={`Note · ${male.matricule}`} notes={male.notes} accent="male" />
           {!mTree ? (
             <p className="mb-2 text-[11px] text-slate-500 dark:text-slate-400">Parents non renseignés.</p>
           ) : null}
@@ -231,9 +219,7 @@ export function CageGenealogyView({ mode, pigeon, male, femelle, pigeonById, pig
             <span className="size-1.5 rounded-full bg-pink-500" aria-hidden />
             Femelle — {femelle.matricule}
           </p>
-          <div className="mb-2">
-            <PigeonNotesSection title="Note — femelle" notes={femelle.notes} />
-          </div>
+          <PigeonGenealogyNote label={`Note · ${femelle.matricule}`} notes={femelle.notes} accent="female" />
           {!fTree ? (
             <p className="mb-2 text-[11px] text-slate-500 dark:text-slate-400">Parents non renseignés.</p>
           ) : null}

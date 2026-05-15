@@ -224,7 +224,7 @@ Le candidat devra :
 
 1. **Cahier des charges** (3 pages maximum) : objectifs, règles métier, fonctionnalités.
 2. **Code source complet** déposé sur GitHub / GitLab avec un **README** clair.
-3. **Application déployée** ou **APK** mis à disposition — fichier livrable : [`Volière Manager.apk`](../Volière%20Manager.apk) à la racine du dépôt (voir aussi le [README](../README.md)).
+3. **Application déployée** ou **APK / IPA** mis à disposition — livrables : [**GitHub Releases**](https://github.com/cheikh-dev99/voliere-manager/releases/latest) (voir [Releases mobiles](./RELEASES-MOBILES.md) et le [README](../README.md)).
 4. **Présentation orale** : 5 min de démo + 5 min de questions.
 
 ---

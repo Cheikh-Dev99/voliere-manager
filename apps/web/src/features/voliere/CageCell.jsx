@@ -1,5 +1,6 @@
 import { Bird, GripVertical } from 'lucide-react'
 import { CageDescriptionTooltip } from './CageDescriptionTooltip'
+import { vmElevation1, vmPressable, vmTransitionInteractive } from '../../theme/voliereMotionUi'
 
 const statutStyles = {
   LIBRE: {
@@ -58,7 +59,7 @@ export function CageCell({
 
   return (
     <div
-      className={`flex min-h-[7.25rem] rounded-xl border-2 shadow-sm transition ${
+      className={`flex min-h-[7.25rem] rounded-xl border-2 ${vmElevation1} ${vmTransitionInteractive} ${
         st.card
       } ${selected ? 'ring-2 ring-sky-500 ring-offset-2 ring-offset-slate-50' : ''} ${
         isDropTarget ? 'ring-2 ring-teal-500 ring-offset-2 ring-offset-slate-50' : ''
@@ -78,7 +79,7 @@ export function CageCell({
           }
         }}
         title={titleHover}
-        className={`relative min-w-0 flex-1 cursor-pointer rounded-l-xl p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500/60 ${
+        className={`relative min-w-0 flex-1 cursor-pointer rounded-l-xl p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500/60 ${vmPressable} ${
           hasDescription ? 'pb-8' : ''
         }`}
       >

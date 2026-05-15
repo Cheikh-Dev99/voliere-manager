@@ -10,6 +10,16 @@ import {
   deleteCageOccupancyEvent,
   fetchCageOccupancyEvents,
 } from '@shared/services/cagesService'
+import { PageTransition } from '../components/layout/PageTransition'
+import {
+  dmEventCard,
+  dmFieldClass,
+  dmFilterCard,
+  dmGhostButton,
+  dmLabelXs,
+  dmStandaloneHeader,
+} from '../theme/voliereDarkUi'
+import { vmPressable, vmTransitionInteractive } from '../theme/voliereMotionUi'
 
 const REASON_OPTIONS = [
   { value: '', label: 'Non précisé' },
@@ -216,11 +226,11 @@ export function CageHistoryFullPage() {
 
   return (
     <div className="flex min-h-dvh w-full max-w-none flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="sticky top-0 z-20 w-full shrink-0 border-b border-slate-200/90 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-slate-700 dark:bg-slate-900/95 dark:supports-[backdrop-filter]:bg-slate-900/90 sm:px-6 lg:px-10">
+      <header className={`${dmStandaloneHeader} sm:px-6 lg:px-10`}>
         <div className="flex w-full flex-wrap items-center gap-3">
           <Link
             to={back.path}
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+            className={`${dmGhostButton} shrink-0 px-3 py-2 text-sm font-semibold ${vmPressable}`}
           >
             <ArrowLeft className="size-4 shrink-0" aria-hidden />
             {back.label}
@@ -243,10 +253,11 @@ export function CageHistoryFullPage() {
       </header>
 
       <main className="flex w-full min-w-0 flex-1 flex-col overflow-y-auto bg-white dark:bg-slate-900">
-        <div className="w-full border-b border-slate-100 bg-slate-50/80 px-4 py-4 dark:border-slate-700 dark:bg-slate-800/50 sm:px-8 lg:px-12">
+        <PageTransition>
+        <div className={`mx-4 mt-4 sm:mx-8 lg:mx-12 ${dmFilterCard}`}>
           <div className="flex flex-wrap items-end gap-3">
             <div className="min-w-[min(100%,14rem)] flex-1">
-              <label htmlFor="cage-hist-search" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+              <label htmlFor="cage-hist-search" className={dmLabelXs}>
                 Recherche
               </label>
               <input
@@ -255,19 +266,19 @@ export function CageHistoryFullPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Résumé, raison, ID…"
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                className={dmFieldClass()}
                 autoComplete="off"
               />
             </div>
             <div className="min-w-[10rem]">
-              <label htmlFor="cage-hist-kind" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+              <label htmlFor="cage-hist-kind" className={dmLabelXs}>
                 Type d’événement
               </label>
               <select
                 id="cage-hist-kind"
                 value={kindFilter}
                 onChange={(e) => setKindFilter(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                className={dmFieldClass()}
               >
                 <option value="ALL">Tous</option>
                 {Object.entries(OCC_KIND_LABELS).map(([k, lab]) => (
@@ -278,7 +289,7 @@ export function CageHistoryFullPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="cage-hist-from" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+              <label htmlFor="cage-hist-from" className={dmLabelXs}>
                 Du
               </label>
               <input
@@ -286,11 +297,11 @@ export function CageHistoryFullPage() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="w-full min-w-[10.5rem] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                className={`${dmFieldClass()} min-w-[10.5rem]`}
               />
             </div>
             <div>
-              <label htmlFor="cage-hist-to" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+              <label htmlFor="cage-hist-to" className={dmLabelXs}>
                 Au
               </label>
               <input
@@ -298,14 +309,14 @@ export function CageHistoryFullPage() {
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="w-full min-w-[10.5rem] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                className={`${dmFieldClass()} min-w-[10.5rem]`}
               />
             </div>
             {hasActiveFilters ? (
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                className={`${dmGhostButton} ${vmPressable}`}
               >
                 <FilterX className="size-4 shrink-0" aria-hidden />
                 Réinitialiser
@@ -358,7 +369,7 @@ export function CageHistoryFullPage() {
               {filtered.map((ev) => (
                 <li
                   key={ev.id}
-                  className="flex gap-3 rounded-xl border border-slate-100 bg-slate-50/90 px-3 py-3 dark:border-slate-600 dark:bg-slate-800/80 sm:px-4"
+                  className={dmEventCard}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
@@ -396,6 +407,7 @@ export function CageHistoryFullPage() {
             {hasActiveFilters ? ' (filtres actifs)' : null}
           </footer>
         ) : null}
+        </PageTransition>
       </main>
     </div>
   )

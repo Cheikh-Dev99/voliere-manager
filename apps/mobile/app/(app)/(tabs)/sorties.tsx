@@ -9,6 +9,7 @@ import type { SortieType } from '@shared/types';
 
 import { PigeonPhotoAvatar } from '../../../components/pigeons/PigeonPhotoAvatar';
 import { PageHeader } from '../../../components/layout/PageHeader';
+import { TabScreenFade } from '../../../components/layout/TabScreenFade';
 import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
 import {
   FloatingAddButton,
@@ -16,6 +17,7 @@ import {
 } from '../../../components/ui/FloatingAddButton';
 import { SearchField } from '../../../components/ui/SearchField';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
+import { AnimatedPressable } from '../../../components/ui/AnimatedPressable';
 import type { ThemeColors } from '../../../constants/palettes';
 import { useAppTheme } from '../../../context/AppThemeContext';
 import { formatFirestoreDate } from '../../../utils/formatDate';
@@ -144,6 +146,7 @@ export default function SortiesTabScreen() {
   );
 
   return (
+    <TabScreenFade>
     <View style={styles.root}>
       {loading ? (
         <View style={styles.center}>
@@ -187,7 +190,7 @@ export default function SortiesTabScreen() {
                   asChild
                   accessibilityLabel={`Fiche sortie ${TYPE_LABEL[item.type]} ${item.pigeonMatricule ?? ''}`}
                 >
-                  <Pressable style={({ pressed }) => [styles.cardPressable, pressed && styles.cardPressed]}>
+                  <AnimatedPressable style={styles.cardPressable}>
                     <View style={[styles.card, shadowCard]}>
                       <View style={styles.cardMainRow}>
                         <PigeonPhotoAvatar pigeon={photoRef} size="sm" />
@@ -215,7 +218,7 @@ export default function SortiesTabScreen() {
                         </View>
                       </View>
                     </View>
-                  </Pressable>
+                  </AnimatedPressable>
                 </Link>
               );
             }}
@@ -228,6 +231,7 @@ export default function SortiesTabScreen() {
         </>
       )}
     </View>
+    </TabScreenFade>
   );
 }
 

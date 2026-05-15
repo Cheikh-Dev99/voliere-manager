@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import type { ThemeColors } from '../../constants/palettes';
+import type { ShadowCardStyle, ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
+import { AnimatedPressable } from './AnimatedPressable';
 
 type PrimaryButtonProps = {
   label: string;
@@ -13,7 +14,7 @@ type PrimaryButtonProps = {
   variant?: 'solid' | 'outline';
 };
 
-function createPrimaryButtonStyles(theme: ThemeColors) {
+function createPrimaryButtonStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
   return StyleSheet.create({
     base: {
       borderRadius: theme.radiusMd,
@@ -22,14 +23,13 @@ function createPrimaryButtonStyles(theme: ThemeColors) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    solid: { backgroundColor: theme.teal600 },
+    solid: { backgroundColor: theme.teal600, ...shadowCard },
     outline: {
       backgroundColor: theme.surfaceElevated,
       borderWidth: 1,
       borderColor: theme.border,
     },
     disabled: { opacity: 0.55 },
-    pressed: { opacity: 0.9 },
     inner: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     txt: { color: theme.white, fontWeight: '800', fontSize: 15 },
     txtOutline: { color: theme.slate800 },
@@ -43,19 +43,14 @@ export function PrimaryButton({
   icon,
   variant = 'solid',
 }: PrimaryButtonProps) {
-  const { colors: theme } = useAppTheme();
-  const styles = useMemo(() => createPrimaryButtonStyles(theme), [theme]);
+  const { colors: theme, shadowCard } = useAppTheme();
+  const styles = useMemo(() => createPrimaryButtonStyles(theme, shadowCard), [theme, shadowCard]);
   const outline = variant === 'outline';
   return (
-    <Pressable
+    <AnimatedPressable
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => [
-        styles.base,
-        outline ? styles.outline : styles.solid,
-        disabled && styles.disabled,
-        pressed && !disabled && styles.pressed,
-      ]}
+      style={[styles.base, outline ? styles.outline : styles.solid, disabled && styles.disabled]}
       accessibilityRole="button"
       accessibilityLabel={label}
     >
@@ -63,6 +58,6 @@ export function PrimaryButton({
         {icon}
         <Text style={[styles.txt, outline && styles.txtOutline]}>{label}</Text>
       </View>
-    </Pressable>
+    </AnimatedPressable>
   );
 }

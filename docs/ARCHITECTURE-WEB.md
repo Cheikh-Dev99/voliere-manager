@@ -191,6 +191,6 @@ flowchart TB
 
 Tableau **URL → composant** : **§ 4**.
 
-**Mobile** : application native via [`Volière Manager.apk`](../Volière%20Manager.apk) ou Expo — voir [Architecture mobile](./ARCHITECTURE-MOBILE.md).
+**Mobile** : application native via [**GitHub Releases**](https://github.com/cheikh-dev99/voliere-manager/releases/latest) (APK) ou Expo — voir [Architecture mobile](./ARCHITECTURE-MOBILE.md).
 
 ---

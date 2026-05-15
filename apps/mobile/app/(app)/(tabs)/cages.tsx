@@ -19,6 +19,7 @@ import { appFeedback } from '../../../lib/appFeedback';
 import { readCagesListPrefs, writeCagesListPrefs } from '../../../lib/cagesListPrefs';
 import { CageListRow } from '../../../components/cages/CageListRow';
 import { PageHeader } from '../../../components/layout/PageHeader';
+import { TabScreenFade } from '../../../components/layout/TabScreenFade';
 import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
 import {
   FloatingAddButton,
@@ -351,6 +352,7 @@ export default function CagesTabScreen() {
   );
 
   return (
+    <TabScreenFade>
     <View style={styles.root}>
       {loading || lp || lco ? (
         <View style={styles.center}>
@@ -415,6 +417,7 @@ export default function CagesTabScreen() {
         </>
       )}
     </View>
+    </TabScreenFade>
   );
 }
 

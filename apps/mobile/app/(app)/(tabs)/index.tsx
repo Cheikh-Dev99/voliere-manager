@@ -17,6 +17,7 @@ import { appFeedback } from '../../../lib/appFeedback';
 import { CageGridCell } from '../../../components/cages/CageGridCell';
 import { EmptyStateCard } from '../../../components/layout/EmptyStateCard';
 import { PageHeader } from '../../../components/layout/PageHeader';
+import { TabScreenFade } from '../../../components/layout/TabScreenFade';
 import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
 import { MobileLabeledSelect } from '../../../components/ui/MobileLabeledSelect';
 import { SearchField } from '../../../components/ui/SearchField';
@@ -337,6 +338,7 @@ export default function VoliereTabScreen() {
   );
 
   return (
+    <TabScreenFade>
     <View style={styles.root}>
       {loading ? (
         <View style={styles.center}>
@@ -451,6 +453,7 @@ export default function VoliereTabScreen() {
         </Fragment>
       )}
     </View>
+    </TabScreenFade>
   );
 }
 

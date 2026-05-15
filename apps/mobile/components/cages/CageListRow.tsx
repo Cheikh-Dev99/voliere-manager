@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Bird, Pencil, Trash2 } from 'lucide-react-native';
 
 import type { Cage, Couple, Pigeon } from '@shared/types';
@@ -7,6 +7,8 @@ import type { Cage, Couple, Pigeon } from '@shared/types';
 import type { ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
 import { appFeedback } from '../../lib/appFeedback';
+import { AnimatedPressable } from '../ui/AnimatedPressable';
+import { IconPressable } from '../ui/IconPressable';
 import { cageStatutVisualFor } from './cageStatutTheme';
 
 type Props = {
@@ -92,7 +94,6 @@ function createCageListRowStyles(theme: ThemeColors, resolved: 'light' | 'dark')
       paddingVertical: 12,
       paddingHorizontal: 12,
     },
-    mainPressed: { opacity: 0.92 },
     topRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
@@ -174,7 +175,6 @@ function createCageListRowStyles(theme: ThemeColors, resolved: 'light' | 'dark')
       borderColor: '#fecaca',
       backgroundColor: theme.surfaceElevated,
     },
-    iconBtnPressed: { opacity: 0.88 },
   });
 }
 
@@ -224,11 +224,11 @@ export function CageListRow({
         </View>
       ) : null}
       <View style={styles.bodyColumn}>
-        <Pressable
+        <AnimatedPressable
           onPress={onPress}
           onLongPress={desc ? openDescription : undefined}
           delayLongPress={450}
-          style={({ pressed }) => [styles.main, pressed && styles.mainPressed]}
+          style={styles.main}
           accessibilityRole="button"
           accessibilityLabel={`Cage ${vol} ${cage.numero}, ${statutLibelle}`}
           accessibilityHint={
@@ -273,28 +273,24 @@ export function CageListRow({
               {desc}
             </Text>
           ) : null}
-        </Pressable>
+        </AnimatedPressable>
 
         <View style={styles.actionRow}>
-          <Pressable
+          <IconPressable
             onPress={onEditPress}
-            style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
-            hitSlop={8}
-            accessibilityRole="button"
+            style={styles.iconBtn}
             accessibilityLabel="Modifier la cage"
           >
             <Pencil size={20} color={theme.teal700} strokeWidth={2.2} />
-          </Pressable>
+          </IconPressable>
           {onDeletePress ? (
-            <Pressable
+            <IconPressable
               onPress={onDeletePress}
-              style={({ pressed }) => [styles.iconBtnDanger, pressed && styles.iconBtnPressed]}
-              hitSlop={8}
-              accessibilityRole="button"
+              style={styles.iconBtnDanger}
               accessibilityLabel="Supprimer la cage"
             >
               <Trash2 size={20} color={theme.red600} strokeWidth={2.2} />
-            </Pressable>
+            </IconPressable>
           ) : null}
         </View>
       </View>

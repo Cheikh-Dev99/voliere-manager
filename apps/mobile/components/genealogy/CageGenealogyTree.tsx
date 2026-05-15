@@ -1,22 +1,14 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { GitBranch } from 'lucide-react-native';
 
 import type { Pigeon } from '@shared/types';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { GenealogyForRoot, PigeonSoloAncestorBlock } from './GenealogyForRootView';
-
-function PigeonNotesBlock({ title, notes }: { title: string; notes: string }) {
-  const t = (notes ?? '').trim();
-  if (!t) return null;
-  return (
-    <View style={styles.noteBlock}>
-      <Text style={styles.noteK}>{title}</Text>
-      <Text style={styles.noteTxt}>{t}</Text>
-    </View>
-  );
-}
+import { PigeonGenealogyNote } from './PigeonGenealogyNote';
 
 type Props = {
   mode: 'solo' | 'couple';
@@ -31,6 +23,8 @@ function hasAnyParent(p: Pigeon | null | undefined): boolean {
 }
 
 export function CageGenealogyTree({ mode, pigeon, male, femelle, pigeonById }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
   const openPigeon = (id: string) => {
     router.push(`/(app)/pigeon/${id}`);
@@ -42,7 +36,7 @@ export function CageGenealogyTree({ mode, pigeon, male, femelle, pigeonById }: P
   if (!hasSingle && !hasCouple) {
     return (
       <View style={styles.unavailable}>
-        <GitBranch size={32} color={theme.slate500} />
+        <GitBranch size={32} color={colors.slate500} />
         <Text style={styles.unavailableTitle}>Généalogie indisponible</Text>
         <Text style={styles.unavailableSub}>Affecte un pigeon ou un couple pour voir l’arbre ascendant.</Text>
       </View>
@@ -52,7 +46,7 @@ export function CageGenealogyTree({ mode, pigeon, male, femelle, pigeonById }: P
   if (hasSingle && pigeon) {
     return (
       <View style={styles.soloWrap}>
-        <PigeonNotesBlock title="NOTE" notes={pigeon.notes} />
+        <PigeonGenealogyNote label={`Note · ${pigeon.matricule}`} notes={pigeon.notes} />
         <PigeonSoloAncestorBlock pigeon={pigeon} pigeonById={pigeonById} onOpenPigeon={openPigeon} />
       </View>
     );
@@ -72,7 +66,7 @@ export function CageGenealogyTree({ mode, pigeon, male, femelle, pigeonById }: P
               <View style={styles.coupleDotM} />
               <Text style={[styles.coupleHeadTxt, styles.coupleHeadMale]}>Mâle — {male.matricule}</Text>
             </View>
-            <PigeonNotesBlock title="NOTE — MÂLE" notes={male.notes} />
+            <PigeonGenealogyNote label={`Note · ${male.matricule}`} notes={male.notes} accent="male" />
             {!mTree ? <Text style={styles.coupleHint}>Parents non renseignés.</Text> : null}
             <GenealogyForRoot rootId={male.id} pigeonById={pigeonById} maxGen={2} onOpenPigeon={openPigeon} />
           </View>
@@ -82,7 +76,7 @@ export function CageGenealogyTree({ mode, pigeon, male, femelle, pigeonById }: P
               <View style={styles.coupleDotF} />
               <Text style={[styles.coupleHeadTxt, styles.coupleHeadFem]}>Femelle — {femelle.matricule}</Text>
             </View>
-            <PigeonNotesBlock title="NOTE — FEMELLE" notes={femelle.notes} />
+            <PigeonGenealogyNote label={`Note · ${femelle.matricule}`} notes={femelle.notes} accent="female" />
             {!fTree ? <Text style={styles.coupleHint}>Parents non renseignés.</Text> : null}
             <GenealogyForRoot rootId={femelle.id} pigeonById={pigeonById} maxGen={2} onOpenPigeon={openPigeon} />
           </View>
@@ -94,44 +88,36 @@ export function CageGenealogyTree({ mode, pigeon, male, femelle, pigeonById }: P
   return null;
 }
 
-const styles = StyleSheet.create({
-  wrap: { gap: 12 },
-  soloWrap: { gap: 12 },
-  noteBlock: {
-    marginBottom: 2,
-    borderRadius: theme.radiusLg,
-    borderWidth: 1,
-    borderColor: theme.slate200,
-    backgroundColor: theme.slate50,
-    padding: 12,
-  },
-  noteK: { fontSize: 10, fontWeight: '700', color: theme.slate500, letterSpacing: 0.8 },
-  noteTxt: { marginTop: 6, fontSize: 14, color: theme.slate700, lineHeight: 21 },
-  intro: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: theme.slate600,
-  },
-  unavailable: {
-    borderRadius: 14,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: theme.slate200,
-    backgroundColor: 'rgba(248, 250, 252, 0.9)',
-    padding: 20,
-    alignItems: 'center',
-  },
-  unavailableTitle: { marginTop: 10, fontSize: 15, fontWeight: '700', color: theme.slate600 },
-  unavailableSub: { marginTop: 6, fontSize: 12, color: theme.slate500, textAlign: 'center' },
-  coupleCol: { gap: 16, marginTop: 4 },
-  coupleSection: { gap: 8 },
-  coupleDivider: { height: 1, backgroundColor: theme.slate100, marginVertical: 4 },
-  coupleHeadM: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  coupleHeadF: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  coupleDotM: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#0ea5e9' },
-  coupleDotF: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#ec4899' },
-  coupleHeadTxt: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
-  coupleHeadMale: { color: '#075985' },
-  coupleHeadFem: { color: '#9f1239' },
-  coupleHint: { fontSize: 11, color: theme.slate500, marginBottom: 4 },
-});
+function createStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    wrap: { gap: 12 },
+    soloWrap: { gap: 12 },
+    intro: {
+      fontSize: 12,
+      lineHeight: 18,
+      color: theme.slate600,
+    },
+    unavailable: {
+      borderRadius: 14,
+      borderWidth: 1,
+      borderStyle: 'dashed' as const,
+      borderColor: theme.border,
+      backgroundColor: theme.surfaceHighlight,
+      padding: 20,
+      alignItems: 'center' as const,
+    },
+    unavailableTitle: { marginTop: 10, fontSize: 15, fontWeight: '700' as const, color: theme.slate600 },
+    unavailableSub: { marginTop: 6, fontSize: 12, color: theme.slate500, textAlign: 'center' as const },
+    coupleCol: { gap: 16, marginTop: 4 },
+    coupleSection: { gap: 8 },
+    coupleDivider: { height: 1, backgroundColor: theme.slate100, marginVertical: 4 },
+    coupleHeadM: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8 },
+    coupleHeadF: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8 },
+    coupleDotM: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#0ea5e9' },
+    coupleDotF: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#ec4899' },
+    coupleHeadTxt: { fontSize: 11, fontWeight: '800' as const, letterSpacing: 0.6, textTransform: 'uppercase' as const },
+    coupleHeadMale: { color: '#075985' },
+    coupleHeadFem: { color: '#9f1239' },
+    coupleHint: { fontSize: 11, color: theme.slate500, marginBottom: 4 },
+  });
+}

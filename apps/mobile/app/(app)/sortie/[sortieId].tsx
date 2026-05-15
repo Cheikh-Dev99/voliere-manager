@@ -9,7 +9,9 @@ import type { Sortie, SortieType } from '@shared/types';
 
 import { PigeonPhotoAvatar } from '../../../components/pigeons/PigeonPhotoAvatar';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme, shadowCard } from '../../../constants/theme';
+import type { ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
+import { useThemedStyles } from '../../../lib/useThemedStyles';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
 const TYPE_LABEL: Record<SortieType, string> = {
@@ -23,16 +25,9 @@ function normalizeId(raw: string | string[] | undefined): string | undefined {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLab}>{label}</Text>
-      <Text style={styles.rowVal}>{value || '—'}</Text>
-    </View>
-  );
-}
-
 export default function SortieDetailScreen() {
+  const { colors, shadowCard } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   const { sortieId: sortieIdParam } = useLocalSearchParams<{ sortieId: string | string[] }>();
   const sortieId = useMemo(() => normalizeId(sortieIdParam), [sortieIdParam]);
@@ -127,7 +122,7 @@ export default function SortieDetailScreen() {
           <PigeonPhotoAvatar pigeon={pigeonPhotoRef} size="lg" circle />
           <View style={styles.headText}>
             <View style={styles.rowTop}>
-              <Text style={[styles.typeBadge, typeBadgeStyle(sortie.type)]}>{TYPE_LABEL[sortie.type]}</Text>
+              <Text style={[styles.typeBadge, typeBadgeStyle(sortie.type, colors)]}>{TYPE_LABEL[sortie.type]}</Text>
               <Text style={styles.dateHead}>{formatFirestoreDate(sortie.date, 'long')}</Text>
             </View>
             <Text style={styles.mat}>{sortie.pigeonMatricule ?? pigeon?.matricule ?? '—'}</Text>
@@ -140,14 +135,14 @@ export default function SortieDetailScreen() {
         <Text style={styles.section}>Détail</Text>
         {sortie.type === 'VENTE' ? (
           <>
-            <Row label="Prix" value={sortie.prix != null ? String(sortie.prix) : '—'} />
-            <Row label="Acheteur" value={sortie.acheteur ?? ''} />
+            <Row styles={styles} label="Prix" value={sortie.prix != null ? String(sortie.prix) : '—'} />
+            <Row styles={styles} label="Acheteur" value={sortie.acheteur ?? ''} />
           </>
         ) : null}
-        {sortie.type === 'DECES' ? <Row label="Cause" value={sortie.cause ?? ''} /> : null}
-        {sortie.type === 'PERTE' ? <Row label="Circonstance" value={sortie.circonstance ?? ''} /> : null}
-        <Row label="Notes" value={sortie.notes ?? ''} />
-        <Row label="Enregistré le" value={formatFirestoreDate(sortie.createdAt, 'long')} />
+        {sortie.type === 'DECES' ? <Row styles={styles} label="Cause" value={sortie.cause ?? ''} /> : null}
+        {sortie.type === 'PERTE' ? <Row styles={styles} label="Circonstance" value={sortie.circonstance ?? ''} /> : null}
+        <Row styles={styles} label="Notes" value={sortie.notes ?? ''} />
+        <Row styles={styles} label="Enregistré le" value={formatFirestoreDate(sortie.createdAt, 'long')} />
       </View>
 
       {(sortie.cageSoloIdLiberee || sortie.cageCoupleIdLiberee || sortie.coupleRompuId) && (
@@ -155,18 +150,21 @@ export default function SortieDetailScreen() {
           <Text style={styles.section}>Effets enregistrés</Text>
           {sortie.cageSoloIdLiberee ? (
             <Row
+              styles={styles}
               label="Cage (pigeon seul) libérée"
               value={cageSolo ? cageLabel(cageSolo) : sortie.cageSoloIdLiberee}
             />
           ) : null}
           {sortie.cageCoupleIdLiberee ? (
             <Row
+              styles={styles}
               label="Cage (couple) libérée"
               value={cageCouple ? cageLabel(cageCouple) : sortie.cageCoupleIdLiberee}
             />
           ) : null}
           {sortie.coupleRompuId ? (
             <Row
+              styles={styles}
               label="Couple rompu"
               value={
                 conjoint
@@ -192,7 +190,24 @@ export default function SortieDetailScreen() {
   );
 }
 
-function typeBadgeStyle(t: SortieType) {
+function Row({
+  label,
+  value,
+  styles,
+}: {
+  label: string;
+  value: string;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  return (
+    <View style={styles.row}>
+      <Text style={styles.rowLab}>{label}</Text>
+      <Text style={styles.rowVal}>{value || '—'}</Text>
+    </View>
+  );
+}
+
+function typeBadgeStyle(t: SortieType, theme: ThemeColors) {
   switch (t) {
     case 'VENTE':
       return { backgroundColor: theme.teal100, color: theme.teal900 };
@@ -205,14 +220,15 @@ function typeBadgeStyle(t: SortieType) {
   }
 }
 
-const styles = StyleSheet.create({
+function createStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
   err: { color: theme.red600, textAlign: 'center', marginBottom: 12, fontSize: 15 },
   backBtn: { padding: 12 },
   backTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
   scroll: { padding: theme.screenPadding, paddingBottom: 40, backgroundColor: 'transparent' },
   headCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -234,7 +250,7 @@ const styles = StyleSheet.create({
   mat: { fontSize: 22, fontWeight: '900', color: theme.slate900 },
   nomP: { fontSize: 15, color: theme.slate600, marginTop: 4 },
   block: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -260,4 +276,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryBtnTxt: { color: theme.white, fontWeight: '800', fontSize: 16 },
-});
+  });
+}

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Bird, CircleAlert, GripVertical } from 'lucide-react-native';
 
 import type { Cage, Pigeon } from '@shared/types';
@@ -7,6 +7,8 @@ import type { Cage, Pigeon } from '@shared/types';
 import type { ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
 import { appFeedback } from '../../lib/appFeedback';
+import { AnimatedPressable } from '../ui/AnimatedPressable';
+import { IconPressable } from '../ui/IconPressable';
 import { cageStatutCenterText, cageStatutVisualFor } from './cageStatutTheme';
 
 type Props = {
@@ -20,7 +22,6 @@ type Props = {
 };
 
 function createGridStyles(theme: ThemeColors, resolved: 'light' | 'dark') {
-  const shadowOpacity = resolved === 'dark' ? 0.22 : 0.05;
   const descBg = resolved === 'dark' ? 'rgba(51,65,85,0.92)' : 'rgba(255,255,255,0.9)';
 
   return StyleSheet.create({
@@ -33,13 +34,6 @@ function createGridStyles(theme: ThemeColors, resolved: 'light' | 'dark') {
       marginBottom: 0,
       overflow: 'hidden',
     },
-    shadowSm: {
-      shadowColor: '#0f172a',
-      shadowOpacity,
-      shadowRadius: 4,
-      shadowOffset: { width: 0, height: 1 },
-      elevation: resolved === 'dark' ? 3 : 1,
-    },
     main: {
       padding: 12,
       justifyContent: 'flex-start',
@@ -47,7 +41,6 @@ function createGridStyles(theme: ThemeColors, resolved: 'light' | 'dark') {
     },
     mainFull: { flex: 1 },
     mainWithHandle: { flex: 1 },
-    mainPressed: { opacity: 0.94 },
     descBtn: {
       position: 'absolute',
       left: 8,
@@ -132,7 +125,6 @@ function createGridStyles(theme: ThemeColors, resolved: 'light' | 'dark') {
       justifyContent: 'center',
       paddingVertical: 8,
     },
-    handlePressed: { backgroundColor: 'rgba(254, 205, 211, 0.65)' },
   });
 }
 
@@ -144,7 +136,7 @@ export function CageGridCell({
   onPress,
   onDragHandlePress,
 }: Props) {
-  const { colors: theme, resolved } = useAppTheme();
+  const { colors: theme, shadowCard, resolved } = useAppTheme();
   const styles = useMemo(() => createGridStyles(theme, resolved), [theme, resolved]);
   const st = cageStatutVisualFor(resolved, cage.statut);
   const center = cageStatutCenterText[cage.statut] ?? '';
@@ -171,27 +163,22 @@ export function CageGridCell({
     ) : null;
 
   return (
-    <View style={[styles.wrap, { borderColor: st.border, backgroundColor: st.cardBg }, styles.shadowSm]}>
-      <Pressable
+    <View style={[styles.wrap, { borderColor: st.border, backgroundColor: st.cardBg }, shadowCard]}>
+      <AnimatedPressable
         onPress={onPress}
-        style={({ pressed }) => [
-          styles.main,
-          showHandle ? styles.mainWithHandle : styles.mainFull,
-          pressed && styles.mainPressed,
-        ]}
+        style={[styles.main, showHandle ? styles.mainWithHandle : styles.mainFull]}
         accessibilityRole="button"
         accessibilityLabel={`Cage ${cage.numero}, ${center}`}
       >
         {desc ? (
-          <Pressable
+          <IconPressable
             onPress={openDescription}
             style={styles.descBtn}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            hitSlop={8}
             accessibilityLabel={`Description cage ${cage.numero}`}
-            accessibilityRole="button"
           >
             <CircleAlert size={14} color="#ea580c" strokeWidth={2.2} />
-          </Pressable>
+          </IconPressable>
         ) : null}
 
         <View style={styles.topRow}>
@@ -231,18 +218,18 @@ export function CageGridCell({
             ) : null}
           </>
         )}
-      </Pressable>
+      </AnimatedPressable>
 
       {showHandle ? (
-        <Pressable
+        <AnimatedPressable
           onPress={onDragHandlePress}
-          style={({ pressed }) => [styles.handle, pressed && styles.handlePressed]}
+          style={styles.handle}
           accessibilityRole="button"
           accessibilityLabel="Former un couple : touche une cage cible surlignée"
           accessibilityHint="Touche d’abord cette poignée, puis une autre cage occupée par un pigeon du sexe opposé."
         >
           <GripVertical size={20} color="#9f1239" style={{ opacity: 0.8 }} />
-        </Pressable>
+        </AnimatedPressable>
       ) : null}
     </View>
   );

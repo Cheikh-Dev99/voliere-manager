@@ -1,5 +1,6 @@
 import { Moon, Sun } from 'lucide-react'
 import { useAppTheme } from './themeContext'
+import { dmIconButton } from './voliereDarkUi'
 
 /**
  * Bascule rapide clair / sombre (icône = thème actuellement affiché).
@@ -13,7 +14,7 @@ export function ThemeHeaderToggle() {
     <button
       type="button"
       onClick={() => setPreference(isDark ? 'light' : 'dark')}
-      className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-amber-600 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/45 dark:border-slate-600 dark:bg-slate-800 dark:text-amber-200 dark:hover:bg-slate-700"
+      className={`${dmIconButton} text-amber-600 dark:text-amber-200`}
       aria-label={isDark ? 'Passer en thème clair' : 'Passer en thème sombre'}
       title={isDark ? 'Thème clair' : 'Thème sombre'}
     >

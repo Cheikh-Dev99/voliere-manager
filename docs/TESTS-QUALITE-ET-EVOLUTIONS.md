@@ -68,7 +68,7 @@ ESLint avec plugins React / hooks (voir `package.json` du workspace web).
 - [ ] `.env.example` à jour ; aucun secret dans Git.
 - [ ] Règles Firestore déployées sur le projet de démo.
 - [ ] Compte de démo ou vidéo screencast du parcours utilisateur.
-- [ ] Documentation à jour (ce dossier `docs/`) + captures insérées dans le PDF final ; APK jury : [`Volière Manager.apk`](../Volière%20Manager.apk).
+- [ ] Documentation à jour (ce dossier `docs/`) + captures insérées dans le PDF final ; APK / IPA jury : [**dernière release GitHub**](https://github.com/cheikh-dev99/voliere-manager/releases/latest) — voir [Releases mobiles](./RELEASES-MOBILES.md).
 - [ ] `yarn test` vert.
 
 ---

@@ -12,7 +12,7 @@ import { useAppTheme } from '../../../context/AppThemeContext';
 const MAIN_TAB_SEGMENTS = new Set(['index', 'cages', 'pigeons', 'couples', 'reproductions', 'sorties']);
 
 export default function TabsLayout() {
-  const { colors } = useAppTheme();
+  const { colors, shadows } = useAppTheme();
   const segments = useSegments();
   const pathname = (usePathname() ?? '/').replace(/\/$/, '') || '/';
   const leaf = segments[segments.length - 1] ?? '';
@@ -47,6 +47,7 @@ export default function TabsLayout() {
         minHeight: 82,
         paddingTop: 8,
         paddingBottom: 10,
+        ...shadows.floating,
       },
       tabBarItemStyle: { flex: 1, minWidth: 0, paddingVertical: 4 },
       tabBarLabelStyle: {
@@ -58,7 +59,7 @@ export default function TabsLayout() {
       },
       tabBarIconStyle: { marginTop: 0, marginBottom: 0 },
     }),
-    [colors],
+    [colors, shadows.floating],
   );
 
   const styles = useMemo(

@@ -10,9 +10,10 @@ import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
 import { AuthDivider, GoogleSignInButton } from '../components/auth/GoogleSignInButton'
 import { SiteBackgroundDecor } from '../components/layout/SiteBackgroundDecor'
 import { resolvePostAuthPath } from '../router/postAuthRedirect'
+import { vmElevation4, vmPressable, vmTransitionInteractive } from '../theme/voliereMotionUi'
 
 const inputClass =
-  'w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 pl-9 text-sm text-slate-900 shadow-inner transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800/50 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-teal-400 dark:focus:bg-slate-900'
+  'w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 pl-9 text-sm text-slate-900 shadow-inner transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-teal-400 dark:focus:bg-slate-900'
 
 const inputInvalidClass =
   'border-red-400 bg-red-50/50 focus:border-red-500 focus:ring-red-500/25 dark:border-red-500 dark:bg-red-950/30 dark:focus:border-red-400'
@@ -258,7 +259,7 @@ export function LoginPage() {
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-slate-100 via-slate-50 to-teal-50/40 px-4 py-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:py-8">
       <SiteBackgroundDecor />
       <div className="relative z-[1] w-full max-w-md">
-        <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-xl shadow-slate-200/60 ring-1 ring-slate-200/40 backdrop-blur-sm dark:border-slate-600/80 dark:bg-slate-900/95 dark:shadow-black/40 dark:ring-slate-700/50 sm:p-5">
+        <div className={`vm-page-enter rounded-2xl border border-slate-200/80 bg-white/95 p-4 ring-1 ring-slate-200/40 backdrop-blur-sm dark:border-slate-600/80 dark:bg-slate-900/95 dark:ring-slate-700/50 sm:p-5 ${vmElevation4}`}>
           <div className="px-0.5 pb-2" role="tablist" aria-label="Connexion, inscription ou réinitialisation du mot de passe">
             <div className="grid grid-cols-3 gap-0.5 rounded-lg border border-slate-200/80 bg-slate-50/90 p-0.5 shadow-inner dark:border-slate-600/80 dark:bg-slate-800/90 sm:flex sm:flex-wrap sm:gap-0.5">
               <button

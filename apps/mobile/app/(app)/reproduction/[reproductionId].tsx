@@ -9,7 +9,9 @@ import type { Couple, Pigeon, Reproduction } from '@shared/types';
 
 import { PigeonPhotoAvatar } from '../../../components/pigeons/PigeonPhotoAvatar';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme, shadowCard } from '../../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
+import { useThemedStyles } from '../../../lib/useThemedStyles';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
 function normalizeId(raw: string | string[] | undefined): string | undefined {
@@ -17,16 +19,9 @@ function normalizeId(raw: string | string[] | undefined): string | undefined {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLab}>{label}</Text>
-      <Text style={styles.rowVal}>{value || '—'}</Text>
-    </View>
-  );
-}
-
 export default function ReproductionDetailScreen() {
+  const { shadowCard } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   const { reproductionId: ridParam } = useLocalSearchParams<{ reproductionId: string | string[] }>();
   const reproductionId = useMemo(() => normalizeId(ridParam), [ridParam]);
@@ -140,13 +135,14 @@ export default function ReproductionDetailScreen() {
       <View style={[styles.block, shadowCard]}>
         <Text style={styles.section}>Détail</Text>
         <Row
+          styles={styles}
           label="Éclosion"
           value={reproduction.dateEclosion ? formatFirestoreDate(reproduction.dateEclosion, 'long') : '—'}
         />
-        <Row label="Œufs" value={String(reproduction.nombreOeufs)} />
-        <Row label="Pigeonneaux (nombre déclaré)" value={String(reproduction.nombrePigeonneaux)} />
-        <Row label="Notes" value={reproduction.notes ?? ''} />
-        <Row label="Enregistré le" value={formatFirestoreDate(reproduction.createdAt, 'long')} />
+        <Row styles={styles} label="Œufs" value={String(reproduction.nombreOeufs)} />
+        <Row styles={styles} label="Pigeonneaux (nombre déclaré)" value={String(reproduction.nombrePigeonneaux)} />
+        <Row styles={styles} label="Notes" value={reproduction.notes ?? ''} />
+        <Row styles={styles} label="Enregistré le" value={formatFirestoreDate(reproduction.createdAt, 'long')} />
       </View>
 
       <Text style={styles.sectionOut}>Pigeonneaux liés</Text>
@@ -191,14 +187,32 @@ export default function ReproductionDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function Row({
+  label,
+  value,
+  styles,
+}: {
+  label: string;
+  value: string;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  return (
+    <View style={styles.row}>
+      <Text style={styles.rowLab}>{label}</Text>
+      <Text style={styles.rowVal}>{value || '—'}</Text>
+    </View>
+  );
+}
+
+function createStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
   err: { color: theme.red600, textAlign: 'center', marginBottom: 12, fontSize: 15 },
   backBtn: { padding: 12 },
   backTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
   scroll: { padding: theme.screenPadding, paddingBottom: 40, backgroundColor: 'transparent' },
   headCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -213,7 +227,7 @@ const styles = StyleSheet.create({
   miniMat: { marginTop: 6, fontSize: 13, fontWeight: '800', color: theme.slate800, maxWidth: 100 },
   warnCouple: { marginTop: 12, fontSize: 13, color: theme.amber950 },
   block: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -234,7 +248,7 @@ const styles = StyleSheet.create({
   rowLab: { fontSize: 13, color: theme.slate500, fontWeight: '600', flex: 0.42 },
   rowVal: { fontSize: 14, color: theme.slate900, fontWeight: '600', flex: 0.58, textAlign: 'right' },
   emptyBox: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -246,7 +260,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -259,7 +273,7 @@ const styles = StyleSheet.create({
   pigNom: { fontSize: 14, color: theme.slate600, marginTop: 2 },
   secondaryBtn: {
     marginTop: 8,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderWidth: 2,
     borderColor: theme.teal600,
     paddingVertical: 14,
@@ -267,4 +281,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   secondaryBtnTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
-});
+  });
+}

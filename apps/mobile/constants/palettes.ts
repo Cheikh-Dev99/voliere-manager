@@ -101,14 +101,86 @@ export const darkPalette: ThemeColors = {
   radiusSm: 8,
 };
 
+export type ShadowStyle = {
+  shadowColor: string;
+  shadowOpacity: number;
+  shadowRadius: number;
+  shadowOffset: { width: number; height: number };
+  elevation: number;
+};
+
+/** Niveaux d’élévation alignés sur le web (vmElevation1–4). */
+export function shadowFor(
+  c: ThemeColors,
+  mode: 'light' | 'dark',
+  level: 1 | 2 | 3 | 4,
+): ShadowStyle {
+  const dark = mode === 'dark';
+  const baseColor = dark ? '#000000' : c.slate900;
+  const presets: Record<1 | 2 | 3 | 4, ShadowStyle> = {
+    1: {
+      shadowColor: baseColor,
+      shadowOpacity: dark ? 0.32 : 0.06,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: dark ? 3 : 2,
+    },
+    2: {
+      shadowColor: baseColor,
+      shadowOpacity: dark ? 0.38 : 0.08,
+      shadowRadius: 14,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: dark ? 4 : 3,
+    },
+    3: {
+      shadowColor: baseColor,
+      shadowOpacity: dark ? 0.45 : 0.12,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: dark ? 6 : 5,
+    },
+    4: {
+      shadowColor: baseColor,
+      shadowOpacity: dark ? 0.52 : 0.16,
+      shadowRadius: 24,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: dark ? 8 : 7,
+    },
+  };
+  return presets[level];
+}
+
+/** Carte standard (équivalent vmElevation1 / shadow-sm). */
 export function shadowCardFor(c: ThemeColors, mode: 'light' | 'dark') {
-  return {
-    shadowColor: mode === 'dark' ? '#000000' : c.slate900,
-    shadowOpacity: mode === 'dark' ? 0.35 : 0.06,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: mode === 'dark' ? 4 : 2,
-  } as const;
+  return shadowFor(c, mode, 1);
 }
 
 export type ShadowCardStyle = ReturnType<typeof shadowCardFor>;
+
+export type ThemeShadows = {
+  card: ShadowStyle;
+  raised: ShadowStyle;
+  overlay: ShadowStyle;
+  floating: ShadowStyle;
+};
+
+export function shadowsFor(c: ThemeColors, mode: 'light' | 'dark'): ThemeShadows {
+  return {
+    card: shadowFor(c, mode, 1),
+    raised: shadowFor(c, mode, 2),
+    overlay: shadowFor(c, mode, 3),
+    floating: shadowFor(c, mode, 4),
+  };
+}
+
+/** Feedback press cohérent (boutons, cartes, onglets). */
+export const motionPress = {
+  scale: 0.97,
+  opacity: 0.92,
+} as const;
+
+export const motionDuration = {
+  fast: 150,
+  base: 220,
+  slow: 420,
+} as const;

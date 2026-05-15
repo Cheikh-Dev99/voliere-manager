@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import type { ShadowCardStyle, ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
+import { AnimatedPressable } from '../ui/AnimatedPressable';
 
 type EmptyStateCardProps = {
   icon: ReactNode;
@@ -59,7 +60,6 @@ function createEmptyStateStyles(theme: ThemeColors, shadowCard: ShadowCardStyle)
       paddingVertical: 12,
       alignItems: 'center',
     },
-    btnPressed: { opacity: 0.92 },
     btnTxt: { color: theme.white, fontWeight: '800', fontSize: 15 },
   });
 }
@@ -95,14 +95,14 @@ export function EmptyStateCard({
         </View>
       ) : null}
       {primaryLabel && onPrimaryPress ? (
-        <Pressable
+        <AnimatedPressable
           onPress={onPrimaryPress}
-          style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+          style={styles.btn}
           accessibilityRole="button"
           accessibilityLabel={primaryLabel}
         >
           <Text style={styles.btnTxt}>{primaryLabel}</Text>
-        </Pressable>
+        </AnimatedPressable>
       ) : null}
     </View>
   );

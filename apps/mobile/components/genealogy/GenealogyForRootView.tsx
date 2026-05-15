@@ -6,7 +6,9 @@ import type { Pigeon } from '@shared/types';
 import { buildAncestorRows, generationLabel } from '@shared/utils/genealogyTree';
 
 import { usePigeonDisplayPhoto } from '../../hooks/usePigeonDisplayPhoto';
-import { theme, shadowCard } from '../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
+import { useThemedStyles } from '../../lib/useThemedStyles';
 
 const STATUT_DOT: Record<string, string> = {
   ACTIF: '#10b981',
@@ -15,10 +17,10 @@ const STATUT_DOT: Record<string, string> = {
   PERDU: '#f59e0b',
 };
 
-function ConnectorDown() {
+function ConnectorDown({ s }: { s: ReturnType<typeof createTreeStyles> }) {
   return (
-    <View style={styles.connectorWrap} accessibilityElementsHidden>
-      <View style={styles.connectorLine} />
+    <View style={s.connectorWrap} accessibilityElementsHidden>
+      <View style={s.connectorLine} />
     </View>
   );
 }
@@ -30,7 +32,14 @@ type MiniCardProps = {
   onOpenPigeon: (id: string) => void;
 };
 
-function PigeonMiniCard({ pigeonId, pigeonById, emphasis, onOpenPigeon }: MiniCardProps) {
+function PigeonMiniCard({
+  pigeonId,
+  pigeonById,
+  emphasis,
+  onOpenPigeon,
+  s,
+}: MiniCardProps & { s: ReturnType<typeof createTreeStyles> }) {
+  const { colors } = useAppTheme();
   const p = pigeonById.get(pigeonId);
   const photoUri = usePigeonDisplayPhoto(p ? { id: p.id, photo: p.photo } : null);
   const dotColor = p ? STATUT_DOT[p.statut] ?? '#cbd5e1' : '#cbd5e1';
@@ -38,10 +47,10 @@ function PigeonMiniCard({ pigeonId, pigeonById, emphasis, onOpenPigeon }: MiniCa
 
   if (!p) {
     return (
-      <View style={[styles.miniCard, styles.miniCardMissing, emphasis && styles.miniCardEmphasis]}>
-        <HelpCircle size={20} color={theme.slate500} />
-        <Text style={styles.missingK}>Réf. absente</Text>
-        <Text style={styles.missingId} numberOfLines={1}>
+      <View style={[s.miniCard, s.miniCardMissing, emphasis && s.miniCardEmphasis]}>
+        <HelpCircle size={20} color={colors.slate500} />
+        <Text style={s.missingK}>Réf. absente</Text>
+        <Text style={s.missingId} numberOfLines={1}>
           {pigeonId.slice(0, 8)}…
         </Text>
       </View>
@@ -52,35 +61,35 @@ function PigeonMiniCard({ pigeonId, pigeonById, emphasis, onOpenPigeon }: MiniCa
     <Pressable
       onPress={() => onOpenPigeon(p.id)}
       style={({ pressed }) => [
-        styles.miniCard,
-        emphasis ? styles.miniCardSubject : styles.miniCardPlain,
-        pressed && styles.miniCardPressed,
+        s.miniCard,
+        emphasis ? s.miniCardSubject : s.miniCardPlain,
+        pressed && s.miniCardPressed,
       ]}
       accessibilityRole="button"
       accessibilityLabel={`Fiche ${p.matricule}`}
     >
-      <View style={styles.miniRow}>
+      <View style={s.miniRow}>
         {photoUri ? (
-          <Image source={{ uri: photoUri }} style={styles.miniThumb} accessibilityIgnoresInvertColors />
+          <Image source={{ uri: photoUri }} style={s.miniThumb} accessibilityIgnoresInvertColors />
         ) : (
-          <View style={styles.miniThumbPh}>
-            <Text style={styles.miniThumbPhTxt}>—</Text>
+          <View style={s.miniThumbPh}>
+            <Text style={s.miniThumbPhTxt}>—</Text>
           </View>
         )}
-        <View style={styles.miniBody}>
-          <View style={styles.miniHead}>
-            <View style={[styles.statDot, { backgroundColor: dotColor }]} />
+        <View style={s.miniBody}>
+          <View style={s.miniHead}>
+            <View style={[s.statDot, { backgroundColor: dotColor }]} />
             <Text
-              style={[styles.miniMat, p.sexe === 'MALE' ? styles.miniMale : styles.miniFem]}
+              style={[s.miniMat, p.sexe === 'MALE' ? s.miniMale : s.miniFem]}
               numberOfLines={1}
             >
               {p.sexe === 'MALE' ? '♂' : '♀'} {p.matricule}
             </Text>
           </View>
-          <Text style={styles.miniNom} numberOfLines={1}>
+          <Text style={s.miniNom} numberOfLines={1}>
             {p.nom}
           </Text>
-          {isDeleted ? <Text style={styles.miniRetire}>Retiré de l’effectif</Text> : null}
+          {isDeleted ? <Text style={s.miniRetire}>Retiré de l’effectif</Text> : null}
         </View>
       </View>
     </Pressable>
@@ -95,11 +104,12 @@ export type GenealogyForRootProps = {
 };
 
 export function GenealogyForRoot({ rootId, pigeonById, maxGen = 2, onOpenPigeon }: GenealogyForRootProps) {
+  const s = useThemedStyles(createTreeStyles);
   const rows = useMemo(() => buildAncestorRows(rootId, pigeonById, maxGen), [rootId, pigeonById, maxGen]);
   const maxDepth = rows.length - 1;
 
   if (rows.length === 0) {
-    return <Text style={styles.emptyTree}>Aucune donnée.</Text>;
+    return <Text style={s.emptyTree}>Aucune donnée.</Text>;
   }
 
   return (
@@ -111,18 +121,18 @@ export function GenealogyForRoot({ rootId, pigeonById, maxGen = 2, onOpenPigeon 
 
         return (
           <View key={`row-${rowIdx}`}>
-            {rowIdx > 0 ? <ConnectorDown /> : null}
-            <View style={[styles.genBlock, isSubjectRow ? styles.genBlockSubject : styles.genBlockAnc]}>
-              <View style={[styles.genHeader, isSubjectRow && styles.genHeaderSubject]}>
-                <Text style={[styles.genLabel, isSubjectRow && styles.genLabelSubject]}>{label}</Text>
+            {rowIdx > 0 ? <ConnectorDown s={s} /> : null}
+            <View style={[s.genBlock, isSubjectRow ? s.genBlockSubject : s.genBlockAnc]}>
+              <View style={[s.genHeader, isSubjectRow && s.genHeaderSubject]}>
+                <Text style={[s.genLabel, isSubjectRow && s.genLabelSubject]}>{label}</Text>
                 {!isSubjectRow ? (
-                  <Text style={styles.genCount}>
+                  <Text style={s.genCount}>
                     {ids.length} pigeon{ids.length > 1 ? 's' : ''}
                   </Text>
                 ) : null}
               </View>
-              <View style={isSubjectRow ? styles.genCardsSubjectOuter : undefined}>
-                <View style={styles.genCards}>
+              <View style={isSubjectRow ? s.genCardsSubjectOuter : undefined}>
+                <View style={s.genCards}>
                   {ids.map((id) => (
                     <PigeonMiniCard
                       key={id}
@@ -130,6 +140,7 @@ export function GenealogyForRoot({ rootId, pigeonById, maxGen = 2, onOpenPigeon 
                       pigeonById={pigeonById}
                       emphasis={isSubjectRow}
                       onOpenPigeon={onOpenPigeon}
+                      s={s}
                     />
                   ))}
                 </View>
@@ -154,6 +165,7 @@ export type PigeonSoloAncestorBlockProps = {
 
 /** Intro + bandeau + arbre ascendant (même contenu que l’onglet cage / web). */
 export function PigeonSoloAncestorBlock({ pigeon, pigeonById, onOpenPigeon }: PigeonSoloAncestorBlockProps) {
+  const soloStyles = useThemedStyles(createSoloStyles);
   const hasTree = hasAnyParent(pigeon);
   return (
     <View style={soloStyles.wrap}>
@@ -174,25 +186,28 @@ export function PigeonSoloAncestorBlock({ pigeon, pigeonById, onOpenPigeon }: Pi
   );
 }
 
-const soloStyles = StyleSheet.create({
-  wrap: { gap: 12 },
-  intro: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: theme.slate600,
-  },
-  introBold: { fontWeight: '700', color: theme.slate800 },
-  warnBanner: {
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-    borderColor: '#fde68a',
-    backgroundColor: 'rgba(254, 243, 199, 0.75)',
-    padding: 10,
-  },
-  warnBannerTxt: { fontSize: 12, lineHeight: 17, color: '#78350f' },
-});
+function createSoloStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    wrap: { gap: 12 },
+    intro: {
+      fontSize: 12,
+      lineHeight: 18,
+      color: theme.slate600,
+    },
+    introBold: { fontWeight: '700', color: theme.slate800 },
+    warnBanner: {
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+      borderColor: theme.amber950,
+      backgroundColor: theme.amber50,
+      padding: 10,
+    },
+    warnBannerTxt: { fontSize: 12, lineHeight: 17, color: theme.amber950 },
+  });
+}
 
-const styles = StyleSheet.create({
+function createTreeStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
   connectorWrap: { alignItems: 'center', paddingVertical: 2 },
   connectorLine: { width: 2, height: 14, backgroundColor: '#cbd5e1', borderRadius: 1 },
   genBlock: {
@@ -200,11 +215,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 12,
   },
-  genBlockAnc: { backgroundColor: 'rgba(248, 250, 252, 0.95)' },
+  genBlockAnc: { backgroundColor: theme.surfaceHighlight },
   genBlockSubject: {
-    backgroundColor: 'rgba(240, 253, 250, 0.65)',
+    backgroundColor: theme.teal50,
     borderWidth: 1,
-    borderColor: 'rgba(153, 246, 228, 0.7)',
+    borderColor: theme.teal100,
     ...shadowCard,
   },
   genHeader: {
@@ -248,20 +263,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   miniCardPlain: {
-    borderColor: 'rgba(226, 232, 240, 0.95)',
-    backgroundColor: theme.white,
+    borderColor: theme.border,
+    backgroundColor: theme.surfaceElevated,
     ...shadowCard,
   },
   miniCardSubject: {
-    borderColor: 'rgba(45, 212, 191, 0.45)',
-    backgroundColor: theme.white,
+    borderColor: theme.teal600,
+    backgroundColor: theme.surfaceElevated,
     borderWidth: 2,
     ...shadowCard,
   },
   miniCardMissing: {
     borderStyle: 'dashed',
     borderColor: theme.slate200,
-    backgroundColor: 'rgba(248, 250, 252, 0.95)',
+    backgroundColor: theme.surfaceHighlight,
     alignItems: 'center',
   },
   miniCardEmphasis: {
@@ -290,4 +305,5 @@ const styles = StyleSheet.create({
   missingK: { marginTop: 6, fontSize: 10, fontWeight: '600', color: theme.slate500 },
   missingId: { marginTop: 2, fontSize: 9, color: theme.slate500 },
   emptyTree: { textAlign: 'center', fontSize: 14, color: theme.slate500, paddingVertical: 12 },
-});
+  });
+}
