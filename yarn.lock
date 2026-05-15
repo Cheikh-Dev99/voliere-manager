@@ -4433,6 +4433,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@voliere/shared@workspace:packages/shared"
   dependencies:
+    typescript: "npm:~5.9.2"
     vitest: "npm:^3.2.4"
   peerDependencies:
     firebase: ^12.0.0
