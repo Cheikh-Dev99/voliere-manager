@@ -5,6 +5,7 @@ import { obtenirPigeon } from '@shared/services/pigeonsService'
 import { CageGenealogyView } from '../features/voliere/CageGenealogyView'
 import { getPigeonDisplayPhotoSrc } from '../utils/localPigeonPhoto'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
+import { dmFormShell } from '../theme/voliereDarkUi'
 
 const DEFAULT_BACK = { path: '/pigeons', label: 'Liste des pigeons' }
 
@@ -110,7 +111,7 @@ export function PigeonGenealogyPage() {
         <Link
           to={`/pigeons/${pigeon.id}`}
           state={location.state}
-          className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900"
+          className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-100"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour à la fiche
@@ -118,19 +119,19 @@ export function PigeonGenealogyPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <div className="flex flex-wrap items-start gap-4">
             {photoSrc ? (
-              <img src={photoSrc} alt="" className="size-16 shrink-0 rounded-xl border border-slate-100 object-cover" />
+              <img src={photoSrc} alt="" className="size-16 shrink-0 rounded-xl border border-slate-100 object-cover dark:border-slate-600" />
             ) : (
-              <div className="flex size-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400">
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-500">
                 —
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <h1 className="flex flex-wrap items-center gap-2 text-xl font-bold text-slate-900 sm:text-2xl">
-                <GitBranch className="size-7 shrink-0 text-teal-600" aria-hidden />
+              <h1 className="flex flex-wrap items-center gap-2 text-xl font-bold text-slate-900 dark:text-slate-50 sm:text-2xl">
+                <GitBranch className="size-7 shrink-0 text-teal-600 dark:text-teal-400" aria-hidden />
                 Généalogie
               </h1>
-              <p className="mt-1 font-mono text-sm font-semibold text-teal-900">{pigeon.matricule}</p>
-              <p className="text-sm text-slate-600">
+              <p className="mt-1 font-mono text-sm font-semibold text-teal-900 dark:text-teal-200">{pigeon.matricule}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 {pigeon.nom} · {pigeon.race}
               </p>
             </div>
@@ -138,19 +139,19 @@ export function PigeonGenealogyPage() {
           <Link
             to={`/pigeons/${pigeon.id}/sante`}
             state={location.state}
-            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-900/50"
           >
             <Stethoscope className="size-4" aria-hidden />
             Carnet de santé
           </Link>
         </div>
-        <p className="mt-3 text-sm text-slate-600">
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
           Lignée ascendante jusqu’aux grands-parents lorsque les fiches sont renseignées — même vue que depuis une cage,
           accessible ici pour tout pigeon.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <section className={dmFormShell}>
         <CageGenealogyView
           mode="solo"
           pigeon={pigeon}

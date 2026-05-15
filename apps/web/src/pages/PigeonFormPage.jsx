@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { CouleurCombobox } from '../components/CouleurCombobox'
 import { SearchableCombobox } from '../components/SearchableCombobox'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
+import { dmFieldClass as fieldClass } from '../theme/voliereDarkUi'
 import {
   clearDraftPigeonLocalPhoto,
   clearPigeonLocalPhoto,
@@ -91,12 +92,6 @@ function PigeonPhotoThumb({ localSrc, url }) {
       onError={() => setBroken(true)}
     />
   )
-}
-
-function fieldClass(err) {
-  return `w-full rounded-lg border px-3 py-2 text-slate-900 outline-none focus:ring-2 ${
-    err ? 'border-red-400 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 focus:border-teal-500 focus:ring-teal-500/30'
-  }`
 }
 
 /**
@@ -342,15 +337,15 @@ export function PigeonFormPage() {
       <div>
         <Link
           to="/pigeons"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour à la liste
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
           {isEdit ? 'Modifier le pigeon' : 'Nouveau pigeon'}
         </h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           Les parents se choisissent dans la liste des <strong>mâles</strong> et <strong>femelles actives</strong>{' '}
           (généalogie).
         </p>
@@ -358,7 +353,7 @@ export function PigeonFormPage() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+        className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         noValidate
       >
         <div className="grid gap-4 sm:grid-cols-2">
@@ -377,7 +372,7 @@ export function PigeonFormPage() {
               />
               <button
                 type="button"
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-teal-300 bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 sm:w-auto sm:min-w-[10.5rem]"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-teal-300 bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 sm:w-auto sm:min-w-[10.5rem] dark:border-teal-600 dark:bg-teal-950/50 dark:text-teal-100 dark:hover:bg-teal-900/60"
                 onClick={() => {
                   const next = proposerMatriculeSuivant(pigeons)
                   setValue('matricule', next, { shouldValidate: true, shouldDirty: true })
@@ -390,9 +385,9 @@ export function PigeonFormPage() {
                 Générer
               </button>
             </div>
-            <p id="matricule-hint" className="mt-1 text-xs text-slate-500">
-              Exemples : <span className="font-mono text-slate-700">P001</span>,{' '}
-              <span className="font-mono text-slate-700">P002</span>, <span className="font-mono text-slate-700">P011</span>
+            <p id="matricule-hint" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Exemples : <span className="font-mono text-slate-700 dark:text-slate-200">P001</span>,{' '}
+              <span className="font-mono text-slate-700 dark:text-slate-200">P002</span>, <span className="font-mono text-slate-700 dark:text-slate-200">P011</span>
               — le bouton propose le prochain numéro libre dans cette série.
             </p>
             {errors.matricule ? (
@@ -490,9 +485,9 @@ export function PigeonFormPage() {
             </div>
           ) : null}
 
-          <div className="sm:col-span-2 rounded-lg border border-slate-100 bg-slate-50/80 p-4">
-            <h2 className="text-sm font-semibold text-slate-800">Parents (optionnel)</h2>
-            <p className="mt-0.5 text-xs text-slate-500">Uniquement les pigeons <strong>actifs</strong> ; ton pigeon actuel est exclu en modification.</p>
+          <div className="sm:col-span-2 rounded-lg border border-slate-100 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/60">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Parents (optionnel)</h2>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Uniquement les pigeons <strong>actifs</strong> ; ton pigeon actuel est exclu en modification.</p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="pereId" className="mb-1 block text-sm font-medium text-slate-700">
@@ -542,9 +537,9 @@ export function PigeonFormPage() {
               puis stockée uniquement dans le <strong>localStorage</strong> de ce navigateur (invisible sur un autre
               appareil ou navigateur).
             </p>
-            <div className="rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-4 dark:border-slate-600 dark:bg-slate-800/50">
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-                <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white">
+                <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-900">
                   <PigeonPhotoThumb
                     key={`thumb-${localPhotoRev}-${(photoUrl || '').slice(0, 48)}`}
                     localSrc={localPhotoDataUrl}
@@ -582,7 +577,7 @@ export function PigeonFormPage() {
                     />
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                       onClick={() => photoFileInputRef.current?.click()}
                     >
                       <Upload className="size-4 shrink-0" aria-hidden />

@@ -6,6 +6,7 @@ import faviconUrl from './assets/favicon.png'
 import './index.css'
 import App from './App.jsx'
 import { AuthBootstrap } from './router/AuthBootstrap.jsx'
+import { ThemeProvider } from './theme/ThemeProvider.jsx'
 
 let faviconLink = document.querySelector("link[rel='icon']")
 if (!faviconLink) {
@@ -22,10 +23,12 @@ const routerBasename =
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter basename={routerBasename}>
-      <AuthBootstrap>
-        <App />
-        <Toaster position="top-center" />
-      </AuthBootstrap>
+      <ThemeProvider>
+        <AuthBootstrap>
+          <App />
+          <Toaster position="top-center" />
+        </AuthBootstrap>
+      </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,
 )

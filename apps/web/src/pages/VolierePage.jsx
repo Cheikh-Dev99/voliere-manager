@@ -30,6 +30,15 @@ import { VoliereGrid } from '../features/voliere/VoliereGrid'
 import { CageDetailPanel } from '../features/voliere/CageDetailPanel'
 import { CageDescriptionTooltip } from '../features/voliere/CageDescriptionTooltip'
 import {
+  dmDataTableHeader,
+  dmDataTableSub,
+  dmDataTableTitle,
+  dmTableClass,
+  dmTableWrap,
+  dmThead,
+  dmTbody,
+} from '../theme/voliereDarkUi'
+import {
   cageMatchesQuery,
   compareCages,
   occupantPigeons,
@@ -501,7 +510,7 @@ export function VolierePage() {
               setVoliereCode(e.target.value)
               setSelectedId(null)
             }}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800"
+            className="rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm font-medium text-slate-800"
             aria-label="Choisir la volière"
           >
             {codesVoliere.map((code) => (
@@ -526,7 +535,7 @@ export function VolierePage() {
       ) : null}
 
       {!loading && cages.length > 0 ? (
-        <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+        <div className="space-y-3 rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-3 shadow-sm sm:p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="relative min-w-0 flex-1 lg:max-w-md">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
@@ -535,7 +544,7 @@ export function VolierePage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Rechercher par n° cage, nom, description ou pigeon (matricule, nom, race)…"
-                className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                 aria-label="Recherche sur les cages et leur contenu"
               />
             </div>
@@ -577,7 +586,7 @@ export function VolierePage() {
                 id="voliere-filter-situation"
                 value={filtre}
                 onChange={(e) => setFiltre(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               >
                 {FILTRES.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -594,7 +603,7 @@ export function VolierePage() {
                 id="voliere-filter-race"
                 value={filterRace}
                 onChange={(e) => setFilterRace(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               >
                 <option value="">Toutes les races</option>
                 {raceOptionsVoliere.map((r) => (
@@ -613,7 +622,7 @@ export function VolierePage() {
                   id="voliere-sort-by"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                 >
                   <option value="numero">Numéro de cage</option>
                   <option value="nom">Nom de cage</option>
@@ -628,7 +637,7 @@ export function VolierePage() {
                       : 'Ordre décroissant — cliquer pour croissant'
                   }
                   onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-                  className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                  className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
                   aria-label={sortDir === 'asc' ? 'Trier en ordre décroissant' : 'Trier en ordre croissant'}
                 >
                   {sortDir === 'asc' ? (
@@ -650,7 +659,7 @@ export function VolierePage() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
               >
                 <FilterX className="size-4" aria-hidden />
                 Réinitialiser filtres, recherche et tri
@@ -681,7 +690,7 @@ export function VolierePage() {
                   </Link>
                 </div>
               ) : cagesFiltrees.length === 0 ? (
-                <div className="rounded-xl border border-slate-200 bg-white px-4 py-5 text-center text-sm text-slate-600 sm:py-6">
+                <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 px-4 py-5 text-center text-sm text-slate-600 sm:py-6">
                   <p className="font-medium text-slate-800">Aucune cage ne correspond à ta sélection.</p>
                   <p className="mx-auto mt-2 max-w-md text-xs text-slate-500">
                     Essaie d’autres filtres ou vide la recherche.
@@ -711,9 +720,9 @@ export function VolierePage() {
                 />
               )
             ) : cagesVoliere.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-center text-slate-600 sm:p-6">
+              <div className="rounded-xl border border-dashed border-slate-200 bg-white p-5 text-center text-slate-600 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 sm:p-6">
                 <p>Aucune cage pour cette volière ({voliereCode}).</p>
-                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500">
+                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500 dark:text-slate-400">
                   Ajoute des cages depuis la gestion des cages (menu « Cages ») ou crée-en une pour cette volière.
                 </p>
                 <Link
@@ -725,34 +734,75 @@ export function VolierePage() {
                 </Link>
               </div>
             ) : cagesFiltrees.length === 0 ? (
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/80 px-4 py-5 text-center text-sm text-slate-600 shadow-sm sm:py-6">
-                <p className="font-medium text-slate-800">Aucune cage ne correspond à ta sélection.</p>
-                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500">
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/80 px-4 py-5 text-center text-sm text-slate-600 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:to-slate-900/90 dark:text-slate-300 sm:py-6">
+                <p className="font-medium text-slate-800 dark:text-slate-100">Aucune cage ne correspond à ta sélection.</p>
+                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500 dark:text-slate-400">
                   Essaie d’autres filtres ou vide la recherche.
                 </p>
                 <button
                   type="button"
-                  className="mt-4 text-teal-700 underline hover:text-teal-800"
+                  className="mt-4 text-teal-700 underline hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
                   onClick={resetFilters}
                 >
                   Réinitialiser filtres, recherche et tri
                 </button>
               </div>
             ) : (
-              <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-md shadow-slate-900/5 ring-1 ring-slate-900/[0.04]">
-                <div className="border-b border-teal-100 bg-gradient-to-r from-teal-50/90 via-white to-slate-50/80 px-4 py-3">
-                  <p className="text-sm font-semibold text-slate-800">Liste des cages</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
+              <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-md shadow-slate-900/5 ring-1 ring-slate-900/[0.04]">
+                <div className={dmDataTableHeader}>
+                  <p className={dmDataTableTitle}>Liste des cages</p>
+                  <p className={dmDataTableSub}>
                     Cliquez sur une ligne pour le détail. Création de couple par glisser : poignée à gauche du contenu
                     lorsque la cage a un pigeon seul (comme en vue grille).
                   </p>
                 </div>
-                <div className="overflow-x-auto md:overflow-x-visible">
-                  <table className="w-full min-w-[520px] text-left text-sm md:min-w-0">
+                <div className="grid grid-cols-2 gap-2 p-3 sm:gap-3 md:hidden">
+                  {cagesFiltrees.map((c) => {
+                    const pg = c.pigeonId ? pigeonById.get(c.pigeonId) : null
+                    const cp = c.coupleId ? coupleById.get(c.coupleId) : null
+                    const m = cp ? maleByCouple.get(cp.id) : null
+                    const f = cp ? femelleByCouple.get(cp.id) : null
+                    let contenu = '—'
+                    if (c.statut === 'LIBRE') contenu = 'Libre'
+                    if (c.statut === 'OCCUPE_PIGEON' && c.pigeonId) {
+                      contenu = pg ? `${pg.matricule} — ${pg.nom}` : `Pigeon (${c.pigeonId.slice(0, 6)}…)`
+                    }
+                    if (m && f) contenu = `${m.matricule} (${m.nom}) + ${f.matricule} (${f.nom})`
+                    const selected = selectedIdVisible === c.id
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => setSelectedId(c.id)}
+                        onDragOver={(e) => handleDragOverCage(c, e)}
+                        onDragLeave={(e) => handleDragLeaveCage(c, e)}
+                        onDrop={(e) => handleDropOnCage(c, e)}
+                        className={`flex flex-col rounded-xl border p-3 text-left text-xs shadow-sm transition-colors dark:border-slate-600 dark:bg-slate-800/80 ${
+                          selected
+                            ? 'border-sky-400 bg-sky-50 ring-1 ring-sky-300 dark:border-sky-700 dark:bg-slate-800 dark:ring-sky-700/50'
+                            : 'border-slate-200 bg-white dark:border-slate-600'
+                        } ${dragOverCageId === c.id ? 'ring-2 ring-teal-400 dark:ring-teal-500' : ''}`}
+                      >
+                        <span className="font-mono text-sm font-semibold tabular-nums text-slate-900 dark:text-slate-100">
+                          {c.numero}
+                        </span>
+                        <span className="mt-1">
+                          <StatutListeBadge statut={c.statut} />
+                        </span>
+                        <span className="mt-2 line-clamp-3 text-[11px] leading-snug text-slate-600 dark:text-slate-300">
+                          {contenu}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+                <div className="hidden md:block">
+                <div className={dmTableWrap}>
+                  <table className={dmTableClass('min-w-[520px]')}>
                     <caption className="sr-only">
                       Cages de la volière {voliereCode}, numéro, statut et contenu
                     </caption>
-                    <thead className="border-b border-slate-200 bg-slate-100/90 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                    <thead className={dmThead}>
                       <tr>
                         <th scope="col" className="whitespace-nowrap px-4 py-3.5">
                           Numéro
@@ -765,7 +815,7 @@ export function VolierePage() {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-800">
+                    <tbody className={`${dmTbody} text-slate-800 dark:text-slate-200`}>
                       {cagesFiltrees.map((c) => {
                         const pg = c.pigeonId ? pigeonById.get(c.pigeonId) : null
                         const cp = c.coupleId ? coupleById.get(c.coupleId) : null
@@ -781,18 +831,18 @@ export function VolierePage() {
                         return (
                           <tr
                             key={c.id}
-                            className={`cursor-pointer transition-colors hover:bg-teal-50/70 ${
+                            className={`cursor-pointer transition-colors hover:bg-teal-50/70 dark:hover:bg-teal-950/40 ${
                               selected
-                                ? 'bg-sky-50 ring-1 ring-inset ring-sky-300/80 hover:bg-sky-50'
-                                : 'odd:bg-white even:bg-slate-50/60'
-                            } ${dragOverCageId === c.id ? 'ring-2 ring-inset ring-teal-400' : ''}`}
+                                ? 'bg-sky-50 ring-1 ring-inset ring-sky-300/80 hover:bg-sky-50 dark:bg-slate-800/90 dark:ring-sky-700/50 dark:hover:bg-slate-800'
+                                : 'odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/50'
+                            } ${dragOverCageId === c.id ? 'ring-2 ring-inset ring-teal-400 dark:ring-teal-500' : ''}`}
                             onClick={() => setSelectedId(c.id)}
                             onDragOver={(e) => handleDragOverCage(c, e)}
                             onDragLeave={(e) => handleDragLeaveCage(c, e)}
                             onDrop={(e) => handleDropOnCage(c, e)}
                           >
                             <td
-                              className={`whitespace-nowrap px-4 py-3.5 font-semibold tabular-nums text-slate-900 ${
+                              className={`whitespace-nowrap px-4 py-3.5 font-semibold tabular-nums text-slate-900 dark:text-slate-100 ${
                                 selected ? 'border-l-[3px] border-l-sky-500 pl-[13px]' : 'border-l-[3px] border-l-transparent'
                               }`}
                             >
@@ -804,7 +854,7 @@ export function VolierePage() {
                             <td className="whitespace-nowrap px-4 py-3 align-middle">
                               <StatutListeBadge statut={c.statut} />
                             </td>
-                            <td className="max-w-[min(28rem,92vw)] px-4 py-3.5 text-slate-700 sm:max-w-[min(28rem,55vw)]">
+                            <td className="max-w-[min(28rem,92vw)] px-4 py-3.5 text-slate-700 dark:text-slate-300 sm:max-w-[min(28rem,55vw)]">
                               <div className="flex items-start gap-2">
                                 {c.statut === 'OCCUPE_PIGEON' && c.pigeonId ? (
                                   <div
@@ -830,6 +880,7 @@ export function VolierePage() {
                       })}
                     </tbody>
                   </table>
+                </div>
                 </div>
               </div>
             )}

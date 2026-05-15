@@ -1,29 +1,53 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import type { User } from 'firebase/auth';
-import { ThemeProvider, DefaultTheme } from '@react-navigation/native';
+import { ThemeProvider } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
 
 import { AppLoadingView } from '../components/ui/AppLoadingView';
 import { AppFeedbackProvider } from '../components/providers/AppFeedbackProvider';
-import { theme } from '../constants/theme';
+import { AppThemeProvider, useAppTheme } from '../context/AppThemeContext';
 import { onAuthChange } from '@shared/firebase/auth';
 
-/** Fond transparent : chaque groupe de routes applique son propre fond (ex. filigrane uniquement sur les onglets principaux). */
-const navigationTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: 'transparent',
-    card: 'transparent',
-  },
-};
-
-export default function RootLayout() {
+function RootLayoutContent() {
+  const { navigationTheme, colors, resolved } = useAppTheme();
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const segments = useSegments();
   const router = useRouter();
+
+  const navForRoot = useMemo(
+    () => ({
+      ...navigationTheme,
+      colors: {
+        ...navigationTheme.colors,
+        background: 'transparent',
+        card: 'transparent',
+      },
+    }),
+    [navigationTheme],
+  );
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        shell: {
+          flex: 1,
+          position: 'relative',
+          backgroundColor: colors.slate100,
+        },
+        foreground: {
+          flex: 1,
+        },
+        boot: {
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }),
+    [colors.slate100],
+  );
 
   useEffect(() => {
     return onAuthChange(setUser);
@@ -41,50 +65,45 @@ export default function RootLayout() {
     }
 
     if (inAuth) {
-      router.replace('/(app)/(tabs)/cages');
+      router.replace('/(app)/(tabs)');
     }
   }, [user, segments, router]);
 
   return (
-    <SafeAreaProvider>
-      <AppFeedbackProvider>
-        {user === undefined ? (
-          <View style={styles.shell}>
-            <View style={styles.boot}>
-              <AppLoadingView
-                variant="fullscreen"
-                loadingContext="default"
-                message="Chargement…"
-                subtitle="Volière Manager"
-              />
-            </View>
+    <>
+      <StatusBar style={resolved === 'dark' ? 'light' : 'dark'} />
+      {user === undefined ? (
+        <View style={styles.shell}>
+          <View style={styles.boot}>
+            <AppLoadingView
+              variant="fullscreen"
+              loadingContext="default"
+              message="Chargement…"
+              subtitle="Volière Manager"
+            />
           </View>
-        ) : (
-          <View style={styles.shell}>
-            <View style={styles.foreground}>
-              <ThemeProvider value={navigationTheme}>
-                <Slot />
-              </ThemeProvider>
-            </View>
+        </View>
+      ) : (
+        <View style={styles.shell}>
+          <View style={styles.foreground}>
+            <ThemeProvider value={navForRoot}>
+              <Slot />
+            </ThemeProvider>
           </View>
-        )}
-      </AppFeedbackProvider>
-    </SafeAreaProvider>
+        </View>
+      )}
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  shell: {
-    flex: 1,
-    position: 'relative',
-    backgroundColor: theme.slate100,
-  },
-  foreground: {
-    flex: 1,
-  },
-  boot: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <AppThemeProvider>
+        <AppFeedbackProvider>
+          <RootLayoutContent />
+        </AppFeedbackProvider>
+      </AppThemeProvider>
+    </SafeAreaProvider>
+  );
+}

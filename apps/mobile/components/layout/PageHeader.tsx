@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 type PageHeaderProps = {
   /** Omis quand le titre est dans la barre native (Tabs). */
@@ -14,12 +16,35 @@ type PageHeaderProps = {
   children?: ReactNode;
 };
 
+function createPageHeaderStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    wrap: { marginBottom: 14 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+    title: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: theme.slate900,
+      letterSpacing: -0.3,
+      flexShrink: 1,
+    },
+    desc: {
+      marginTop: 8,
+      fontSize: 14,
+      lineHeight: 20,
+      color: theme.slate600,
+    },
+    actions: { marginTop: 14, gap: 10 },
+  });
+}
+
 export function PageHeader({
   title,
   description,
   titleAccessory,
   children,
 }: PageHeaderProps) {
+  const { colors: theme } = useAppTheme();
+  const styles = useMemo(() => createPageHeaderStyles(theme), [theme]);
   const showTitleRow = Boolean(title?.trim()) || titleAccessory != null;
 
   return (
@@ -35,22 +60,3 @@ export function PageHeader({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { marginBottom: 14 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: theme.slate900,
-    letterSpacing: -0.3,
-    flexShrink: 1,
-  },
-  desc: {
-    marginTop: 8,
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.slate600,
-  },
-  actions: { marginTop: 14, gap: 10 },
-});

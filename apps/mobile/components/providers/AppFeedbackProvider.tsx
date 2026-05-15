@@ -13,7 +13,8 @@ import { AlertTriangle, CheckCircle2, HelpCircle, Info, X } from 'lucide-react-n
 
 import { registerAppFeedbackHandler } from '../../lib/appFeedbackBus';
 import type { FeedbackOpenPayload, FeedbackVariant } from '../../lib/appFeedbackTypes';
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 function variantMeta(variant: FeedbackVariant) {
   switch (variant) {
@@ -49,6 +50,8 @@ function variantMeta(variant: FeedbackVariant) {
 }
 
 export function AppFeedbackProvider({ children }: { children: ReactNode }) {
+  const { colors: theme } = useAppTheme();
+  const styles = useMemo(() => createFeedbackStyles(theme), [theme]);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const cardMax = Math.min(360, width - 32);
@@ -171,7 +174,8 @@ export function AppFeedbackProvider({ children }: { children: ReactNode }) {
   );
 }
 
-const styles = StyleSheet.create({
+function createFeedbackStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.5)',
@@ -181,7 +185,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -231,12 +235,12 @@ const styles = StyleSheet.create({
   },
   btnPrimary: { backgroundColor: theme.teal600 },
   btnCancel: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderWidth: 1,
     borderColor: theme.slate200,
   },
   btnDest: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderWidth: 2,
     borderColor: theme.red600,
   },
@@ -245,4 +249,5 @@ const styles = StyleSheet.create({
   btnTxtPrimary: { color: theme.white },
   btnTxtCancel: { color: theme.slate800 },
   btnTxtDest: { color: theme.red600 },
-});
+  });
+}

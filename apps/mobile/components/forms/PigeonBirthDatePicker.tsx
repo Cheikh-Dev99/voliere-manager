@@ -11,7 +11,8 @@ import {
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { Calendar } from 'lucide-react-native';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 type Props = {
   value: string;
@@ -56,6 +57,8 @@ function formatFrLong(isoYmd: string): string {
 }
 
 export function PigeonBirthDatePicker({ value, onChange, error, onClearError }: Props) {
+  const { colors: c, resolved } = useAppTheme();
+  const styles = useMemo(() => createBirthDateStyles(c), [c]);
   const [iosOpen, setIosOpen] = useState(false);
   const [iosTemp, setIosTemp] = useState(() => parseYmd(value));
 
@@ -72,7 +75,7 @@ export function PigeonBirthDatePicker({ value, onChange, error, onClearError }: 
             onClearError?.();
           }}
           placeholder="AAAA-MM-JJ"
-          placeholderTextColor={theme.slate500}
+          placeholderTextColor={c.slate500}
         />
         <Text style={styles.hint}>Sur le web Expo, saisis la date au format AAAA-MM-JJ.</Text>
         {error ? <Text style={styles.errTxt}>{error}</Text> : null}
@@ -118,7 +121,7 @@ export function PigeonBirthDatePicker({ value, onChange, error, onClearError }: 
         accessibilityRole="button"
         accessibilityLabel="Choisir la date de naissance"
       >
-        <Calendar size={20} color={theme.teal700} />
+        <Calendar size={20} color={c.teal700} />
         <View style={styles.triggerTextCol}>
           <Text style={[styles.triggerMain, !value.trim() && styles.triggerPlaceholder]} numberOfLines={2}>
             {displayLine}
@@ -147,7 +150,7 @@ export function PigeonBirthDatePicker({ value, onChange, error, onClearError }: 
                 onChange={(_, date) => {
                   if (date) setIosTemp(date);
                 }}
-                themeVariant="light"
+                themeVariant={resolved === 'dark' ? 'dark' : 'light'}
               />
               <View style={styles.sheetActions}>
                 <Pressable style={styles.btnGhost} onPress={() => setIosOpen(false)}>
@@ -171,7 +174,8 @@ export function PigeonBirthDatePicker({ value, onChange, error, onClearError }: 
   );
 }
 
-const styles = StyleSheet.create({
+function createBirthDateStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   wrap: {},
   webInp: {
     borderWidth: 1,
@@ -180,7 +184,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 16,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     color: theme.slate900,
   },
   trigger: {
@@ -192,7 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 14,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     minHeight: 52,
   },
   triggerErr: { borderColor: theme.red600 },
@@ -205,7 +209,7 @@ const styles = StyleSheet.create({
   modalRoot: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,23,42,0.45)' },
   sheet: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingTop: 16,
@@ -234,4 +238,5 @@ const styles = StyleSheet.create({
     backgroundColor: theme.teal600,
   },
   btnPrimaryTxt: { fontWeight: '800', color: theme.white },
-});
+  });
+}

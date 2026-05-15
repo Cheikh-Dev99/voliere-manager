@@ -11,7 +11,8 @@ import type { ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronDown, X } from 'lucide-react-native';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 export type MobileSelectOption = { value: string; label: string };
 
@@ -24,6 +25,68 @@ type Props = {
   accessibilityHint?: string;
 };
 
+function createMobileSelectStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    wrap: { flex: 1, minWidth: 0 },
+    lab: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: theme.slate800,
+      marginBottom: 6,
+    },
+    trigger: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 8,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: theme.radiusMd,
+      paddingHorizontal: 12,
+      paddingVertical: Platform.OS === 'ios' ? 12 : 10,
+      backgroundColor: theme.surfaceElevated,
+      minHeight: 44,
+    },
+    triggerTxt: {
+      flex: 1,
+      fontSize: 15,
+      fontWeight: '600',
+      color: theme.slate900,
+    },
+    modalRoot: { flex: 1, justifyContent: 'flex-end' },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    },
+    sheet: {
+      backgroundColor: theme.surfaceElevated,
+      borderTopLeftRadius: 18,
+      borderTopRightRadius: 18,
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      maxHeight: '55%',
+    },
+    sheetHead: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+      paddingBottom: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    sheetTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
+    row: {
+      paddingVertical: 14,
+      paddingHorizontal: 4,
+      borderRadius: theme.radiusMd,
+    },
+    rowOn: { backgroundColor: theme.teal50 },
+    rowTxt: { fontSize: 16, fontWeight: '600', color: theme.slate800 },
+    rowTxtOn: { color: theme.teal900, fontWeight: '700' },
+  });
+}
+
 export function MobileLabeledSelect({
   label,
   options,
@@ -32,6 +95,8 @@ export function MobileLabeledSelect({
   containerStyle,
   accessibilityHint,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => createMobileSelectStyles(colors), [colors]);
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
 
@@ -52,7 +117,7 @@ export function MobileLabeledSelect({
         <Text style={styles.triggerTxt} numberOfLines={1}>
           {displayLabel}
         </Text>
-        <ChevronDown size={20} color={theme.slate500} strokeWidth={2.2} />
+        <ChevronDown size={20} color={colors.slate500} strokeWidth={2.2} />
       </Pressable>
 
       <Modal visible={open} animationType="slide" transparent onRequestClose={() => setOpen(false)}>
@@ -66,7 +131,7 @@ export function MobileLabeledSelect({
             <View style={styles.sheetHead}>
               <Text style={styles.sheetTitle}>{label}</Text>
               <Pressable onPress={() => setOpen(false)} hitSlop={12} accessibilityLabel="Fermer">
-                <X size={22} color={theme.slate600} strokeWidth={2.2} />
+                <X size={22} color={colors.slate600} strokeWidth={2.2} />
               </Pressable>
             </View>
             {options.map((opt) => {
@@ -94,63 +159,3 @@ export function MobileLabeledSelect({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { flex: 1, minWidth: 0 },
-  lab: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: theme.slate800,
-    marginBottom: 6,
-  },
-  trigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: theme.radiusMd,
-    paddingHorizontal: 12,
-    paddingVertical: Platform.OS === 'ios' ? 12 : 10,
-    backgroundColor: theme.white,
-    minHeight: 44,
-  },
-  triggerTxt: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.slate900,
-  },
-  modalRoot: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
-  },
-  sheet: {
-    backgroundColor: theme.white,
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    maxHeight: '55%',
-  },
-  sheetHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.border,
-  },
-  sheetTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
-  row: {
-    paddingVertical: 14,
-    paddingHorizontal: 4,
-    borderRadius: theme.radiusMd,
-  },
-  rowOn: { backgroundColor: theme.teal50 },
-  rowTxt: { fontSize: 16, fontWeight: '600', color: theme.slate800 },
-  rowTxtOn: { color: theme.teal900, fontWeight: '700' },
-});

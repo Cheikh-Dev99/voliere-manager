@@ -1,14 +1,13 @@
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Bird, CircleAlert, GripVertical } from 'lucide-react-native';
 
 import type { Cage, Pigeon } from '@shared/types';
 
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { appFeedback } from '../../lib/appFeedback';
-import { theme } from '../../constants/theme';
-import { cageStatutCenterText, cageStatutTheme } from './cageStatutTheme';
-
-/** Texte secondaire type web `text-slate-600` + `text-xs` pour « 1 pigeon » / « 2 pigeons ». */
-const CENTER_MUTED = '#475569';
+import { cageStatutCenterText, cageStatutVisualFor } from './cageStatutTheme';
 
 type Props = {
   cage: Cage;
@@ -20,6 +19,123 @@ type Props = {
   onDragHandlePress?: () => void;
 };
 
+function createGridStyles(theme: ThemeColors, resolved: 'light' | 'dark') {
+  const shadowOpacity = resolved === 'dark' ? 0.22 : 0.05;
+  const descBg = resolved === 'dark' ? 'rgba(51,65,85,0.92)' : 'rgba(255,255,255,0.9)';
+
+  return StyleSheet.create({
+    wrap: {
+      flex: 1,
+      flexDirection: 'row',
+      minHeight: 128,
+      borderRadius: 12,
+      borderWidth: 2,
+      marginBottom: 0,
+      overflow: 'hidden',
+    },
+    shadowSm: {
+      shadowColor: '#0f172a',
+      shadowOpacity,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 1 },
+      elevation: resolved === 'dark' ? 3 : 1,
+    },
+    main: {
+      padding: 12,
+      justifyContent: 'flex-start',
+      minWidth: 0,
+    },
+    mainFull: { flex: 1 },
+    mainWithHandle: { flex: 1 },
+    mainPressed: { opacity: 0.94 },
+    descBtn: {
+      position: 'absolute',
+      left: 8,
+      bottom: 8,
+      zIndex: 2,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: descBg,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(251, 146, 60, 0.35)',
+    },
+    topRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      gap: 8,
+    },
+    numero: {
+      flex: 1,
+      fontSize: 15,
+      fontWeight: '600',
+      color: theme.slate900,
+      letterSpacing: -0.2,
+    },
+    dot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      marginTop: 4,
+    },
+    libreBody: {
+      flex: 1,
+      minHeight: 56,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingBottom: 4,
+    },
+    libreLabel: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: theme.slate600,
+    },
+    birdsWrap: {
+      marginTop: 8,
+      minHeight: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    birdRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+    centerLbl: {
+      marginTop: 4,
+      textAlign: 'center',
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '500',
+      color: theme.slate600,
+    },
+    meta: { marginTop: 2, alignItems: 'center' },
+    metaWithDesc: { paddingBottom: 26 },
+    mat: {
+      fontSize: 11,
+      fontWeight: '500',
+      color: theme.slate700,
+      textAlign: 'center',
+    },
+    nom: {
+      fontSize: 10,
+      lineHeight: 14,
+      color: theme.slate500,
+      textAlign: 'center',
+      marginTop: 2,
+    },
+    handle: {
+      minWidth: 44,
+      borderLeftWidth: 1,
+      borderLeftColor: 'rgba(254, 205, 211, 0.85)',
+      backgroundColor: 'rgba(255, 228, 230, 0.55)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 8,
+    },
+    handlePressed: { backgroundColor: 'rgba(254, 205, 211, 0.65)' },
+  });
+}
+
 export function CageGridCell({
   cage,
   pigeon,
@@ -28,7 +144,9 @@ export function CageGridCell({
   onPress,
   onDragHandlePress,
 }: Props) {
-  const st = cageStatutTheme[cage.statut] ?? cageStatutTheme.LIBRE;
+  const { colors: theme, resolved } = useAppTheme();
+  const styles = useMemo(() => createGridStyles(theme, resolved), [theme, resolved]);
+  const st = cageStatutVisualFor(resolved, cage.statut);
   const center = cageStatutCenterText[cage.statut] ?? '';
   const desc = (cage.description ?? '').trim();
   const soloPigeonId = cage.statut === 'OCCUPE_PIGEON' ? cage.pigeonId : null;
@@ -129,125 +247,3 @@ export function CageGridCell({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    flex: 1,
-    flexDirection: 'row',
-    minHeight: 128,
-    borderRadius: 12,
-    borderWidth: 2,
-    marginBottom: 0,
-    overflow: 'hidden',
-  },
-  /** Proche de `shadow-sm` Tailwind (léger). */
-  shadowSm: {
-    shadowColor: '#0f172a',
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
-  },
-  main: {
-    padding: 12,
-    justifyContent: 'flex-start',
-    minWidth: 0,
-  },
-  mainFull: { flex: 1 },
-  mainWithHandle: { flex: 1 },
-  mainPressed: { opacity: 0.94 },
-  descBtn: {
-    position: 'absolute',
-    left: 8,
-    bottom: 8,
-    zIndex: 2,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(251, 146, 60, 0.35)',
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  /** `font-semibold text-slate-900` */
-  numero: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.slate900,
-    letterSpacing: -0.2,
-  },
-  /** `size-2.5` = 10px */
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginTop: 4,
-  },
-  /** Zone « Libre » centrée verticalement (aperçu web A06). */
-  libreBody: {
-    flex: 1,
-    minHeight: 56,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 4,
-  },
-  /** `text-xs font-medium text-slate-600` — libellé principal de la carte libre */
-  libreLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: CENTER_MUTED,
-  },
-  /** `mt-2 flex min-h-[28px] items-center justify-center` */
-  birdsWrap: {
-    marginTop: 8,
-    minHeight: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  birdRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  /** `mt-1 text-center text-xs font-medium text-slate-600` — même ligne que le web après les oiseaux */
-  centerLbl: {
-    marginTop: 4,
-    textAlign: 'center',
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '500',
-    color: CENTER_MUTED,
-  },
-  meta: { marginTop: 2, alignItems: 'center' },
-  metaWithDesc: { paddingBottom: 26 },
-  /** `text-[11px] font-medium text-slate-700` */
-  mat: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: theme.slate700,
-    textAlign: 'center',
-  },
-  /** `text-[10px] text-slate-500` */
-  nom: {
-    fontSize: 10,
-    lineHeight: 14,
-    color: theme.slate500,
-    textAlign: 'center',
-    marginTop: 2,
-  },
-  /** Web : `w-9 border-l border-rose-200/80 bg-rose-100/50` + cible tactile ≥ 44 */
-  handle: {
-    minWidth: 44,
-    borderLeftWidth: 1,
-    borderLeftColor: 'rgba(254, 205, 211, 0.85)',
-    backgroundColor: 'rgba(255, 228, 230, 0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-  },
-  handlePressed: { backgroundColor: 'rgba(254, 205, 211, 0.65)' },
-});

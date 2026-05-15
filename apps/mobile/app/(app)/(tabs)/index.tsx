@@ -21,7 +21,8 @@ import { TabHeaderTitle } from '../../../components/layout/TabHeaderTitle';
 import { MobileLabeledSelect } from '../../../components/ui/MobileLabeledSelect';
 import { SearchField } from '../../../components/ui/SearchField';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme } from '../../../constants/theme';
+import type { ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
 import { useMergedVoliereCodes } from '../../../hooks/useMergedVoliereCodes';
 
 const FILTRES: { id: string; label: string }[] = [
@@ -31,7 +32,84 @@ const FILTRES: { id: string; label: string }[] = [
   { id: 'OCCUPE_COUPLE', label: 'Couples' },
 ];
 
+function createVoliereIndexStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: 'transparent' },
+    headerBlock: { paddingHorizontal: theme.screenPadding, paddingBottom: 8 },
+    fieldLab: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: theme.slate800,
+      marginBottom: 6,
+    },
+    legend: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 14,
+      marginTop: 4,
+    },
+    legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    legendDot: { width: 10, height: 10, borderRadius: 5 },
+    legendTxt: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
+    summary: {
+      marginTop: 10,
+      fontSize: 14,
+      fontWeight: '700',
+      color: theme.slate800,
+    },
+    filtersRow: {
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      width: '100%',
+      gap: 10,
+      alignItems: 'flex-start',
+      marginTop: 4,
+    },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+    err: { color: theme.red600, padding: 16, textAlign: 'center' },
+    list: {
+      paddingHorizontal: theme.screenPadding,
+      /** Marge basse sans FAB : évite que la dernière ligne soit masquée par la barre d’onglets. */
+      paddingBottom: 80,
+      paddingTop: 4,
+    },
+    gridRow: { gap: 10, marginBottom: 10, justifyContent: 'space-between' },
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(15, 23, 42, 0.45)',
+      justifyContent: 'flex-end',
+    },
+    modalCard: {
+      backgroundColor: theme.surfaceElevated,
+      borderTopLeftRadius: 18,
+      borderTopRightRadius: 18,
+      paddingHorizontal: 16,
+      paddingTop: 14,
+      paddingBottom: 28,
+      maxHeight: '85%',
+    },
+    modalHead: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+    },
+    modalTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
+    modalHint: { fontSize: 13, color: theme.slate600, lineHeight: 18, marginBottom: 12 },
+    pickRow: {
+      paddingVertical: 14,
+      paddingHorizontal: 4,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.border,
+    },
+    pickMat: { fontSize: 16, fontWeight: '700', color: theme.slate900 },
+    pickNom: { fontSize: 13, color: theme.slate600, marginTop: 4 },
+  });
+}
+
 export default function VoliereTabScreen() {
+  const { colors: theme } = useAppTheme();
+  const styles = useMemo(() => createVoliereIndexStyles(theme), [theme]);
   const router = useRouter();
   const navigation = useNavigation();
   const { cages, loading: lc, error: ec } = useCages();
@@ -376,75 +454,3 @@ export default function VoliereTabScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: 'transparent' },
-  headerBlock: { paddingHorizontal: theme.screenPadding, paddingBottom: 8 },
-  fieldLab: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: theme.slate800,
-    marginBottom: 6,
-  },
-  legend: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 14,
-    marginTop: 4,
-  },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  legendDot: { width: 10, height: 10, borderRadius: 5 },
-  legendTxt: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
-  summary: {
-    marginTop: 10,
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.slate800,
-  },
-  filtersRow: {
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    width: '100%',
-    gap: 10,
-    alignItems: 'flex-start',
-    marginTop: 4,
-  },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  err: { color: theme.red600, padding: 16, textAlign: 'center' },
-  list: {
-    paddingHorizontal: theme.screenPadding,
-    /** Marge basse sans FAB : évite que la dernière ligne soit masquée par la barre d’onglets. */
-    paddingBottom: 80,
-    paddingTop: 4,
-  },
-  gridRow: { gap: 10, marginBottom: 10, justifyContent: 'space-between' },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
-    justifyContent: 'flex-end',
-  },
-  modalCard: {
-    backgroundColor: theme.white,
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 28,
-    maxHeight: '85%',
-  },
-  modalHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  modalTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
-  modalHint: { fontSize: 13, color: theme.slate600, lineHeight: 18, marginBottom: 12 },
-  pickRow: {
-    paddingVertical: 14,
-    paddingHorizontal: 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.border,
-  },
-  pickMat: { fontSize: 16, fontWeight: '700', color: theme.slate900 },
-  pickNom: { fontSize: 13, color: theme.slate600, marginTop: 4 },
-});

@@ -8,6 +8,7 @@ import { ElevageStatsSection } from '../profile/ElevageStatsSection'
 import { VoliereCodesPanel } from '../settings/VoliereCodesPanel'
 import { updateUserProfile } from '@shared/services/usersProfileService'
 import useAuthStore from '../../stores/authStore'
+import { ThemeModeControl } from '../../theme/ThemeModeControl'
 
 function initials(prenom, nom, email) {
   const p = (prenom ?? '').trim()
@@ -113,7 +114,7 @@ export function UserProfileMenu() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex w-full max-w-full items-center justify-between gap-2 rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition-colors hover:border-teal-200 hover:bg-teal-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:ring-offset-2 sm:min-w-[12rem] sm:justify-start"
+        className="inline-flex w-full max-w-full items-center justify-between gap-2 rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition-colors hover:border-teal-200 hover:bg-teal-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:ring-offset-2 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-teal-500/40 dark:hover:bg-slate-700/60 dark:focus-visible:ring-offset-slate-900 sm:min-w-[12rem] sm:justify-start"
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-controls="user-profile-panel"
@@ -121,18 +122,18 @@ export function UserProfileMenu() {
       >
         <span className="flex min-w-0 flex-1 items-center gap-2.5">
           <span
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-xs font-bold text-white shadow-inner ring-2 ring-white"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-xs font-bold text-white shadow-inner ring-2 ring-white dark:ring-slate-800"
             aria-hidden
           >
             {profileLoading ? <Loader2 className="size-4 animate-spin opacity-90" /> : inn}
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block truncate font-semibold text-slate-900">{nameLine}</span>
-            <span className="hidden max-w-full truncate text-xs font-normal text-slate-500 sm:block">{elevage}</span>
+            <span className="block truncate font-semibold text-slate-900 dark:text-slate-50">{nameLine}</span>
+            <span className="hidden max-w-full truncate text-xs font-normal text-slate-500 dark:text-slate-400 sm:block">{elevage}</span>
           </span>
         </span>
         <ChevronDown
-          className={`size-4 shrink-0 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`size-4 shrink-0 text-slate-400 transition-transform dark:text-slate-500 ${open ? 'rotate-180' : ''}`}
           aria-hidden
         />
       </button>
@@ -142,7 +143,7 @@ export function UserProfileMenu() {
           id="user-profile-panel"
           role="dialog"
           aria-labelledby="user-profile-trigger"
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-[min(32rem,85vh)] w-[min(22rem,calc(100vw-1.5rem))] origin-top-right overflow-y-auto rounded-2xl border border-slate-200/90 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/[0.06]"
+          className="absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-[min(32rem,85vh)] w-[min(22rem,calc(100vw-1.5rem))] origin-top-right overflow-y-auto rounded-2xl border border-slate-200/90 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/[0.06] dark:border-slate-600 dark:bg-slate-900 dark:shadow-black/40 dark:ring-white/10"
         >
           <div className="border-b border-slate-100 bg-gradient-to-br from-teal-600 via-teal-600 to-teal-700 px-4 py-4 text-white">
             <div className="flex items-start justify-between gap-2">
@@ -169,7 +170,7 @@ export function UserProfileMenu() {
           </div>
 
           <div className="space-y-3 px-3 py-3">
-            <p className="px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Mon élevage</p>
+            <p className="px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Mon élevage</p>
             <ElevageStatsSection
               cages={cages}
               cagesLoading={lc}
@@ -180,13 +181,13 @@ export function UserProfileMenu() {
             />
           </div>
 
-          <div className="border-t border-slate-100 px-3 py-3">
-            <p className="px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Mes volières</p>
-            <p className="mt-1 px-1 text-xs leading-relaxed text-slate-500">
-              Une <span className="font-medium text-slate-700">volière</span> est un bâtiment ou une zone ; dans l’app tu
-              lui donnes un <span className="font-medium text-slate-700">nom court</span> (ex.{' '}
-              <span className="font-medium text-slate-700">A</span>,{' '}
-              <span className="font-medium text-slate-700">B</span>, <span className="font-medium text-slate-700">Nord</span>
+          <div className="border-t border-slate-100 px-3 py-3 dark:border-slate-700">
+            <p className="px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Mes volières</p>
+            <p className="mt-1 px-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+              Une <span className="font-medium text-slate-700 dark:text-slate-200">volière</span> est un bâtiment ou une zone ; dans l’app tu
+              lui donnes un <span className="font-medium text-slate-700 dark:text-slate-200">nom court</span> (ex.{' '}
+              <span className="font-medium text-slate-700 dark:text-slate-200">A</span>,{' '}
+              <span className="font-medium text-slate-700 dark:text-slate-200">B</span>, <span className="font-medium text-slate-700 dark:text-slate-200">Nord</span>
               ) pour classer tes cages et te repérer dans les listes, même avant d’y mettre des cages.
             </p>
             {user?.uid ? (
@@ -196,12 +197,12 @@ export function UserProfileMenu() {
             ) : null}
           </div>
 
-          <div className="border-t border-slate-100 px-3 py-3">
+          <div className="border-t border-slate-100 px-3 py-3 dark:border-slate-700">
             {!editing ? (
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
               >
                 <PencilLine className="size-4 shrink-0 text-teal-700" aria-hidden />
                 Modifier mes informations
@@ -209,34 +210,34 @@ export function UserProfileMenu() {
             ) : (
               <div className="space-y-3">
                 <div>
-                  <label htmlFor="prof-prenom" className="mb-1 block text-xs font-medium text-slate-600">
+                  <label htmlFor="prof-prenom" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
                     Prénom
                   </label>
                   <div className="relative">
-                    <UserRound className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
+                    <UserRound className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" aria-hidden />
                     <input
                       id="prof-prenom"
                       value={draftPrenom}
                       onChange={(e) => setDraftPrenom(e.target.value)}
-                      className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-10 pr-3 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+                      className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-10 pr-3 text-sm text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                       autoComplete="given-name"
                     />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="prof-nom" className="mb-1 block text-xs font-medium text-slate-600">
+                  <label htmlFor="prof-nom" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
                     Nom
                   </label>
                   <input
                     id="prof-nom"
                     value={draftNom}
                     onChange={(e) => setDraftNom(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                     autoComplete="family-name"
                   />
                 </div>
                 <div>
-                  <label htmlFor="prof-elevage" className="mb-1 block text-xs font-medium text-slate-600">
+                  <label htmlFor="prof-elevage" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
                     Nom de la volière / élevage
                   </label>
                   <input
@@ -244,7 +245,7 @@ export function UserProfileMenu() {
                     value={draftElevage}
                     onChange={(e) => setDraftElevage(e.target.value)}
                     placeholder="Ex. Volière Grand Yoff"
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                   />
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -271,7 +272,7 @@ export function UserProfileMenu() {
                         setDraftElevage(profile.nomElevage ?? '')
                       }
                     }}
-                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
                   >
                     <X className="size-4" aria-hidden />
                     Annuler
@@ -281,12 +282,19 @@ export function UserProfileMenu() {
             )}
           </div>
 
-          <div className="border-t border-slate-100 px-3 pb-3">
+          <div className="border-t border-slate-100 px-3 py-3 dark:border-slate-700">
+            <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              Apparence
+            </p>
+            <ThemeModeControl />
+          </div>
+
+          <div className="border-t border-slate-100 px-3 pb-3 dark:border-slate-700">
             <button
               type="button"
               onClick={() => void handleLogout()}
               disabled={signingOut}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-900 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-900 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-100 dark:hover:bg-red-950/60"
             >
               <LogOut className="size-4 shrink-0 opacity-90" aria-hidden />
               {signingOut ? 'Déconnexion…' : 'Se déconnecter'}

@@ -113,17 +113,17 @@ export function PigeonDetailPage() {
         <div>
           <Link
             to={back.path}
-            className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900"
+            className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-100"
           >
             <ArrowLeft className="size-4" aria-hidden />
             {back.label}
           </Link>
-          <h1 className="flex flex-wrap items-center gap-3 text-2xl font-bold tracking-tight text-slate-900">
-            <Bird className="size-8 shrink-0 text-teal-600" aria-hidden />
+          <h1 className="flex flex-wrap items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+            <Bird className="size-8 shrink-0 text-teal-600 dark:text-teal-400" aria-hidden />
             <span className="font-mono">{pigeon.matricule}</span>
-            <span className="text-slate-700">— {pigeon.nom}</span>
+            <span className="text-slate-700 dark:text-slate-300">— {pigeon.nom}</span>
           </h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
             Fiche en lecture seule. Utilise le bouton ci-dessous pour modifier les données.
           </p>
         </div>
@@ -131,7 +131,7 @@ export function PigeonDetailPage() {
           <Link
             to={`/pigeons/${pigeon.id}/sante`}
             state={location.state}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-900/50"
           >
             <Stethoscope className="size-4" aria-hidden />
             Carnet de santé
@@ -139,7 +139,7 @@ export function PigeonDetailPage() {
           <Link
             to={`/pigeons/${pigeon.id}/genealogie`}
             state={location.state}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-900/50"
           >
             <GitBranch className="size-4" aria-hidden />
             Généalogie
@@ -148,7 +148,7 @@ export function PigeonDetailPage() {
             <Link
               to={`/sorties?pigeon=${encodeURIComponent(pigeon.id)}`}
               state={location.state}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
             >
               <ClipboardList className="size-4" aria-hidden />
               Enregistrer une sortie
@@ -166,33 +166,33 @@ export function PigeonDetailPage() {
       </div>
 
       {pigeon.deletedAt ? (
-        <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+        <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/35 dark:text-amber-100">
           Ce pigeon a été retiré de l’effectif actif (données conservées pour la traçabilité).
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <div className="grid gap-5 p-5 md:grid-cols-[minmax(0,14rem)_1fr]">
           <div className="flex justify-center md:justify-start">
             {photoSrc ? (
               <img
                 src={photoSrc}
                 alt=""
-                className="size-48 rounded-2xl border border-slate-100 object-cover shadow-inner"
+                className="size-48 rounded-2xl border border-slate-100 object-cover shadow-inner dark:border-slate-600"
               />
             ) : (
-              <div className="flex size-48 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
+              <div className="flex size-48 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400">
                 Sans photo
               </div>
             )}
           </div>
           <dl className="grid gap-4 sm:grid-cols-2">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Sexe</dt>
-              <dd className="mt-1 text-slate-900">{pigeon.sexe === 'MALE' ? 'Mâle' : 'Femelle'}</dd>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Sexe</dt>
+              <dd className="mt-1 text-slate-900 dark:text-slate-100">{pigeon.sexe === 'MALE' ? 'Mâle' : 'Femelle'}</dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Statut</dt>
               <dd className="mt-1 flex flex-wrap items-center gap-2">
                 <span
                   className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold ring-1 ${STATUT_BADGE[pigeon.statut] ?? 'border-slate-200 bg-slate-100'}`}
@@ -202,7 +202,7 @@ export function PigeonDetailPage() {
                 <Link
                   to={`/pigeons/${pigeon.id}/sante`}
                   state={location.state}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-teal-800 underline-offset-2 hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-teal-800 underline-offset-2 hover:underline dark:text-teal-300"
                 >
                   <Stethoscope className="size-3.5 shrink-0" aria-hidden />
                   Carnet de santé
@@ -210,7 +210,7 @@ export function PigeonDetailPage() {
                 <Link
                   to={`/pigeons/${pigeon.id}/genealogie`}
                   state={location.state}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-teal-800 underline-offset-2 hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-teal-800 underline-offset-2 hover:underline dark:text-teal-300"
                 >
                   <GitBranch className="size-3.5 shrink-0" aria-hidden />
                   Généalogie
@@ -218,53 +218,53 @@ export function PigeonDetailPage() {
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Race</dt>
-              <dd className="mt-1 text-slate-900">{pigeon.race}</dd>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Race</dt>
+              <dd className="mt-1 text-slate-900 dark:text-slate-100">{pigeon.race}</dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Couleur</dt>
-              <dd className="mt-1 text-slate-900">{pigeon.couleur}</dd>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Couleur</dt>
+              <dd className="mt-1 text-slate-900 dark:text-slate-100">{pigeon.couleur}</dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Date de naissance</dt>
-              <dd className="mt-1 text-slate-900">{formatDateNaissance(pigeon.dateNaissance)}</dd>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Date de naissance</dt>
+              <dd className="mt-1 text-slate-900 dark:text-slate-100">{formatDateNaissance(pigeon.dateNaissance)}</dd>
             </div>
             {(pigeon.pereId || pigeon.mereId) && (
               <div className="sm:col-span-2">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Généalogie</dt>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Généalogie</dt>
                 <dd className="mt-2 flex flex-wrap gap-4 text-sm">
                   {pigeon.pereId ? (
                     <span>
-                      <span className="text-slate-500">Père : </span>
+                      <span className="text-slate-500 dark:text-slate-400">Père : </span>
                       {pere ? (
                         <Link
                           to={`/pigeons/${pere.id}`}
                           state={location.state}
-                          className="font-mono font-medium text-teal-800 underline-offset-2 hover:underline"
+                          className="font-mono font-medium text-teal-800 underline-offset-2 hover:underline dark:text-teal-300"
                         >
                           {pere.matricule}
                         </Link>
                       ) : (
-                        <span className="font-mono text-slate-600">{pigeon.pereId}</span>
+                        <span className="font-mono text-slate-600 dark:text-slate-400">{pigeon.pereId}</span>
                       )}
-                      {pere ? <span className="text-slate-600"> — {pere.nom}</span> : null}
+                      {pere ? <span className="text-slate-600 dark:text-slate-300"> — {pere.nom}</span> : null}
                     </span>
                   ) : null}
                   {pigeon.mereId ? (
                     <span>
-                      <span className="text-slate-500">Mère : </span>
+                      <span className="text-slate-500 dark:text-slate-400">Mère : </span>
                       {mere ? (
                         <Link
                           to={`/pigeons/${mere.id}`}
                           state={location.state}
-                          className="font-mono font-medium text-teal-800 underline-offset-2 hover:underline"
+                          className="font-mono font-medium text-teal-800 underline-offset-2 hover:underline dark:text-teal-300"
                         >
                           {mere.matricule}
                         </Link>
                       ) : (
-                        <span className="font-mono text-slate-600">{pigeon.mereId}</span>
+                        <span className="font-mono text-slate-600 dark:text-slate-400">{pigeon.mereId}</span>
                       )}
-                      {mere ? <span className="text-slate-600"> — {mere.nom}</span> : null}
+                      {mere ? <span className="text-slate-600 dark:text-slate-300"> — {mere.nom}</span> : null}
                     </span>
                   ) : null}
                 </dd>
@@ -272,14 +272,14 @@ export function PigeonDetailPage() {
             )}
             {pigeon.notes?.trim() ? (
               <div className="sm:col-span-2">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Notes</dt>
-                <dd className="mt-1 whitespace-pre-wrap text-slate-800">{pigeon.notes}</dd>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Notes</dt>
+                <dd className="mt-1 whitespace-pre-wrap text-slate-800 dark:text-slate-200">{pigeon.notes}</dd>
               </div>
             ) : null}
             {description ? (
               <div className="sm:col-span-2">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Description</dt>
-                <dd className="mt-1 whitespace-pre-wrap text-slate-800">{description}</dd>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Description</dt>
+                <dd className="mt-1 whitespace-pre-wrap text-slate-800 dark:text-slate-200">{description}</dd>
               </div>
             ) : null}
           </dl>

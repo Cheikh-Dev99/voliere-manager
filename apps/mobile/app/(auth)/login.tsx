@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -34,7 +34,8 @@ import {
 
 import { appFeedback } from '../../lib/appFeedback';
 import { SiteBackgroundDecor } from '../../components/layout/SiteBackgroundDecor';
-import { theme, shadowCard } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -54,6 +55,8 @@ type RegIssues = {
 };
 
 export default function LoginScreen() {
+  const { colors: theme, shadowCard, resolved } = useAppTheme();
+  const styles = useMemo(() => createLoginStyles(theme), [theme]);
   const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<AuthTab>('login');
 
@@ -245,7 +248,7 @@ export default function LoginScreen() {
         style={[styles.container, { paddingTop: Math.max(insets.top, 12) }]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-      <StatusBar style="dark" />
+      <StatusBar style={resolved === 'dark' ? 'light' : 'dark'} />
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[
@@ -625,7 +628,8 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createLoginStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   screenRoot: {
     flex: 1,
     backgroundColor: theme.slate100,
@@ -642,7 +646,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.screenPadding,
   },
   card: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     padding: 20,
     borderWidth: 1,
@@ -675,7 +679,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.slate50,
   },
   segBtnOn: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceHighlight,
     borderColor: theme.teal600,
     borderWidth: 2,
   },
@@ -775,3 +779,4 @@ const styles = StyleSheet.create({
   },
   secondaryBtnTxt: { fontSize: 15, fontWeight: '700', color: theme.teal700 },
 });
+}

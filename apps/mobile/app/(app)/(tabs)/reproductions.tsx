@@ -17,10 +17,13 @@ import {
 } from '../../../components/ui/FloatingAddButton';
 import { SearchField } from '../../../components/ui/SearchField';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme, shadowCard } from '../../../constants/theme';
+import type { ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
 export default function ReproductionsTabScreen() {
+  const { colors: theme, shadowCard } = useAppTheme();
+  const styles = useMemo(() => createReproductionsStyles(theme), [theme]);
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -135,7 +138,7 @@ export default function ReproductionsTabScreen() {
           <FloatingAddButton
             onPress={() => router.push('/(app)/reproduction/nouveau')}
             accessibilityLabel="Nouvelle reproduction"
-            icon={<Egg size={24} color={theme.white} strokeWidth={2.4} />}
+            icon={<Egg size={24} color="#ffffff" strokeWidth={2.4} />}
           />
         </>
       )}
@@ -143,23 +146,25 @@ export default function ReproductionsTabScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: 'transparent' },
-  header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
-  list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28 },
-  cardPressable: { marginBottom: 10 },
-  card: {
-    backgroundColor: theme.white,
-    borderRadius: theme.radiusLg,
-    padding: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  cardPressed: { opacity: 0.92 },
-  title: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
-  sub: { fontSize: 13, color: theme.slate600, marginTop: 4 },
-  notes: { fontSize: 13, color: theme.slate500, marginTop: 6 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  err: { color: theme.red600, padding: 16 },
-});
+function createReproductionsStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: 'transparent' },
+    header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
+    list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28 },
+    cardPressable: { marginBottom: 10 },
+    card: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: theme.radiusLg,
+      padding: 14,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    cardPressed: { opacity: 0.92 },
+    title: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
+    sub: { fontSize: 13, color: theme.slate600, marginTop: 4 },
+    notes: { fontSize: 13, color: theme.slate500, marginTop: 6 },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    err: { color: theme.red600, padding: 16 },
+  });
+}

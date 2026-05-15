@@ -7,6 +7,7 @@ import { ajouterEvenementSante } from '@shared/services/pigeonHealthService'
 import { obtenirPigeon } from '@shared/services/pigeonsService'
 import { getPigeonDisplayPhotoSrc } from '../utils/localPigeonPhoto'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
+import { dmFieldClass, dmFormShell, dmLabelXs } from '../theme/voliereDarkUi'
 
 const DEFAULT_BACK = { path: '/pigeons', label: 'Liste des pigeons' }
 
@@ -120,7 +121,7 @@ export function PigeonHealthPage() {
         <Link
           to={`/pigeons/${pigeon.id}`}
           state={location.state}
-          className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900"
+          className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-100"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour à la fiche
@@ -128,19 +129,19 @@ export function PigeonHealthPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <div className="flex flex-wrap items-start gap-4">
             {photoSrc ? (
-              <img src={photoSrc} alt="" className="size-16 shrink-0 rounded-xl border border-slate-100 object-cover" />
+              <img src={photoSrc} alt="" className="size-16 shrink-0 rounded-xl border border-slate-100 object-cover dark:border-slate-600" />
             ) : (
-              <div className="flex size-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400">
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-500">
                 —
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <h1 className="flex flex-wrap items-center gap-2 text-xl font-bold text-slate-900 sm:text-2xl">
-                <Stethoscope className="size-7 shrink-0 text-teal-600" aria-hidden />
+              <h1 className="flex flex-wrap items-center gap-2 text-xl font-bold text-slate-900 dark:text-slate-50 sm:text-2xl">
+                <Stethoscope className="size-7 shrink-0 text-teal-600 dark:text-teal-400" aria-hidden />
                 Carnet de santé
               </h1>
-              <p className="mt-1 font-mono text-sm font-semibold text-teal-900">{pigeon.matricule}</p>
-              <p className="text-sm text-slate-600">
+              <p className="mt-1 font-mono text-sm font-semibold text-teal-900 dark:text-teal-200">{pigeon.matricule}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 {pigeon.nom} · {pigeon.race}
               </p>
             </div>
@@ -148,23 +149,23 @@ export function PigeonHealthPage() {
           <Link
             to={`/pigeons/${pigeon.id}/genealogie`}
             state={location.state}
-            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 shadow-sm hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-900/50"
           >
             <GitBranch className="size-4" aria-hidden />
             Généalogie
           </Link>
         </div>
-        <p className="mt-3 text-sm text-slate-600">
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
           Historique lié à ce pigeon (consultations, traitements, observations). Les entrées restent sur sa fiche,
           indépendamment des cages.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-        <h2 className="text-sm font-semibold text-slate-800">Nouvelle entrée</h2>
+      <section className={dmFormShell}>
+        <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Nouvelle entrée</h2>
         <div className="mt-4 space-y-3">
           <div>
-            <label htmlFor="ph-occurred" className="mb-1 block text-xs font-medium text-slate-600">
+            <label htmlFor="ph-occurred" className={dmLabelXs}>
               Date de l’événement
             </label>
             <input
@@ -172,11 +173,11 @@ export function PigeonHealthPage() {
               type="date"
               value={occDate}
               onChange={(e) => setOccDate(e.target.value)}
-              className="w-full max-w-xs rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+              className={`max-w-xs ${dmFieldClass(false)}`}
             />
           </div>
           <div>
-            <label htmlFor="ph-summary" className="mb-1 block text-xs font-medium text-slate-600">
+            <label htmlFor="ph-summary" className={dmLabelXs}>
               Résumé (obligatoire)
             </label>
             <input
@@ -185,12 +186,12 @@ export function PigeonHealthPage() {
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               placeholder="Ex. Vermifuge, consultation…"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+              className={dmFieldClass(false)}
               autoComplete="off"
             />
           </div>
           <div>
-            <label htmlFor="ph-detail" className="mb-1 block text-xs font-medium text-slate-600">
+            <label htmlFor="ph-detail" className={dmLabelXs}>
               Détail (optionnel)
             </label>
             <textarea
@@ -199,7 +200,7 @@ export function PigeonHealthPage() {
               value={detail}
               onChange={(e) => setDetail(e.target.value)}
               placeholder="Dosage, symptômes…"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+              className={dmFieldClass(false)}
             />
           </div>
           <button
@@ -213,28 +214,33 @@ export function PigeonHealthPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-        <h2 className="text-sm font-semibold text-slate-800">Historique</h2>
+      <section className={dmFormShell}>
+        <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Historique</h2>
         {eventsError ? (
-          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800">{eventsError}</p>
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800 dark:bg-red-950/40 dark:text-red-200">
+            {eventsError}
+          </p>
         ) : null}
         {eventsLoading ? (
           <div className="mt-4 space-y-2" aria-busy="true">
-            <div className="h-12 animate-pulse rounded-lg bg-slate-100" />
-            <div className="h-12 animate-pulse rounded-lg bg-slate-100" />
+            <div className="h-12 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
+            <div className="h-12 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
           </div>
         ) : events.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-600">Aucune entrée pour l’instant.</p>
+          <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">Aucune entrée pour l’instant.</p>
         ) : (
           <ul className="mt-4 max-h-[min(50vh,24rem)] space-y-2 overflow-y-auto pr-1">
             {events.map((ev) => (
-              <li key={ev.id} className="rounded-lg border border-slate-100 bg-slate-50/90 px-3 py-2.5 text-sm">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              <li
+                key={ev.id}
+                className="rounded-lg border border-slate-100 bg-slate-50/90 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-800/80"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   {formatCalendarDate(ev.occurredAt)}
                 </p>
-                <p className="mt-1 font-medium text-slate-900">{ev.summary}</p>
+                <p className="mt-1 font-medium text-slate-900 dark:text-slate-100">{ev.summary}</p>
                 {ev.detail?.trim() ? (
-                  <p className="mt-1 whitespace-pre-wrap text-xs text-slate-600">{ev.detail.trim()}</p>
+                  <p className="mt-1 whitespace-pre-wrap text-xs text-slate-600 dark:text-slate-300">{ev.detail.trim()}</p>
                 ) : null}
               </li>
             ))}

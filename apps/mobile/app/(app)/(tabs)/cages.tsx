@@ -27,7 +27,8 @@ import {
 import { MobileLabeledSelect } from '../../../components/ui/MobileLabeledSelect';
 import { SearchField } from '../../../components/ui/SearchField';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme } from '../../../constants/theme';
+import type { ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
 import { useMergedVoliereCodes } from '../../../hooks/useMergedVoliereCodes';
 
 const statutLabel: Record<CageStatut, string> = {
@@ -68,7 +69,64 @@ function compareRows(a: Cage, b: Cage, sortBy: string, sortDir: string): number 
   return a.numero.localeCompare(b.numero, undefined, { numeric: true });
 }
 
+function createCagesTabStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: 'transparent' },
+    header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
+    filtersRow: {
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      width: '100%',
+      gap: 10,
+      alignItems: 'flex-start',
+    },
+    sortRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
+    sortLab: { fontSize: 13, color: theme.slate600, fontWeight: '700' },
+    sChip: {
+      paddingHorizontal: 8,
+      paddingVertical: 5,
+      borderRadius: theme.radiusSm,
+      backgroundColor: theme.surfaceElevated,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    sChipOn: { borderColor: theme.teal600, backgroundColor: theme.teal50 },
+    sChipTxt: { fontSize: 11, color: theme.slate600, textTransform: 'capitalize' },
+    sChipTxtOn: { color: theme.teal900, fontWeight: '700' },
+    dirBtn: { paddingHorizontal: 10, paddingVertical: 4, marginLeft: 4 },
+    dirTxt: { fontSize: 16, fontWeight: '800', color: theme.teal700 },
+    hint: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
+    toolbarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignItems: 'center' },
+    tbBtn: {
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+      borderColor: theme.border,
+      backgroundColor: theme.surfaceElevated,
+    },
+    tbBtnOn: { borderColor: theme.teal600, backgroundColor: theme.teal50 },
+    tbBtnTxt: { fontSize: 14, fontWeight: '700', color: theme.slate800 },
+    tbBtnTxtOn: { color: theme.teal900 },
+    tbBtnDanger: {
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+      borderColor: theme.red600,
+      backgroundColor: theme.surfaceElevated,
+    },
+    tbBtnDangerTxt: { fontSize: 14, fontWeight: '800', color: theme.red600 },
+    list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28, paddingTop: 4 },
+    muted: { textAlign: 'center', color: theme.slate500, marginTop: 24, marginBottom: 24 },
+    err: { color: theme.red600, margin: 16 },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  });
+}
+
 export default function CagesTabScreen() {
+  const { colors: theme } = useAppTheme();
+  const styles = useMemo(() => createCagesTabStyles(theme), [theme]);
   const router = useRouter();
   const { cages, loading, error } = useCages();
   const { pigeons, loading: lp } = usePigeons(false);
@@ -360,55 +418,3 @@ export default function CagesTabScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: 'transparent' },
-  header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
-  filtersRow: {
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    width: '100%',
-    gap: 10,
-    alignItems: 'flex-start',
-  },
-  sortRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
-  sortLab: { fontSize: 13, color: theme.slate600, fontWeight: '700' },
-  sChip: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: theme.radiusSm,
-    backgroundColor: theme.white,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  sChipOn: { borderColor: theme.teal600, backgroundColor: theme.teal50 },
-  sChipTxt: { fontSize: 11, color: theme.slate600, textTransform: 'capitalize' },
-  sChipTxtOn: { color: theme.teal900, fontWeight: '700' },
-  dirBtn: { paddingHorizontal: 10, paddingVertical: 4, marginLeft: 4 },
-  dirTxt: { fontSize: 16, fontWeight: '800', color: theme.teal700 },
-  hint: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
-  toolbarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignItems: 'center' },
-  tbBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-    borderColor: theme.border,
-    backgroundColor: theme.white,
-  },
-  tbBtnOn: { borderColor: theme.teal600, backgroundColor: theme.teal50 },
-  tbBtnTxt: { fontSize: 14, fontWeight: '700', color: theme.slate800 },
-  tbBtnTxtOn: { color: theme.teal900 },
-  tbBtnDanger: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-    borderColor: theme.red600,
-    backgroundColor: theme.white,
-  },
-  tbBtnDangerTxt: { fontSize: 14, fontWeight: '800', color: theme.red600 },
-  list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28, paddingTop: 4 },
-  muted: { textAlign: 'center', color: theme.slate500, marginTop: 24, marginBottom: 24 },
-  err: { color: theme.red600, margin: 16 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-});

@@ -16,7 +16,8 @@ import { ChevronDown, ChevronLeft, Pipette, Plus, Search, X } from 'lucide-react
 import { hexForCouleurReference, PIGEON_COULEURS_NOMS_REFERENCE } from '@shared/data/pigeonCouleurHex';
 
 import { appFeedback } from '../../lib/appFeedback';
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import {
   mergeCouleurNoms,
   readCustomCouleurs,
@@ -96,11 +97,13 @@ function normalizeHexInput(raw: string): string | null {
   return null;
 }
 
+const SWATCH_BORDER = { borderWidth: 1, borderColor: 'rgba(148, 163, 184, 0.4)' } as const;
+
 function Swatch({ hex, size = 22 }: { hex: string; size?: number }) {
   return (
     <View
       style={[
-        styles.swatch,
+        SWATCH_BORDER,
         { width: size, height: size, borderRadius: size / 4, backgroundColor: hex },
       ]}
       accessibilityElementsHidden
@@ -109,6 +112,8 @@ function Swatch({ hex, size = 22 }: { hex: string; size?: number }) {
 }
 
 export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Props) {
+  const { colors: c } = useAppTheme();
+  const styles = useMemo(() => createPigeonCouleurStyles(c), [c]);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<'browse' | 'palette'>('browse');
   const [searchQ, setSearchQ] = useState('');
@@ -227,7 +232,7 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
           accessibilityRole="button"
         >
           <Swatch hex={currentHex} size={24} />
-          <Pipette size={18} color={theme.teal700} />
+          <Pipette size={18} color={c.teal700} />
         </Pressable>
         <Pressable
           onPress={openModal}
@@ -240,7 +245,7 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
           </Text>
         </Pressable>
         <Pressable onPress={openModal} accessibilityLabel="Ouvrir la liste" hitSlop={8}>
-          <ChevronDown size={22} color={theme.slate500} />
+          <ChevronDown size={22} color={c.slate500} />
         </Pressable>
       </View>
       <Text style={styles.hint}>
@@ -269,23 +274,23 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
                           style={styles.iconBtn}
                           accessibilityLabel="Nuancier"
                         >
-                          <Pipette size={22} color={theme.teal700} />
+                          <Pipette size={22} color={c.teal700} />
                         </Pressable>
                       ) : null}
                       <Pressable onPress={closeAll} hitSlop={12} accessibilityLabel="Fermer">
-                        <X size={24} color={theme.slate600} />
+                        <X size={24} color={c.slate600} />
                       </Pressable>
                     </View>
                   </View>
 
                   <View style={styles.searchRow}>
-                    <Search size={18} color={theme.slate500} style={styles.searchIcon} />
+                    <Search size={18} color={c.slate500} style={styles.searchIcon} />
                     <TextInput
                       style={styles.searchInp}
                       value={searchQ}
                       onChangeText={setSearchQ}
                       placeholder="Filtrer ou saisir un nom…"
-                      placeholderTextColor={theme.slate500}
+                      placeholderTextColor={c.slate500}
                       autoCorrect={false}
                       autoCapitalize="sentences"
                       clearButtonMode="while-editing"
@@ -294,7 +299,7 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
 
                   {showAddRow ? (
                     <Pressable style={styles.addBanner} onPress={onAddBanner} accessibilityRole="button">
-                      <Plus size={20} color={theme.teal800} />
+                      <Plus size={20} color={c.teal800} />
                       <Text style={styles.addBannerTxt}>Ajouter « {trimmedSearch} »… (teinte d’aperçu)</Text>
                     </Pressable>
                   ) : null}
@@ -331,11 +336,11 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
                       style={styles.backBtn}
                       accessibilityLabel="Retour à la liste"
                     >
-                      <ChevronLeft size={26} color={theme.slate800} />
+                      <ChevronLeft size={26} color={c.slate800} />
                     </Pressable>
                     <Text style={[styles.sheetTitle, styles.sheetTitleFlex]}>Teinte d’aperçu</Text>
                     <Pressable onPress={closeAll} hitSlop={12}>
-                      <X size={24} color={theme.slate600} />
+                      <X size={24} color={c.slate600} />
                     </Pressable>
                   </View>
                   <Text style={styles.paletteLead}>
@@ -348,7 +353,7 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
                     value={pendingName}
                     onChangeText={setPendingName}
                     placeholder="Ex. Bleu barré"
-                    placeholderTextColor={theme.slate500}
+                    placeholderTextColor={c.slate500}
                   />
 
                   <Text style={[styles.fieldLab, { marginTop: 14 }]}>Pastilles rapides</Text>
@@ -380,7 +385,7 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
                       if (n) setPendingHex(n);
                     }}
                     placeholder="#64748b"
-                    placeholderTextColor={theme.slate500}
+                    placeholderTextColor={c.slate500}
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
@@ -404,7 +409,8 @@ export function PigeonCouleurPicker({ value, onChange, error, onClearError }: Pr
   );
 }
 
-const styles = StyleSheet.create({
+function createPigeonCouleurStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   wrap: {},
   trigger: {
     flexDirection: 'row',
@@ -415,7 +421,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: Platform.OS === 'ios' ? 10 : 8,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     minHeight: 48,
   },
   triggerErr: { borderColor: theme.red600 },
@@ -423,17 +429,13 @@ const styles = StyleSheet.create({
   triggerCenter: { flex: 1, minWidth: 0, paddingVertical: 4 },
   triggerTxt: { fontSize: 16, fontWeight: '600', color: theme.slate900 },
   triggerPlaceholder: { color: theme.slate500, fontWeight: '500' },
-  swatch: {
-    borderWidth: 1,
-    borderColor: 'rgba(15,23,42,0.12)',
-  },
   hint: { fontSize: 12, color: theme.slate500, marginTop: 6, lineHeight: 16 },
   errTxt: { color: theme.red600, fontSize: 12, marginTop: 4 },
   modalRoot: { flex: 1, justifyContent: 'flex-end' },
   modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,23,42,0.45)' },
   sheetOuter: { width: '100%' },
   sheet: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingBottom: Platform.OS === 'ios' ? 24 : 16,
@@ -462,7 +464,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.border,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
     paddingHorizontal: 12,
   },
   searchIcon: { marginRight: 4 },
@@ -516,7 +518,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: Platform.OS === 'ios' ? 12 : 10,
     fontSize: 16,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     color: theme.slate900,
   },
   presetGrid: {
@@ -566,4 +568,5 @@ const styles = StyleSheet.create({
     backgroundColor: theme.teal600,
   },
   btnPrimaryTxt: { fontWeight: '800', color: theme.white },
-});
+  });
+}

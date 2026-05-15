@@ -17,6 +17,15 @@ import { usePigeons } from '@shared/hooks/usePigeons'
 import { useCages } from '@shared/hooks/useCages'
 import { rompreCouple } from '@shared/services/couplesService'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
+import {
+  dmDataTableHeader,
+  dmDataTableSub,
+  dmDataTableTitle,
+  dmTableClass,
+  dmTableWrap,
+  dmThead,
+  dmTbody,
+} from '../theme/voliereDarkUi'
 
 const statutCoupleClass = {
   ACTIF: 'border-emerald-200 bg-emerald-50 text-emerald-900 ring-emerald-500/15',
@@ -285,8 +294,8 @@ export function CouplesListPage() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Couples</h1>
-          <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Couples</h1>
+          <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             Association <strong>mâle + femelle</strong> pour la reproduction. Un pigeon ne peut figurer que dans{' '}
             <strong>un seul couple actif</strong> à la fois. Rompre un couple libère la cage qui lui était dédiée.
           </p>
@@ -328,7 +337,7 @@ export function CouplesListPage() {
       ) : null}
 
       {!loadingAll && couples.length > 0 ? (
-        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+        <div className="space-y-4 rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-3 shadow-sm sm:p-4">
           <div className="relative min-w-0">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
             <input
@@ -336,12 +345,12 @@ export function CouplesListPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Rechercher par matricule, nom, race, notes (couple ou pigeons)…"
-              className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               aria-label="Recherche sur les couples et les pigeons associés"
             />
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div>
               <label htmlFor="couples-filter-statut" className="mb-1 block text-xs font-medium text-slate-600">
                 Statut couple
@@ -350,7 +359,7 @@ export function CouplesListPage() {
                 id="couples-filter-statut"
                 value={filtreStatut}
                 onChange={(e) => setFiltreStatut(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               >
                 <option value="ALL">Tous</option>
                 <option value="ACTIF">Actifs</option>
@@ -365,7 +374,7 @@ export function CouplesListPage() {
                 id="couples-filter-cage"
                 value={filterCage}
                 onChange={(e) => setFilterCage(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               >
                 <option value="">Indifférent</option>
                 <option value="WITH">Avec cage en volière</option>
@@ -380,7 +389,7 @@ export function CouplesListPage() {
                 id="couples-filter-race"
                 value={filterRace}
                 onChange={(e) => setFilterRace(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               >
                 <option value="">Toutes les races</option>
                 {raceOptions.map((r) => (
@@ -399,7 +408,7 @@ export function CouplesListPage() {
                 value={filterVoliere}
                 onChange={(e) => setFilterVoliere(e.target.value)}
                 disabled={voliereOptions.length === 0}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <option value="">Toutes</option>
                 {voliereOptions.map((code) => (
@@ -421,7 +430,7 @@ export function CouplesListPage() {
                   id="couples-sort-by"
                   value={sortBy}
                   onChange={(e) => setSortByAndSave(e.target.value)}
-                  className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                 >
                   <option value="dateDebut">Date de début</option>
                   <option value="maleMatricule">Matricule mâle</option>
@@ -436,7 +445,7 @@ export function CouplesListPage() {
                       : 'Ordre décroissant — cliquer pour croissant'
                   }
                   onClick={toggleSortDirAndSave}
-                  className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                  className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
                   aria-label={sortDir === 'asc' ? 'Trier en ordre décroissant' : 'Trier en ordre croissant'}
                 >
                   {sortDir === 'asc' ? (
@@ -457,7 +466,7 @@ export function CouplesListPage() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
               >
                 <FilterX className="size-4" aria-hidden />
                 Réinitialiser filtres & recherche
@@ -470,12 +479,12 @@ export function CouplesListPage() {
       {loadingAll ? (
         <AppLoadingScreen variant="embedded" loadingContext="couples" message="Chargement des couples…" subtitle="Pigeons et cages associés." />
       ) : couples.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
-          <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-900 px-6 py-12 text-center shadow-sm">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300">
             <Heart className="size-9" strokeWidth={1.5} aria-hidden />
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-slate-900">Aucun couple enregistré</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+          <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-50">Aucun couple enregistré</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-600 dark:text-slate-300">
             Crée un couple à partir de deux pigeons actifs. Tu pourras ensuite enregistrer des reproductions.
           </p>
           <Link
@@ -487,26 +496,109 @@ export function CouplesListPage() {
           </Link>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-5 text-center text-sm text-slate-600 sm:py-6">
-          <p className="font-medium text-slate-800">Aucun couple ne correspond à ta sélection.</p>
-          <p className="mx-auto mt-2 max-w-md text-xs text-slate-500">
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 px-4 py-5 text-center text-sm text-slate-600 dark:text-slate-300 sm:py-6">
+          <p className="font-medium text-slate-800 dark:text-slate-100">Aucun couple ne correspond à ta sélection.</p>
+          <p className="mx-auto mt-2 max-w-md text-xs text-slate-500 dark:text-slate-400">
             Essaie d’autres filtres ou vide la recherche.
           </p>
-          <button type="button" className="mt-4 text-teal-700 underline hover:text-teal-800" onClick={resetFilters}>
+          <button type="button" className="mt-4 text-teal-700 underline hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200" onClick={resetFilters}>
             Réinitialiser filtres & recherche
           </button>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-md shadow-slate-900/5 ring-1 ring-slate-900/[0.04]">
-          <div className="border-b border-teal-100 bg-gradient-to-r from-teal-50/90 via-white to-slate-50/80 px-4 py-3">
-            <p className="text-sm font-semibold text-slate-800">Liste des couples</p>
-            <p className="mt-0.5 text-xs text-slate-500">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-md shadow-slate-900/5 ring-1 ring-slate-900/[0.04]">
+          <div className={dmDataTableHeader}>
+            <p className={dmDataTableTitle}>Liste des couples</p>
+            <p className={dmDataTableSub}>
               Cliquez sur un matricule pour ouvrir la fiche pigeon.
             </p>
           </div>
-          <div className="overflow-x-auto md:overflow-x-visible">
-            <table className="w-full min-w-[640px] divide-y divide-slate-200 text-left text-sm md:min-w-0">
-              <thead className="border-b border-slate-200 bg-slate-100/90 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div className="grid grid-cols-2 gap-2 p-3 sm:gap-3 md:hidden">
+            {filtered.map((c) => {
+              const male = pigeonById.get(c.maleId)
+              const fem = pigeonById.get(c.femelleId)
+              const cage = c.cageId ? cageById.get(c.cageId) : null
+              return (
+                <article
+                  key={c.id}
+                  className="flex flex-col rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-sm dark:border-slate-600 dark:bg-slate-800/80"
+                >
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Début {formatDate(c.dateDebut)}
+                  </p>
+                  <div className="mt-2 min-w-0 space-y-1">
+                    <p className="truncate text-slate-800 dark:text-slate-100">
+                      <span className="text-slate-500 dark:text-slate-400">M </span>
+                      {male ? (
+                        <Link
+                          to={`/pigeons/${male.id}`}
+                          state={{ back: { path: '/couples', label: 'Retour aux couples' } }}
+                          className="font-mono font-semibold text-teal-800 underline-offset-2 hover:underline dark:text-teal-300"
+                        >
+                          {male.matricule}
+                        </Link>
+                      ) : (
+                        '—'
+                      )}
+                    </p>
+                    <p className="truncate text-slate-800 dark:text-slate-100">
+                      <span className="text-slate-500 dark:text-slate-400">F </span>
+                      {fem ? (
+                        <Link
+                          to={`/pigeons/${fem.id}`}
+                          state={{ back: { path: '/couples', label: 'Retour aux couples' } }}
+                          className="font-mono font-semibold text-teal-800 underline-offset-2 hover:underline dark:text-teal-300"
+                        >
+                          {fem.matricule}
+                        </Link>
+                      ) : (
+                        '—'
+                      )}
+                    </p>
+                  </div>
+                  <div className="mt-2">
+                    <span
+                      className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold shadow-sm ring-1 ${statutCoupleClass[c.statut] || 'border-slate-200 bg-slate-100'}`}
+                    >
+                      {statutCoupleLabel[c.statut] ?? c.statut}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 truncate text-[11px] text-slate-600 dark:text-slate-300" title={cage ? `${cage.voliereCode ?? 'A'} · ${cage.numero}` : ''}>
+                    {cage ? `${cage.voliereCode ?? 'A'} · ${cage.numero}` : 'Sans cage'}
+                  </p>
+                  {c.statut === 'ROMPU' ? (
+                    <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">Fin {formatDate(c.dateFin)}</p>
+                  ) : null}
+                  {c.notes?.trim() ? (
+                    <p className="mt-1 line-clamp-2 text-[10px] text-slate-500 dark:text-slate-400">{c.notes}</p>
+                  ) : null}
+                  {c.statut === 'ACTIF' ? (
+                    <div className="mt-auto flex flex-col gap-1.5 border-t border-slate-100 pt-2 dark:border-slate-600">
+                      <Link
+                        to={`/reproductions/nouveau?coupleId=${encodeURIComponent(c.id)}`}
+                        className="inline-flex items-center justify-center gap-1 rounded-lg border border-teal-200 bg-teal-50 px-2 py-1.5 text-[10px] font-medium text-teal-900 dark:border-teal-800 dark:bg-teal-950/50 dark:text-teal-100"
+                      >
+                        <Egg className="size-3 shrink-0" aria-hidden />
+                        Reproduction
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => openRompreDialog(c)}
+                        className="inline-flex items-center justify-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1.5 text-[10px] font-medium text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100"
+                      >
+                        <HeartCrack className="size-3 shrink-0" aria-hidden />
+                        Rompre
+                      </button>
+                    </div>
+                  ) : null}
+                </article>
+              )
+            })}
+          </div>
+          <div className="hidden md:block">
+          <div className={dmTableWrap}>
+            <table className={dmTableClass('min-w-[640px]')}>
+              <thead className={dmThead}>
                 <tr>
                   <th scope="col" className="whitespace-nowrap px-4 py-3.5">
                     Début
@@ -534,45 +626,45 @@ export function CouplesListPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className={dmTbody}>
                 {filtered.map((c) => {
                   const male = pigeonById.get(c.maleId)
                   const fem = pigeonById.get(c.femelleId)
                   const cage = c.cageId ? cageById.get(c.cageId) : null
                   return (
-                    <tr key={c.id} className="transition-colors odd:bg-white even:bg-slate-50/60 hover:bg-teal-50/50">
-                      <td className="whitespace-nowrap px-4 py-3.5 text-slate-700">{formatDate(c.dateDebut)}</td>
-                      <td className="px-4 py-3.5 text-slate-900">
+                    <tr key={c.id} className="transition-colors odd:bg-white even:bg-slate-50/60 hover:bg-teal-50/50 dark:odd:bg-slate-900 dark:even:bg-slate-800/60 dark:hover:bg-teal-950/40">
+                      <td className="whitespace-nowrap px-4 py-3.5 text-slate-700 dark:text-slate-200">{formatDate(c.dateDebut)}</td>
+                      <td className="px-4 py-3.5 text-slate-900 dark:text-slate-100">
                         {male ? (
                           <Link
                             to={`/pigeons/${male.id}`}
                             state={{
                               back: { path: '/couples', label: 'Retour aux couples' },
                             }}
-                            className="group inline-flex items-center gap-1 font-mono font-medium text-teal-800 underline-offset-2 hover:text-teal-950 hover:underline"
+                            className="group inline-flex items-center gap-1 font-mono font-medium text-teal-800 underline-offset-2 hover:text-teal-950 hover:underline dark:text-teal-300 dark:hover:text-teal-200"
                           >
                             {male.matricule}
                             <ExternalLink className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-70" aria-hidden />
                           </Link>
                         ) : null}
-                        {male ? <span className="text-slate-600"> — {male.nom}</span> : null}
-                        {!male ? <span className="text-slate-400">—</span> : null}
+                        {male ? <span className="text-slate-600 dark:text-slate-300"> — {male.nom}</span> : null}
+                        {!male ? <span className="text-slate-400 dark:text-slate-500">—</span> : null}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-900">
+                      <td className="px-4 py-3.5 text-slate-900 dark:text-slate-100">
                         {fem ? (
                           <Link
                             to={`/pigeons/${fem.id}`}
                             state={{
                               back: { path: '/couples', label: 'Retour aux couples' },
                             }}
-                            className="group inline-flex items-center gap-1 font-mono font-medium text-teal-800 underline-offset-2 hover:text-teal-950 hover:underline"
+                            className="group inline-flex items-center gap-1 font-mono font-medium text-teal-800 underline-offset-2 hover:text-teal-950 hover:underline dark:text-teal-300 dark:hover:text-teal-200"
                           >
                             {fem.matricule}
                             <ExternalLink className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-70" aria-hidden />
                           </Link>
                         ) : null}
-                        {fem ? <span className="text-slate-600"> — {fem.nom}</span> : null}
-                        {!fem ? <span className="text-slate-400">—</span> : null}
+                        {fem ? <span className="text-slate-600 dark:text-slate-300"> — {fem.nom}</span> : null}
+                        {!fem ? <span className="text-slate-400 dark:text-slate-500">—</span> : null}
                       </td>
                       <td className="px-4 py-3.5">
                         <span
@@ -582,7 +674,7 @@ export function CouplesListPage() {
                         </span>
                       </td>
                       <td
-                        className="max-w-[10rem] truncate px-4 py-3.5 text-slate-600"
+                        className="max-w-[10rem] truncate px-4 py-3.5 text-slate-600 dark:text-slate-300"
                         title={cage ? `${cage.voliereCode ?? 'A'} · ${cage.numero}` : ''}
                       >
                         {cage ? (
@@ -590,19 +682,19 @@ export function CouplesListPage() {
                             {cage.voliereCode ?? 'A'} · {cage.numero}
                           </>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-slate-400 dark:text-slate-500">—</span>
                         )}
                       </td>
-                      <td className="hidden max-w-[14rem] px-4 py-3.5 text-slate-600 lg:table-cell">
+                      <td className="hidden max-w-[14rem] px-4 py-3.5 text-slate-600 dark:text-slate-300 lg:table-cell">
                         {c.notes?.trim() ? (
                           <span className="line-clamp-2 text-xs" title={c.notes}>
                             {c.notes}
                           </span>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-slate-400 dark:text-slate-500">—</span>
                         )}
                       </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3.5 text-slate-500 md:table-cell">
+                      <td className="hidden whitespace-nowrap px-4 py-3.5 text-slate-500 dark:text-slate-400 md:table-cell">
                         {c.statut === 'ROMPU' ? formatDate(c.dateFin) : '—'}
                       </td>
                       <td className="px-4 py-3.5 text-right">
@@ -625,7 +717,7 @@ export function CouplesListPage() {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-400">—</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                         )}
                       </td>
                     </tr>
@@ -633,6 +725,7 @@ export function CouplesListPage() {
                 })}
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       )}

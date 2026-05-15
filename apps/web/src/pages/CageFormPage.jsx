@@ -15,12 +15,7 @@ import {
 import { mergeProfileVoliereCodesWithCages, VOLIERE_CODE_MAX_LEN } from '@shared/utils/voliereCodesMerge'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
 import useAuthStore from '../stores/authStore'
-
-function fieldClass(err) {
-  return `w-full rounded-lg border px-3 py-2 text-slate-900 outline-none focus:ring-2 ${
-    err ? 'border-red-400 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 focus:border-teal-500 focus:ring-teal-500/30'
-  }`
-}
+import { dmFieldClass as fieldClass } from '../theme/voliereDarkUi'
 
 export function CageFormPage() {
   const authEmail = useAuthStore((s) => s.user?.email ?? '')
@@ -256,9 +251,9 @@ export function CageFormPage() {
 
   if (isEdit && !loadingCage && !cageRemote) {
     return (
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-amber-900">
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100">
         <p>Cage introuvable ou accès refusé.</p>
-        <Link to="/cages" className="mt-2 inline-block text-teal-800 underline">
+        <Link to="/cages" className="mt-2 inline-block text-teal-800 underline dark:text-teal-300">
           Retour à la liste des cages
         </Link>
       </div>
@@ -268,22 +263,22 @@ export function CageFormPage() {
   return (
     <div className="mx-auto max-w-lg space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Link to="/cages" className="inline-flex items-center gap-1 text-sm font-medium text-teal-800 hover:underline">
+        <Link to="/cages" className="inline-flex items-center gap-1 text-sm font-medium text-teal-800 hover:underline dark:text-teal-300">
           <ArrowLeft className="size-4" aria-hidden />
           Liste des cages
         </Link>
       </div>
-      <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
+      <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-50">{title}</h1>
 
       {!isEdit ? (
-        <div className="flex rounded-xl border border-slate-200 bg-slate-50/90 p-1 shadow-inner">
+        <div className="flex rounded-xl border border-slate-200 bg-slate-50/90 p-1 shadow-inner dark:border-slate-600 dark:bg-slate-800/90">
           <button
             type="button"
             onClick={() => setModeTab('single')}
             className={`flex min-h-[2.5rem] flex-1 items-center justify-center rounded-lg px-3 text-sm font-medium transition ${
               mode === 'single'
-                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                : 'text-slate-600 hover:bg-white/70'
+                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200 dark:bg-slate-700 dark:text-slate-100 dark:ring-slate-600'
+                : 'text-slate-600 hover:bg-white/70 dark:text-slate-400 dark:hover:bg-slate-700/70'
             }`}
           >
             Une cage
@@ -293,8 +288,8 @@ export function CageFormPage() {
             onClick={() => setModeTab('lot')}
             className={`flex min-h-[2.5rem] flex-1 items-center justify-center rounded-lg px-3 text-sm font-medium transition ${
               mode === 'lot'
-                ? 'bg-white text-teal-900 shadow-sm ring-1 ring-teal-200'
-                : 'text-slate-600 hover:bg-white/70'
+                ? 'bg-white text-teal-900 shadow-sm ring-1 ring-teal-200 dark:bg-teal-950/50 dark:text-teal-100 dark:ring-teal-800'
+                : 'text-slate-600 hover:bg-white/70 dark:text-slate-400 dark:hover:bg-slate-700/70'
             }`}
           >
             Plusieurs cages (série)
@@ -305,13 +300,13 @@ export function CageFormPage() {
       {!isEdit && mode === 'lot' ? (
         <form
           onSubmit={onSubmitLot}
-          className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             Même volière, superficie et description pour toutes les cages. Les numéros sont générés automatiquement
             (ex. A01 … A20). Placeholders du nom :{' '}
-            <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">{`{n}`}</code> = numéro complet,{' '}
-            <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">{`{i}`}</code> = indice numérique de la plage.
+            <code className="rounded bg-slate-100 px-1 py-0.5 text-xs dark:bg-slate-800 dark:text-slate-200">{`{n}`}</code> = numéro complet,{' '}
+            <code className="rounded bg-slate-100 px-1 py-0.5 text-xs dark:bg-slate-800 dark:text-slate-200">{`{i}`}</code> = indice numérique de la plage.
           </p>
 
           <div>
@@ -491,14 +486,14 @@ export function CageFormPage() {
             </button>
             <Link
               to="/cages"
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Annuler
             </Link>
           </div>
         </form>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           <div>
             <label htmlFor="voliere-select" className="mb-1 block text-sm font-medium text-slate-700">
               Volière (nom court)
@@ -565,7 +560,7 @@ export function CageFormPage() {
               />
               <button
                 type="button"
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-teal-300 bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 sm:w-auto sm:min-w-[10.5rem]"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-teal-300 bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 sm:w-auto sm:min-w-[10.5rem] dark:border-teal-600 dark:bg-teal-950/50 dark:text-teal-100 dark:hover:bg-teal-900/60"
                 onClick={() => {
                   const volRaw = (getValues('voliereCode') ?? '').trim()
                   if (!volRaw) {
@@ -632,7 +627,7 @@ export function CageFormPage() {
             </button>
             <Link
               to="/cages"
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Annuler
             </Link>

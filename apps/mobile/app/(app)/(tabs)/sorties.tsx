@@ -16,7 +16,8 @@ import {
 } from '../../../components/ui/FloatingAddButton';
 import { SearchField } from '../../../components/ui/SearchField';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme, shadowCard } from '../../../constants/theme';
+import type { ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
 const TYPE_LABEL: Record<SortieType, string> = {
@@ -25,34 +26,41 @@ const TYPE_LABEL: Record<SortieType, string> = {
   PERTE: 'Perte',
 };
 
-const CHIP: Record<'ALL' | SortieType, { on: object; off: object; txtOn: object; txtOff: object }> = {
-  ALL: {
-    on: { backgroundColor: theme.slate100, borderColor: theme.slate500 },
-    off: { backgroundColor: theme.white, borderColor: theme.border },
-    txtOn: { color: theme.slate900 },
-    txtOff: { color: theme.slate600 },
-  },
-  VENTE: {
-    on: { backgroundColor: theme.teal50, borderColor: theme.teal600 },
-    off: { backgroundColor: theme.white, borderColor: theme.border },
-    txtOn: { color: theme.teal900 },
-    txtOff: { color: theme.slate600 },
-  },
-  DECES: {
-    on: { backgroundColor: theme.slate100, borderColor: theme.slate500 },
-    off: { backgroundColor: theme.white, borderColor: theme.border },
-    txtOn: { color: theme.slate900 },
-    txtOff: { color: theme.slate600 },
-  },
-  PERTE: {
-    on: { backgroundColor: theme.amber50, borderColor: '#f59e0b' },
-    off: { backgroundColor: theme.white, borderColor: theme.border },
-    txtOn: { color: theme.amber950 },
-    txtOff: { color: theme.slate600 },
-  },
-};
+type ChipKey = 'ALL' | SortieType;
+
+function buildSortiesChipPalette(c: ThemeColors): Record<ChipKey, { on: object; off: object; txtOn: object; txtOff: object }> {
+  return {
+    ALL: {
+      on: { backgroundColor: c.surfaceHighlight, borderColor: c.slate500 },
+      off: { backgroundColor: c.surfaceElevated, borderColor: c.border },
+      txtOn: { color: c.slate900 },
+      txtOff: { color: c.slate600 },
+    },
+    VENTE: {
+      on: { backgroundColor: c.teal50, borderColor: c.teal600 },
+      off: { backgroundColor: c.surfaceElevated, borderColor: c.border },
+      txtOn: { color: c.teal900 },
+      txtOff: { color: c.slate600 },
+    },
+    DECES: {
+      on: { backgroundColor: c.surfaceHighlight, borderColor: c.slate500 },
+      off: { backgroundColor: c.surfaceElevated, borderColor: c.border },
+      txtOn: { color: c.slate900 },
+      txtOff: { color: c.slate600 },
+    },
+    PERTE: {
+      on: { backgroundColor: c.amber50, borderColor: '#f59e0b' },
+      off: { backgroundColor: c.surfaceElevated, borderColor: c.border },
+      txtOn: { color: c.amber950 },
+      txtOff: { color: c.slate600 },
+    },
+  };
+}
 
 export default function SortiesTabScreen() {
+  const { colors: themeColors, shadowCard } = useAppTheme();
+  const styles = useMemo(() => createSortiesStyles(themeColors), [themeColors]);
+  const chipPalette = useMemo(() => buildSortiesChipPalette(themeColors), [themeColors]);
   const navigation = useNavigation();
   const router = useRouter();
   const { sorties, loading, error, stats } = useSorties();
@@ -108,7 +116,7 @@ export default function SortiesTabScreen() {
       <View style={styles.pillRow}>
         {(['ALL', 'VENTE', 'DECES', 'PERTE'] as const).map((t) => {
           const on = filtreType === t;
-          const pal = CHIP[t];
+          const pal = chipPalette[t];
           return (
             <Pressable
               key={t}
@@ -215,7 +223,7 @@ export default function SortiesTabScreen() {
           <FloatingAddButton
             onPress={onNouvelleSortie}
             accessibilityLabel="Nouvelle sortie"
-            icon={<Plus size={26} color={theme.white} strokeWidth={2.5} />}
+            icon={<Plus size={26} color="#ffffff" strokeWidth={2.5} />}
           />
         </>
       )}
@@ -223,58 +231,60 @@ export default function SortiesTabScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: 'transparent' },
-  listFlex: { flex: 1 },
-  header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
-  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  pill: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  pillTxt: { fontSize: 12, fontWeight: '700' },
-  pillHint: { fontSize: 12, color: theme.slate500, lineHeight: 17 },
-  sectionTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900, marginTop: 4 },
-  sectionSub: { fontSize: 13, color: theme.slate600, lineHeight: 18 },
-  list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28 },
-  emptyCard: {
-    backgroundColor: theme.white,
-    borderRadius: theme.radiusLg,
-    borderWidth: 1,
-    borderColor: theme.border,
-    padding: 20,
-    marginTop: 4,
-  },
-  emptyTitle: { fontSize: 16, fontWeight: '800', color: theme.slate900, marginBottom: 8 },
-  emptyHint: { fontSize: 14, color: theme.slate600, lineHeight: 20 },
-  cardPressable: { marginBottom: 10 },
-  card: {
-    backgroundColor: theme.white,
-    borderRadius: theme.radiusLg,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  cardPressed: { opacity: 0.92 },
-  cardMainRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  cardBody: { flex: 1, minWidth: 0 },
-  rowTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  type: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: theme.teal800,
-    backgroundColor: theme.teal100,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  date: { fontSize: 12, color: theme.slate500, fontWeight: '600' },
-  mat: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
-  sub: { fontSize: 13, color: theme.slate600, marginTop: 4 },
-  notes: { fontSize: 13, color: theme.slate500, marginTop: 6 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  err: { color: theme.red600, padding: 16 },
-});
+function createSortiesStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: 'transparent' },
+    listFlex: { flex: 1 },
+    header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
+    pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    pill: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 20,
+      borderWidth: 1,
+    },
+    pillTxt: { fontSize: 12, fontWeight: '700' },
+    pillHint: { fontSize: 12, color: theme.slate500, lineHeight: 17 },
+    sectionTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900, marginTop: 4 },
+    sectionSub: { fontSize: 13, color: theme.slate600, lineHeight: 18 },
+    list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28 },
+    emptyCard: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: theme.radiusLg,
+      borderWidth: 1,
+      borderColor: theme.border,
+      padding: 20,
+      marginTop: 4,
+    },
+    emptyTitle: { fontSize: 16, fontWeight: '800', color: theme.slate900, marginBottom: 8 },
+    emptyHint: { fontSize: 14, color: theme.slate600, lineHeight: 20 },
+    cardPressable: { marginVertical: 8 },
+    card: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: theme.radiusLg,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    cardPressed: { opacity: 0.92 },
+    cardMainRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+    cardBody: { flex: 1, minWidth: 0 },
+    rowTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+    type: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: theme.teal800,
+      backgroundColor: theme.teal100,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 8,
+      overflow: 'hidden',
+    },
+    date: { fontSize: 12, color: theme.slate500, fontWeight: '600' },
+    mat: { fontSize: 17, fontWeight: '800', color: theme.slate900 },
+    sub: { fontSize: 13, color: theme.slate600, marginTop: 4 },
+    notes: { fontSize: 13, color: theme.slate500, marginTop: 6 },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    err: { color: theme.red600, padding: 16 },
+  });
+}

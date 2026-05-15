@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 /** Diamètre du bouton flottant. */
 export const FLOATING_ADD_BUTTON_SIZE = 56;
@@ -16,6 +18,40 @@ export const FLOATING_ADD_LIST_PADDING_BOTTOM = 108;
 
 /** Hauteur approximative zone onglets + marge au-dessus du FAB. */
 const TAB_BAR_CLEARANCE = 54;
+
+function createFabStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    fab: {
+      position: 'absolute',
+      right: theme.screenPadding,
+      width: FLOATING_ADD_BUTTON_SIZE,
+      height: FLOATING_ADD_BUTTON_SIZE,
+      borderRadius: FLOATING_ADD_BUTTON_SIZE / 2,
+      backgroundColor: theme.teal600,
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 50,
+      shadowColor: '#0f172a',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.28,
+      shadowRadius: 10,
+      elevation: 8,
+    },
+    fabPressed: {
+      opacity: 0.92,
+      transform: [{ scale: 0.96 }],
+    },
+    ring: {
+      width: FLOATING_ADD_BUTTON_SIZE - 4,
+      height: FLOATING_ADD_BUTTON_SIZE - 4,
+      borderRadius: (FLOATING_ADD_BUTTON_SIZE - 4) / 2,
+      borderWidth: 2,
+      borderColor: 'rgba(255,255,255,0.35)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });
+}
 
 type FloatingAddButtonProps = {
   onPress: () => void;
@@ -36,6 +72,8 @@ export function FloatingAddButton({
   icon,
   bottomExtra = 0,
 }: FloatingAddButtonProps) {
+  const { colors: theme } = useAppTheme();
+  const styles = useMemo(() => createFabStyles(theme), [theme]);
   const insets = useSafeAreaInsets();
   const bottom = TAB_BAR_CLEARANCE + insets.bottom + bottomExtra;
 
@@ -53,35 +91,3 @@ export function FloatingAddButton({
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  fab: {
-    position: 'absolute',
-    right: theme.screenPadding,
-    width: FLOATING_ADD_BUTTON_SIZE,
-    height: FLOATING_ADD_BUTTON_SIZE,
-    borderRadius: FLOATING_ADD_BUTTON_SIZE / 2,
-    backgroundColor: theme.teal600,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 50,
-    shadowColor: '#0f172a',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  fabPressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.96 }],
-  },
-  ring: {
-    width: FLOATING_ADD_BUTTON_SIZE - 4,
-    height: FLOATING_ADD_BUTTON_SIZE - 4,
-    borderRadius: (FLOATING_ADD_BUTTON_SIZE - 4) / 2,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

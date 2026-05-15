@@ -14,10 +14,10 @@ const COULEUR_PRESETS = [
 ]
 
 function comboShellClass(err) {
-  return `relative flex w-full items-stretch rounded-lg border bg-white pr-10 transition-[box-shadow,border-color] ${
+  return `relative flex w-full items-stretch rounded-lg border bg-white pr-10 transition-[box-shadow,border-color] dark:border-slate-600 dark:bg-slate-800 ${
     err
-      ? 'border-red-400 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-200'
-      : 'border-slate-300 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/30'
+      ? 'border-red-400 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-200 dark:focus-within:ring-red-900/40'
+      : 'border-slate-300 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/30 dark:focus-within:border-teal-500 dark:focus-within:ring-teal-500/25'
   }`
 }
 
@@ -26,7 +26,7 @@ function Swatch({ hex, title, size = 'md' }) {
   return (
     <span
       title={title}
-      className={`inline-block rounded border border-slate-300/80 shadow-inner ${cls}`}
+      className={`inline-block rounded border border-slate-300/80 shadow-inner dark:border-slate-500/80 ${cls}`}
       style={{ backgroundColor: hex }}
       aria-hidden
     />
@@ -191,7 +191,7 @@ export function CouleurCombobox({
 
   return (
     <div ref={wrapRef} className="relative">
-      <label htmlFor={id} className="mb-1 block text-sm font-medium text-slate-700">
+      <label htmlFor={id} className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">
         {label}
         {required ? ' *' : ''}
       </label>
@@ -200,7 +200,7 @@ export function CouleurCombobox({
         <div className="flex min-w-0 flex-1 items-center gap-1 pl-2">
           <button
             type="button"
-            className="flex shrink-0 items-center gap-0.5 rounded-md p-0.5 text-slate-600 hover:bg-slate-100 hover:text-teal-800 focus-visible:outline focus-visible:ring-2 focus-visible:ring-teal-500/50"
+            className="flex shrink-0 items-center gap-0.5 rounded-md p-0.5 text-slate-600 hover:bg-slate-100 hover:text-teal-800 focus-visible:outline focus-visible:ring-2 focus-visible:ring-teal-500/50 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-teal-300"
             title="Choisir la teinte d’aperçu (nuancier)"
             aria-label="Ouvrir le nuancier pour choisir la couleur d’aperçu"
             onMouseDown={(e) => e.preventDefault()}
@@ -221,7 +221,7 @@ export function CouleurCombobox({
             aria-invalid={error ? 'true' : 'false'}
             autoComplete="off"
             placeholder={placeholder}
-            className="min-w-0 flex-1 border-0 bg-transparent py-2 pl-0.5 pr-1 text-slate-900 outline-none focus:ring-0"
+            className="min-w-0 flex-1 border-0 bg-transparent py-2 pl-0.5 pr-1 text-slate-900 outline-none focus:ring-0 dark:text-slate-100 dark:placeholder:text-slate-500"
             value={value ?? ''}
             onChange={(e) => {
               onChange(e.target.value)
@@ -235,7 +235,7 @@ export function CouleurCombobox({
         <button
           type="button"
           tabIndex={-1}
-          className="absolute right-1 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+          className="absolute right-1 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
           aria-label="Ouvrir la liste"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
@@ -251,7 +251,7 @@ export function CouleurCombobox({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+          className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-600 dark:bg-slate-900"
         >
           {filtered.map((opt, i) => (
             <li
@@ -259,7 +259,9 @@ export function CouleurCombobox({
               role="option"
               aria-selected={value === opt}
               className={`flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm ${
-                highlight === i ? 'bg-teal-50 text-teal-900' : 'text-slate-800 hover:bg-slate-50'
+                highlight === i
+                  ? 'bg-teal-50 text-teal-900 dark:bg-teal-950/60 dark:text-teal-100'
+                  : 'text-slate-800 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800'
               }`}
               onMouseDown={(e) => e.preventDefault()}
               onMouseEnter={() => setHighlight(i)}
@@ -272,8 +274,10 @@ export function CouleurCombobox({
           {showAddRow ? (
             <li
               role="option"
-              className={`cursor-pointer border-t border-slate-100 px-3 py-2 text-sm font-medium text-teal-700 ${
-                highlight === filtered.length ? 'bg-teal-50' : 'hover:bg-teal-50/80'
+              className={`cursor-pointer border-t border-slate-100 px-3 py-2 text-sm font-medium text-teal-700 dark:border-slate-700 dark:text-teal-300 ${
+                highlight === filtered.length
+                  ? 'bg-teal-50 dark:bg-teal-950/50'
+                  : 'hover:bg-teal-50/80 dark:hover:bg-teal-950/35'
               }`}
               onMouseDown={(e) => e.preventDefault()}
               onMouseEnter={() => setHighlight(filtered.length)}
@@ -286,12 +290,12 @@ export function CouleurCombobox({
       ) : null}
 
       {hint ? (
-        <p id={`${id}-hint`} className="mt-1 text-xs text-slate-500">
+        <p id={`${id}-hint`} className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p className="mt-1 text-xs text-red-600" role="alert">
+        <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">
           {error}
         </p>
       ) : null}
@@ -299,52 +303,55 @@ export function CouleurCombobox({
       <dialog
         ref={dialogRef}
         id={dialogId}
-        className="z-[100] w-[min(100%,24rem)] rounded-xl border border-slate-200 bg-white p-4 shadow-xl backdrop:bg-slate-900/40"
+        className="z-[100] w-[min(100%,24rem)] rounded-xl border border-slate-200 bg-white p-4 shadow-xl backdrop:bg-slate-900/40 dark:border-slate-600 dark:bg-slate-900 dark:shadow-slate-950/80"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <h2 className="text-sm font-semibold text-slate-900">Teinte d’aperçu</h2>
-        <p className="mt-1 text-xs text-slate-600">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-50">Teinte d’aperçu</h2>
+        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
           Nuancier interactif et pastilles rapides. Le nom reste celui de la robe ; la teinte sert uniquement à l’aperçu sur cet
           appareil.
         </p>
         <div className="mt-4 space-y-4" onPointerDown={(e) => e.stopPropagation()}>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600" htmlFor={`${dialogId}-nom`}>
+            <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400" htmlFor={`${dialogId}-nom`}>
               Nom de la couleur
             </label>
             <input
               id={`${dialogId}-nom`}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
               value={pendingName}
               onChange={(e) => setPendingName(e.target.value)}
             />
           </div>
 
           <div>
-            <span className="mb-2 block text-xs font-medium text-slate-600">Bibliothèque — nuancier</span>
+            <span className="mb-2 block text-xs font-medium text-slate-600 dark:text-slate-400">Bibliothèque — nuancier</span>
             <div
-              className="flex touch-none justify-center rounded-lg border border-slate-100 bg-slate-50 p-2"
+              className="vm-couleur-picker-nuancier flex touch-none justify-center rounded-lg border border-slate-100 bg-slate-50 p-2 dark:border-slate-600 dark:bg-slate-800/90"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <HexColorPicker
                 color={pendingHex}
                 onChange={setPendingHex}
+                className="!w-[min(100%,220px)] !h-[180px]"
                 style={{ width: 'min(100%, 220px)', height: '180px' }}
               />
             </div>
-            <p className="mt-1 text-center font-mono text-[11px] text-slate-500">{pendingHex}</p>
+            <p className="mt-1 text-center font-mono text-[11px] text-slate-500 dark:text-slate-400">{pendingHex}</p>
           </div>
 
           <div>
-            <span className="mb-1.5 block text-xs font-medium text-slate-600">Pastilles rapides</span>
+            <span className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">Pastilles rapides</span>
             <div className="grid grid-cols-8 gap-1.5" role="group" aria-label="Couleurs prédéfinies">
               {COULEUR_PRESETS.map((h) => (
                 <button
                   key={h}
                   type="button"
                   title={h}
-                  className={`size-6 rounded border border-slate-300 shadow-sm transition-transform hover:scale-110 focus-visible:outline focus-visible:ring-2 focus-visible:ring-teal-500 ${
-                    pendingHex.toLowerCase() === h.toLowerCase() ? 'ring-2 ring-teal-600 ring-offset-1' : ''
+                  className={`size-6 rounded border border-slate-300 shadow-sm transition-transform hover:scale-110 focus-visible:outline focus-visible:ring-2 focus-visible:ring-teal-500 dark:border-slate-500 ${
+                    pendingHex.toLowerCase() === h.toLowerCase()
+                      ? 'ring-2 ring-teal-600 ring-offset-1 dark:ring-teal-400 dark:ring-offset-slate-900'
+                      : ''
                   }`}
                   style={{ backgroundColor: h }}
                   onClick={() => setPendingHex(h)}
@@ -353,14 +360,14 @@ export function CouleurCombobox({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
-            <label className="text-xs font-medium text-slate-600" htmlFor={`${dialogId}-native`}>
+          <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3 dark:border-slate-700">
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400" htmlFor={`${dialogId}-native`}>
               Sélecteur natif
             </label>
             <input
               id={`${dialogId}-native`}
               type="color"
-              className="h-9 w-12 cursor-pointer rounded border border-slate-300 bg-white p-0.5"
+              className="h-9 w-12 cursor-pointer rounded border border-slate-300 bg-white p-0.5 dark:border-slate-600 dark:bg-slate-800"
               value={pendingHex}
               onChange={(e) => setPendingHex(e.target.value)}
               aria-label="Sélecteur de couleur natif du navigateur"
@@ -371,7 +378,7 @@ export function CouleurCombobox({
         <div className="mt-4 flex justify-end gap-2">
           <button
             type="button"
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
             onClick={() => dialogRef.current?.close()}
           >
             Annuler

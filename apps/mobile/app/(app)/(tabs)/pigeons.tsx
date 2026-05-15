@@ -29,7 +29,8 @@ import {
 } from '../../../components/ui/FloatingAddButton';
 import { SearchField } from '../../../components/ui/SearchField';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme, shadowCard } from '../../../constants/theme';
+import type { ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
 import { appFeedback } from '../../../lib/appFeedback';
 import { clearPigeonLocalPhoto } from '../../../utils/localPigeonPhoto';
 import { shareUtf8TextFile } from '../../../utils/shareUtf8TextFile';
@@ -67,6 +68,8 @@ function libelleChipStatut(st: FiltreStatutTab): string {
 }
 
 export default function PigeonsTabScreen() {
+  const { colors: theme, shadowCard } = useAppTheme();
+  const styles = useMemo(() => createPigeonStyles(theme), [theme]);
   const router = useRouter();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -386,7 +389,8 @@ export default function PigeonsTabScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createPigeonStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   root: { flex: 1, backgroundColor: 'transparent' },
   header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
   lab: { fontSize: 13, fontWeight: '700', color: theme.slate800, marginBottom: 4 },
@@ -400,7 +404,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radiusMd,
     paddingHorizontal: 12,
     paddingVertical: Platform.OS === 'ios' ? 14 : 12,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     minHeight: 48,
   },
   dropdownValue: {
@@ -415,7 +419,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(15, 23, 42, 0.45)',
   },
   filterSheet: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingHorizontal: 16,
@@ -468,7 +472,7 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     maxWidth: '50%',
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     padding: 12,
     borderWidth: 1,
@@ -546,4 +550,5 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   muted: { marginTop: 8, color: theme.slate500 },
   err: { color: theme.red600, padding: 16 },
-});
+  });
+}

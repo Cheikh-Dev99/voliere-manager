@@ -9,12 +9,7 @@ import { useCouples } from '@shared/hooks/useCouples'
 import { creerCouple } from '@shared/services/couplesService'
 import { CoupleSchema } from '@shared/validators/schemas'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
-
-function fieldClass(err) {
-  return `w-full rounded-lg border px-3 py-2 text-slate-900 outline-none focus:ring-2 ${
-    err ? 'border-red-400 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 focus:border-teal-500 focus:ring-teal-500/30'
-  }`
-}
+import { dmFieldClass as fieldClass, dmFormShellCompact, dmLabelSm } from '../theme/voliereDarkUi'
 
 /**
  * Création d’un couple (mâle + femelle actifs, cage libre optionnelle).
@@ -116,22 +111,22 @@ export function CoupleFormPage() {
       <div>
         <Link
           to="/couples"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-100"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour aux couples
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Nouveau couple</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Nouveau couple</h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           Un mâle et une femelle <strong>actifs</strong>, non déjà engagés dans un couple actif. Tu peux optionnellement
           attribuer une <strong>cage libre</strong> tout de suite.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className={dmFormShellCompact}>
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label htmlFor="maleId" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="maleId" className={dmLabelSm}>
               Mâle
             </label>
             <select id="maleId" className={fieldClass(errors.maleId)} {...register('maleId')}>
@@ -148,12 +143,12 @@ export function CoupleFormPage() {
               </p>
             ) : null}
             {malesChoix.length === 0 ? (
-              <p className="mt-1 text-xs text-amber-700">Aucun mâle actif disponible pour un nouveau couple.</p>
+              <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Aucun mâle actif disponible pour un nouveau couple.</p>
             ) : null}
           </div>
 
           <div className="sm:col-span-2">
-            <label htmlFor="femelleId" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="femelleId" className={dmLabelSm}>
               Femelle
             </label>
             <select id="femelleId" className={fieldClass(errors.femelleId)} {...register('femelleId')}>
@@ -170,12 +165,12 @@ export function CoupleFormPage() {
               </p>
             ) : null}
             {femellesChoix.length === 0 ? (
-              <p className="mt-1 text-xs text-amber-700">Aucune femelle active disponible pour un nouveau couple.</p>
+              <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Aucune femelle active disponible pour un nouveau couple.</p>
             ) : null}
           </div>
 
           <div>
-            <label htmlFor="dateDebut" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="dateDebut" className={dmLabelSm}>
               Date de début
             </label>
             <input
@@ -192,7 +187,7 @@ export function CoupleFormPage() {
           </div>
 
           <div>
-            <label htmlFor="cageId" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="cageId" className={dmLabelSm}>
               Cage (optionnel)
             </label>
             <select id="cageId" className={fieldClass(errors.cageId)} {...register('cageId')}>
@@ -209,12 +204,12 @@ export function CoupleFormPage() {
               </p>
             ) : null}
             {cagesLibres.length === 0 ? (
-              <p className="mt-1 text-xs text-slate-500">Aucune cage libre : tu pourras affecter le couple depuis la visualisation.</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Aucune cage libre : tu pourras affecter le couple depuis la visualisation.</p>
             ) : null}
           </div>
 
           <div className="sm:col-span-2">
-            <label htmlFor="notes" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="notes" className={dmLabelSm}>
               Notes
             </label>
             <textarea
@@ -232,10 +227,10 @@ export function CoupleFormPage() {
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-2 border-t border-slate-100 pt-4">
+        <div className="mt-6 flex justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-700">
           <Link
             to="/couples"
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             Annuler
           </Link>

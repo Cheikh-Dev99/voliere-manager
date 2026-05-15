@@ -24,7 +24,8 @@ import { proposerMatriculeSuivant } from '@shared/utils/pigeonMatricule';
 import { PigeonSchema } from '@shared/validators/schemas';
 import type { Pigeon, PigeonStatut } from '@shared/types';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { AppLoadingView } from '../ui/AppLoadingView';
 import { PigeonBirthDatePicker } from './PigeonBirthDatePicker';
 import { PigeonCouleurPicker } from './PigeonCouleurPicker';
@@ -75,6 +76,8 @@ const defaultValues: FormValues = {
 type ParentPick = 'pere' | 'mere' | null;
 
 export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: string }) {
+  const { colors: themeColors } = useAppTheme();
+  const styles = useMemo(() => createPigeonFormStyles(themeColors), [themeColors]);
   const router = useRouter();
   const { pigeons, loading: loadList, males, femelles } = usePigeons(false);
   const [bootLoading, setBootLoading] = useState(isEdit);
@@ -411,7 +414,7 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
             autoCapitalize="characters"
           />
           <Pressable onPress={onGenerateMatricule} style={styles.genBtn} accessibilityLabel="Générer le matricule">
-            <Sparkles size={18} color={theme.teal800} />
+            <Sparkles size={18} color={themeColors.teal800} />
             <Text style={styles.genTxt}>Générer</Text>
           </Pressable>
         </View>
@@ -510,7 +513,7 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
           <View style={styles.photoThumbWrap}>
             {photoBusy ? (
               <View style={[styles.photoThumb, styles.photoThumbCenter]}>
-                <ActivityIndicator color={theme.teal700} />
+                <ActivityIndicator color={themeColors.teal700} />
               </View>
             ) : photoPreviewUri ? (
               <Image
@@ -532,7 +535,7 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
               disabled={photoBusy}
               accessibilityLabel="Choisir une image dans la galerie"
             >
-              <ImageIcon size={18} color={theme.teal800} />
+              <ImageIcon size={18} color={themeColors.teal800} />
               <Text style={styles.photoBtnTxt}>Galerie</Text>
             </Pressable>
             <Pressable
@@ -541,7 +544,7 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
               disabled={photoBusy}
               accessibilityLabel="Prendre une photo avec la caméra"
             >
-              <Camera size={18} color={theme.teal800} />
+              <Camera size={18} color={themeColors.teal800} />
               <Text style={styles.photoBtnTxt}>Caméra</Text>
             </Pressable>
             {photoPreviewUri ? (
@@ -603,6 +606,7 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>{parentPick === 'pere' ? 'Choisir le père' : 'Choisir la mère'}</Text>
             <FlatListSafe
+              styles={styles}
               parentList={parentList}
               onPick={(id) => {
                 if (parentPick === 'pere') setValue('pereId', id);
@@ -619,10 +623,12 @@ export function PigeonForm({ isEdit, pigeonId }: { isEdit: boolean; pigeonId?: s
 }
 
 function FlatListSafe({
+  styles,
   parentList,
   onPick,
   onClose,
 }: {
+  styles: ReturnType<typeof createPigeonFormStyles>;
   parentList: Pigeon[];
   onPick: (id: string) => void;
   onClose: () => void;
@@ -645,7 +651,8 @@ function FlatListSafe({
   );
 }
 
-const styles = StyleSheet.create({
+function createPigeonFormStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   scroll: { padding: 16, paddingBottom: 48 },
   h1: { fontSize: 22, fontWeight: '800', color: theme.slate900 },
@@ -659,7 +666,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: Platform.OS === 'ios' ? 12 : 10,
     fontSize: 16,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     color: theme.slate900,
   },
   inpFlex: { flex: 1 },
@@ -686,7 +693,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 10,
-    backgroundColor: theme.slate100,
+    backgroundColor: theme.surfaceHighlight,
     borderWidth: 1,
     borderColor: theme.border,
   },
@@ -694,7 +701,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: theme.slate100,
+    backgroundColor: theme.surfaceHighlight,
     borderWidth: 1,
     borderColor: theme.border,
   },
@@ -720,10 +727,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: theme.border,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   photoThumbCenter: { justifyContent: 'center', alignItems: 'center' },
-  photoThumbPh: { justifyContent: 'center', alignItems: 'center', backgroundColor: theme.slate100 },
+  photoThumbPh: { justifyContent: 'center', alignItems: 'center', backgroundColor: theme.surfaceHighlight },
   photoThumbPhTxt: { fontSize: 12, color: theme.slate500, fontWeight: '600' },
   photoActions: { flex: 1, gap: 8, minWidth: 0 },
   photoBtn: {
@@ -746,7 +753,7 @@ const styles = StyleSheet.create({
     borderColor: theme.border,
     borderRadius: 10,
     padding: 14,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   pickTxt: { fontSize: 15, color: theme.teal800, fontWeight: '600' },
   clear: { marginTop: 6, color: theme.slate500, fontSize: 13 },
@@ -762,7 +769,7 @@ const styles = StyleSheet.create({
   btnGhostTxt: { color: theme.teal700, fontWeight: '700' },
   modalBg: { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)', justifyContent: 'flex-end' },
   modalCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -773,4 +780,5 @@ const styles = StyleSheet.create({
   modalRowTxt: { fontSize: 16, color: theme.slate900 },
   modalClose: { marginTop: 12, padding: 14, alignItems: 'center' },
   modalCloseTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
-});
+  });
+}

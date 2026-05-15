@@ -19,6 +19,23 @@ import { mergeProfileVoliereCodesWithCages } from '@shared/utils/voliereCodesMer
 import { supprimerCage } from '@shared/services/cagesService'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
 import useAuthStore from '../stores/authStore'
+import {
+  dmDataTableCard,
+  dmDataTableHeader,
+  dmDataTableSub,
+  dmDataTableTitle,
+  dmFilterCard,
+  dmFilterResetRow,
+  dmGhostButton,
+  dmInputSearch,
+  dmLabelXs,
+  dmSelect,
+  dmSortDirButton,
+  dmTableClass,
+  dmTableWrap,
+  dmThead,
+  dmTbody,
+} from '../theme/voliereDarkUi'
 
 const statutLabel = {
   LIBRE: 'Libre',
@@ -255,12 +272,12 @@ export function CagesListPage() {
         <div className="flex items-center gap-3">
           <Link
             to="/"
-            className="inline-flex items-center gap-1 text-sm font-medium text-teal-800 hover:underline"
+            className="inline-flex items-center gap-1 text-sm font-medium text-teal-800 hover:underline dark:text-teal-300"
           >
             <ArrowLeft className="size-4" aria-hidden />
             Visualisation
           </Link>
-          <h1 className="text-lg font-semibold text-slate-900 sm:text-xl">Gestion des cages</h1>
+          <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-50 sm:text-xl">Gestion des cages</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link
@@ -284,17 +301,17 @@ export function CagesListPage() {
         <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">{error}</div>
       ) : null}
 
-      <p className="max-w-2xl text-sm text-slate-600">
+      <p className="max-w-2xl text-sm text-slate-600 dark:text-slate-300">
         Filtre par volière, statut ou recherche (numéro, nom, description). Trie la grille selon tes préférences — les
         réglages sont mémorisés sur cet appareil. Coche les cages <strong>libres</strong> pour en supprimer plusieurs à
         la fois.
       </p>
 
       {cages.length > 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className={dmFilterCard}>
           <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end">
             <div className="min-w-[min(100%,18rem)] flex-1">
-              <label htmlFor="cages-search" className="mb-1 block text-xs font-medium text-slate-600">
+              <label htmlFor="cages-search" className={dmLabelXs}>
                 Recherche
               </label>
               <div className="relative">
@@ -305,19 +322,19 @@ export function CagesListPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Numéro, nom, description…"
-                  className="w-full rounded-lg border border-slate-300 py-2 pl-10 pr-3 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+                  className={dmInputSearch}
                 />
               </div>
             </div>
             <div>
-              <label htmlFor="cages-voliere" className="mb-1 block text-xs font-medium text-slate-600">
+              <label htmlFor="cages-voliere" className={dmLabelXs}>
                 Volière
               </label>
               <select
                 id="cages-voliere"
                 value={filterVoliere}
                 onChange={(e) => persistFilters(filterStatut, e.target.value)}
-                className="w-full min-w-[8rem] rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 md:w-auto"
+                className={`${dmSelect} min-w-[8rem] md:w-auto`}
               >
                 <option value="ALL">Toutes</option>
                 {codesVoliere.map((code) => (
@@ -328,14 +345,14 @@ export function CagesListPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="cages-statut" className="mb-1 block text-xs font-medium text-slate-600">
+              <label htmlFor="cages-statut" className={dmLabelXs}>
                 Statut
               </label>
               <select
                 id="cages-statut"
                 value={filterStatut}
                 onChange={(e) => persistFilters(e.target.value, filterVoliere)}
-                className="w-full min-w-[11rem] rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25 md:w-auto"
+                className={`${dmSelect} min-w-[11rem] md:w-auto`}
               >
                 <option value="ALL">Tous</option>
                 <option value="LIBRE">Libre</option>
@@ -345,12 +362,12 @@ export function CagesListPage() {
             </div>
             <div className="flex flex-wrap items-end gap-2">
               <div>
-                <span className="mb-1 block text-xs font-medium text-slate-600">Trier par</span>
+                <span className={dmLabelXs}>Trier par</span>
                 <div className="flex flex-wrap gap-2">
                   <select
                     value={sortBy}
                     onChange={(e) => persistSort(e.target.value, sortDir)}
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/25"
+                    className={dmSelect}
                   >
                     <option value="voliere">Volière puis n°</option>
                     <option value="nom">Nom</option>
@@ -361,7 +378,7 @@ export function CagesListPage() {
                   <button
                     type="button"
                     onClick={() => persistSort(sortBy, sortDir === 'asc' ? 'desc' : 'asc')}
-                    className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    className={dmSortDirButton}
                     aria-label={sortDir === 'asc' ? 'Ordre décroissant' : 'Ordre croissant'}
                   >
                     {sortDir === 'asc' ? (
@@ -375,22 +392,22 @@ export function CagesListPage() {
             </div>
           </div>
           {hasActiveFilters ? (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
-              <p className="text-xs text-slate-500">
+            <div className={`mt-3 ${dmFilterResetRow}`}>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {sorted.length} cage{sorted.length > 1 ? 's' : ''} affichée{sorted.length > 1 ? 's' : ''} sur{' '}
                 {cages.length}
               </p>
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                className={`${dmGhostButton} px-3 py-1.5 text-xs`}
               >
                 <FilterX className="size-3.5" aria-hidden />
                 Réinitialiser filtres
               </button>
             </div>
           ) : (
-            <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500">
+            <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
               {cages.length} cage{cages.length > 1 ? 's' : ''} au total
             </p>
           )}
@@ -398,9 +415,9 @@ export function CagesListPage() {
       ) : null}
 
       {cages.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-200 bg-white p-8 text-center">
-          <LayoutGrid className="mx-auto size-10 text-slate-300" aria-hidden />
-          <p className="mt-3 text-slate-700">Aucune cage enregistrée pour ton compte.</p>
+        <div className="rounded-xl border border-dashed border-slate-200 bg-white p-8 text-center dark:border-slate-600 dark:bg-slate-900">
+          <LayoutGrid className="mx-auto size-10 text-slate-300 dark:text-slate-500" aria-hidden />
+          <p className="mt-3 text-slate-700 dark:text-slate-200">Aucune cage enregistrée pour ton compte.</p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Link
               to="/cages/nouveau?mode=lot"
@@ -419,21 +436,21 @@ export function CagesListPage() {
           </div>
         </div>
       ) : sorted.length === 0 ? (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-950">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
           <p className="font-medium">Aucune cage ne correspond aux filtres.</p>
-          <button type="button" className="mt-3 text-teal-800 underline hover:text-teal-900" onClick={resetFilters}>
+          <button type="button" className="mt-3 text-teal-800 underline hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-200" onClick={resetFilters}>
             Réinitialiser les filtres
           </button>
         </div>
       ) : (
         <div className="space-y-2">
           {selectedIds.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-teal-200 bg-teal-50/90 px-4 py-3 text-sm text-teal-950 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-teal-200 bg-teal-50/90 px-4 py-3 text-sm text-teal-950 shadow-sm dark:border-teal-800/60 dark:bg-teal-950/40 dark:text-teal-100">
               <p className="font-medium">
                 {selectedIds.length} ligne{selectedIds.length > 1 ? 's' : ''} sélectionnée
                 {selectedIds.length > 1 ? 's' : ''}
                 {selectedLibreCages.length !== selectedIds.length ? (
-                  <span className="ml-1 font-normal text-teal-800/90">
+                  <span className="ml-1 font-normal text-teal-800/90 dark:text-teal-300/90">
                     ({selectedLibreCages.length} libre{selectedLibreCages.length > 1 ? 's' : ''} supprimable
                     {selectedLibreCages.length > 1 ? 's' : ''})
                   </span>
@@ -444,7 +461,7 @@ export function CagesListPage() {
                   type="button"
                   onClick={clearSelection}
                   disabled={deletingBulk}
-                  className="rounded-lg border border-teal-300/80 bg-white px-3 py-1.5 text-xs font-medium text-teal-900 hover:bg-teal-50 disabled:opacity-50"
+                  className="rounded-lg border border-teal-300/80 bg-white px-3 py-1.5 text-xs font-medium text-teal-900 hover:bg-teal-50 disabled:opacity-50 dark:border-teal-700/50 dark:bg-slate-800 dark:text-teal-200 dark:hover:bg-slate-700"
                 >
                   Tout désélectionner
                 </button>
@@ -460,9 +477,68 @@ export function CagesListPage() {
               </div>
             </div>
           ) : null}
-          <div className="-mx-1 overflow-x-auto overflow-y-visible rounded-xl border border-slate-200 bg-white shadow-sm sm:mx-0 md:overflow-x-visible">
-          <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div className={dmDataTableCard}>
+            <div className={dmDataTableHeader}>
+              <p className={dmDataTableTitle}>Liste des cages</p>
+              <p className={dmDataTableSub}>
+                Coche les lignes libres pour une suppression groupée. Actions par cage en fin de ligne.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 p-3 sm:gap-3 md:hidden">
+              {sorted.map((c) => (
+                <article
+                  key={c.id}
+                  className="flex flex-col rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-sm dark:border-slate-600 dark:bg-slate-800/80"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 size-4 shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                      checked={selectedIds.includes(c.id)}
+                      onChange={() => toggleSelectId(c.id)}
+                      disabled={deletingBulk || c.statut !== 'LIBRE'}
+                      aria-label={
+                        c.statut === 'LIBRE'
+                          ? `Sélectionner la cage ${c.numero}`
+                          : `Cage ${c.numero} occupée, non sélectionnable`
+                      }
+                      title={c.statut !== 'LIBRE' ? 'Libère la cage pour pouvoir la sélectionner' : undefined}
+                    />
+                    <span className="text-right font-mono text-[11px] font-semibold text-slate-800 dark:text-slate-100">
+                      {c.voliereCode ?? 'A'} · {c.numero}
+                    </span>
+                  </div>
+                  <p className="mt-1 truncate text-[11px] text-slate-600 dark:text-slate-300">{c.nom || '—'}</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">{c.superficie} m²</p>
+                  <p className="mt-1 text-[11px] font-medium text-slate-700 dark:text-slate-200">
+                    {statutLabel[c.statut] ?? c.statut}
+                  </p>
+                  <div className="mt-auto flex flex-col gap-1 border-t border-slate-100 pt-2 dark:border-slate-600">
+                    <Link
+                      to={`/cages/${c.id}/modifier`}
+                      className="inline-flex items-center justify-center gap-1 rounded border border-slate-200 px-2 py-1 text-[10px] font-medium text-slate-700 dark:border-slate-600 dark:text-slate-200"
+                    >
+                      <Pencil className="size-3 shrink-0" aria-hidden />
+                      Modifier
+                    </Link>
+                    <button
+                      type="button"
+                      disabled={c.statut !== 'LIBRE' || deletingId === c.id || deletingBulk}
+                      onClick={() => void handleDelete(c)}
+                      className="inline-flex items-center justify-center gap-1 rounded border border-rose-200 px-2 py-1 text-[10px] font-medium text-rose-800 disabled:cursor-not-allowed disabled:opacity-40"
+                      title={c.statut !== 'LIBRE' ? 'Libère la cage d’abord' : 'Supprimer'}
+                    >
+                      <Trash2 className="size-3 shrink-0" aria-hidden />
+                      Supprimer
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="hidden md:block">
+            <div className={dmTableWrap}>
+          <table className={dmTableClass('min-w-[640px]')}>
+            <thead className={dmThead}>
               <tr>
                 <th className="w-10 px-2 py-3 text-center" scope="col">
                   <input
@@ -484,11 +560,15 @@ export function CagesListPage() {
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className={dmTbody}>
               {sorted.map((c) => (
                 <tr
                   key={c.id}
-                  className={`text-slate-800 ${selectedIds.includes(c.id) ? 'bg-teal-50/50' : ''}`}
+                  className={`text-slate-800 transition-colors hover:bg-teal-50/40 dark:text-slate-200 dark:hover:bg-teal-950/40 ${
+                    selectedIds.includes(c.id)
+                      ? 'bg-teal-50/50 dark:bg-teal-950/35'
+                      : 'odd:bg-white even:bg-slate-50/50 dark:odd:bg-slate-900 dark:even:bg-slate-800/50'
+                  }`}
                 >
                   <td className="px-2 py-3 text-center align-middle">
                     <input
@@ -514,7 +594,7 @@ export function CagesListPage() {
                     <div className="flex justify-end gap-2">
                       <Link
                         to={`/cages/${c.id}/modifier`}
-                        className="inline-flex items-center gap-1 rounded border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        className="inline-flex items-center gap-1 rounded border border-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
                       >
                         <Pencil className="size-3.5" aria-hidden />
                         Modifier
@@ -535,6 +615,8 @@ export function CagesListPage() {
               ))}
             </tbody>
           </table>
+            </div>
+            </div>
           </div>
         </div>
       )}

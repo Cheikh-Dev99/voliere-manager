@@ -25,7 +25,8 @@ import { appFeedback } from '../../lib/appFeedback';
 import { useMergedVoliereCodes } from '../../hooks/useMergedVoliereCodes';
 import { MobileLabeledSelect } from '../ui/MobileLabeledSelect';
 import { AppLoadingView } from '../ui/AppLoadingView';
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 type SingleForm = {
   voliereCode: string;
@@ -40,6 +41,8 @@ type Props =
   | { mode: 'edit'; cageId: string };
 
 export function CageFormScreen(props: Props) {
+  const { colors: themeColors } = useAppTheme();
+  const styles = useMemo(() => createCageFormStyles(themeColors), [themeColors]);
   const router = useRouter();
   const { cages } = useCages();
   const isEdit = props.mode === 'edit';
@@ -461,7 +464,7 @@ export function CageFormScreen(props: Props) {
               )}
             />
             <Pressable onPress={onGenerateNumero} style={styles.genBtn} accessibilityLabel="Générer le numéro">
-              <Sparkles size={18} color={theme.teal800} />
+              <Sparkles size={18} color={themeColors.teal800} />
               <Text style={styles.genTxt}>Générer</Text>
             </Pressable>
           </View>
@@ -517,15 +520,22 @@ export function CageFormScreen(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createCageFormStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   scroll: { padding: theme.screenPadding, paddingBottom: 40 },
   segRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  seg: { flex: 1, paddingVertical: 10, borderRadius: theme.radiusMd, backgroundColor: theme.slate100, alignItems: 'center' },
-  segOn: { backgroundColor: theme.white, borderWidth: 1, borderColor: theme.teal600 },
+  seg: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: theme.radiusMd,
+    backgroundColor: theme.surfaceHighlight,
+    alignItems: 'center',
+  },
+  segOn: { backgroundColor: theme.surfaceElevated, borderWidth: 1, borderColor: theme.teal600 },
   segTxt: { fontWeight: '600', color: theme.slate600 },
   segTxtOn: { color: theme.teal900 },
   card: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -540,7 +550,7 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 12 : 10,
     fontSize: 16,
     color: theme.slate900,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   ta: { minHeight: 80, textAlignVertical: 'top' },
   row2: { flexDirection: 'row', gap: 10 },
@@ -577,4 +587,5 @@ const styles = StyleSheet.create({
   err: { color: theme.red600, marginBottom: 12 },
   btnGhost: { marginTop: 12, padding: 12 },
   btnGhostTxt: { color: theme.teal700, fontWeight: '700' },
-});
+  });
+}

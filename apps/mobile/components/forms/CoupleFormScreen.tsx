@@ -20,7 +20,8 @@ import { CoupleSchema } from '@shared/validators/schemas';
 import type { Cage, Pigeon } from '@shared/types';
 
 import { appFeedback } from '../../lib/appFeedback';
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { AppLoadingView } from '../ui/AppLoadingView';
 
 type FormValues = {
@@ -34,6 +35,8 @@ type FormValues = {
 type PickKind = 'male' | 'femelle' | 'cage' | null;
 
 export function CoupleFormScreen() {
+  const { colors: themeColors } = useAppTheme();
+  const styles = useMemo(() => createCoupleFormStyles(themeColors), [themeColors]);
   const router = useRouter();
   const { pigeons, loading: loadPigeons } = usePigeons(false);
   const { cages, loading: loadCages } = useCages();
@@ -184,7 +187,7 @@ export function CoupleFormScreen() {
           value={dateDebut}
           onChangeText={(t) => setValue('dateDebut', t, { shouldDirty: true })}
           placeholder="AAAA-MM-JJ"
-          placeholderTextColor={theme.slate500}
+          placeholderTextColor={themeColors.slate500}
         />
         {errors.dateDebut ? <Text style={styles.errTxt}>{errors.dateDebut.message}</Text> : null}
 
@@ -203,7 +206,7 @@ export function CoupleFormScreen() {
           value={notes}
           onChangeText={(t) => setValue('notes', t, { shouldDirty: true })}
           placeholder="Remarques…"
-          placeholderTextColor={theme.slate500}
+          placeholderTextColor={themeColors.slate500}
           multiline
         />
         {errors.notes ? <Text style={styles.errTxt}>{errors.notes.message}</Text> : null}
@@ -268,13 +271,14 @@ export function CoupleFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createCoupleFormStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   scroll: { padding: theme.screenPadding, paddingBottom: 40 },
   h1: { fontSize: 22, fontWeight: '800', color: theme.slate900 },
   lead: { fontSize: 14, color: theme.slate600, marginTop: 8, marginBottom: 16, lineHeight: 20 },
   card: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -289,7 +293,7 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 12 : 10,
     fontSize: 16,
     color: theme.slate900,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   inpErr: { borderColor: theme.red600 },
   ta: { minHeight: 80, textAlignVertical: 'top' },
@@ -298,7 +302,7 @@ const styles = StyleSheet.create({
     borderColor: theme.border,
     borderRadius: theme.radiusMd,
     padding: 14,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   pickTxt: { fontSize: 15, color: theme.teal800, fontWeight: '600' },
   errTxt: { color: theme.red600, fontSize: 12, marginTop: 4 },
@@ -317,7 +321,7 @@ const styles = StyleSheet.create({
   btnGhostTxt: { color: theme.teal700, fontWeight: '700' },
   modalBg: { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)', justifyContent: 'flex-end' },
   modalCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -328,4 +332,5 @@ const styles = StyleSheet.create({
   modalRowTxt: { fontSize: 16, color: theme.slate900 },
   modalClose: { marginTop: 12, padding: 14, alignItems: 'center' },
   modalCloseTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
-});
+  });
+}

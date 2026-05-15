@@ -11,10 +11,10 @@ import { SiteBackgroundDecor } from '../components/layout/SiteBackgroundDecor'
 import { resolvePostAuthPath } from '../router/postAuthRedirect'
 
 const inputClass =
-  'w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 pl-9 text-sm text-slate-900 shadow-inner transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25'
+  'w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 pl-9 text-sm text-slate-900 shadow-inner transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/25 dark:border-slate-600 dark:bg-slate-800/50 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-teal-400 dark:focus:bg-slate-900'
 
 const inputInvalidClass =
-  'border-red-400 bg-red-50/50 focus:border-red-500 focus:ring-red-500/25'
+  'border-red-400 bg-red-50/50 focus:border-red-500 focus:ring-red-500/25 dark:border-red-500 dark:bg-red-950/30 dark:focus:border-red-400'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -235,12 +235,12 @@ export function LoginPage() {
   const forgotEmailHelp = forgotIssues.email
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-slate-100 via-slate-50 to-teal-50/40 px-4 py-6 sm:py-8">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-slate-100 via-slate-50 to-teal-50/40 px-4 py-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 sm:py-8">
       <SiteBackgroundDecor />
       <div className="relative z-[1] w-full max-w-md">
-        <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-xl shadow-slate-200/60 ring-1 ring-slate-200/40 backdrop-blur-sm sm:p-5">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-xl shadow-slate-200/60 ring-1 ring-slate-200/40 backdrop-blur-sm dark:border-slate-600/80 dark:bg-slate-900/95 dark:shadow-black/40 dark:ring-slate-700/50 sm:p-5">
           <div className="px-0.5 pb-2" role="tablist" aria-label="Connexion, inscription ou réinitialisation du mot de passe">
-            <div className="grid grid-cols-3 gap-0.5 rounded-lg border border-slate-200/80 bg-slate-50/90 p-0.5 shadow-inner sm:flex sm:flex-wrap sm:gap-0.5">
+            <div className="grid grid-cols-3 gap-0.5 rounded-lg border border-slate-200/80 bg-slate-50/90 p-0.5 shadow-inner dark:border-slate-600/80 dark:bg-slate-800/90 sm:flex sm:flex-wrap sm:gap-0.5">
               <button
                 type="button"
                 role="tab"
@@ -249,8 +249,8 @@ export function LoginPage() {
                 onClick={() => switchMode('login')}
                 className={`flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition sm:gap-1.5 sm:px-2 sm:text-sm ${
                   isLogin
-                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/80'
-                    : 'text-slate-600 hover:bg-white/60'
+                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-700 dark:text-slate-50 dark:ring-slate-500/60'
+                    : 'text-slate-600 hover:bg-white/60 dark:text-slate-400 dark:hover:bg-slate-700/60'
                 }`}
               >
                 <LayoutGrid className="size-3.5 shrink-0 opacity-80 sm:size-4" aria-hidden />
@@ -264,8 +264,8 @@ export function LoginPage() {
                 onClick={() => switchMode('register')}
                 className={`flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition sm:gap-1.5 sm:px-2 sm:text-sm ${
                   mode === 'register'
-                    ? 'bg-white text-teal-900 shadow-sm ring-1 ring-teal-200/70'
-                    : 'text-slate-600 hover:bg-white/60 hover:text-teal-900'
+                    ? 'bg-white text-teal-900 shadow-sm ring-1 ring-teal-200/70 dark:bg-slate-700 dark:text-teal-100 dark:ring-teal-600/50'
+                    : 'text-slate-600 hover:bg-white/60 hover:text-teal-900 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-teal-200'
                 }`}
               >
                 <UserPlus className="size-3.5 shrink-0 sm:size-4" aria-hidden />
@@ -281,8 +281,8 @@ export function LoginPage() {
                 onClick={() => switchMode('forgot')}
                 className={`flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition sm:gap-1.5 sm:px-2 sm:text-sm ${
                   isForgot
-                    ? 'bg-white text-amber-900 shadow-sm ring-1 ring-amber-200/80'
-                    : 'text-slate-600 hover:bg-white/60 hover:text-amber-900'
+                    ? 'bg-white text-amber-900 shadow-sm ring-1 ring-amber-200/80 dark:bg-slate-700 dark:text-amber-100 dark:ring-amber-700/50'
+                    : 'text-slate-600 hover:bg-white/60 hover:text-amber-900 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-amber-200'
                 }`}
               >
                 <KeyRound className="size-3.5 shrink-0 sm:size-4" aria-hidden />
@@ -300,10 +300,10 @@ export function LoginPage() {
               decoding="async"
               fetchPriority="high"
             />
-            <h1 className="mt-2 text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+            <h1 className="mt-2 text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-xl">
               {isLogin ? 'Connexion' : isForgot ? 'Mot de passe oublié' : 'Créer un compte'}
             </h1>
-            <p className="mt-1 max-w-sm text-xs leading-snug text-slate-600 sm:text-sm">
+            <p className="mt-1 max-w-sm text-xs leading-snug text-slate-600 dark:text-slate-300 sm:text-sm">
               {isLogin
                 ? 'Connecte-toi pour accéder à ta volière.'
                 : isForgot

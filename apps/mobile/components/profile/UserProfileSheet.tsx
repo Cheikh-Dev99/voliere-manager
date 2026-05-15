@@ -38,7 +38,9 @@ import { mergeProfileVoliereCodesWithCages } from '@shared/utils/voliereCodesMer
 import { updateUserProfile } from '@shared/services/usersProfileService';
 
 import { appFeedback } from '../../lib/appFeedback';
-import { shadowCard, theme } from '../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../constants/palettes';
+import { useAppTheme, useThemeColors } from '../../context/AppThemeContext';
+import { ThemeAppearanceControl } from '../settings/ThemeAppearanceControl';
 import { VoliereCodesForm } from './VoliereCodesForm';
 import { profileDisplayName, profileElevageLabel, profileInitials } from './profileUtils';
 
@@ -52,6 +54,26 @@ type StatTileProps = {
 };
 
 function StatTile({ label, value, tone, icon }: StatTileProps) {
+  const theme = useThemeColors();
+  const tileStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        statTile: {
+          flexBasis: '48%',
+          flexGrow: 1,
+          borderWidth: 1,
+          borderRadius: theme.radiusLg,
+          paddingHorizontal: 12,
+          paddingVertical: 12,
+          minHeight: 88,
+        },
+        statTileHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+        statLabel: { flex: 1, fontSize: 10, fontWeight: '700', letterSpacing: 0.4 },
+        statValue: { marginTop: 8, fontSize: 26, fontWeight: '800', fontVariant: ['tabular-nums'] },
+      }),
+    [theme.radiusLg],
+  );
+
   const bg =
     tone === 'teal' ? 'rgba(204, 251, 241, 0.55)' : tone === 'rose' ? theme.rose50 : theme.slate50;
   const border = tone === 'teal' ? theme.teal100 : tone === 'rose' ? '#fecdd3' : theme.slate200;
@@ -59,14 +81,14 @@ function StatTile({ label, value, tone, icon }: StatTileProps) {
   const numColor = tone === 'teal' ? theme.teal800 : tone === 'rose' ? '#9f1239' : theme.slate900;
 
   return (
-    <View style={[styles.statTile, { backgroundColor: bg, borderColor: border }]}>
-      <View style={styles.statTileHead}>
+    <View style={[tileStyles.statTile, { backgroundColor: bg, borderColor: border }]}>
+      <View style={tileStyles.statTileHead}>
         {icon}
-        <Text style={[styles.statLabel, { color: labelColor }]} numberOfLines={2}>
+        <Text style={[tileStyles.statLabel, { color: labelColor }]} numberOfLines={2}>
           {label.toUpperCase()}
         </Text>
       </View>
-      <Text style={[styles.statValue, { color: numColor }]} accessibilityLabel={`${label} ${value}`}>
+      <Text style={[tileStyles.statValue, { color: numColor }]} accessibilityLabel={`${label} ${value}`}>
         {value}
       </Text>
     </View>
@@ -79,6 +101,8 @@ type Props = {
 };
 
 export function UserProfileSheet({ visible, onClose }: Props) {
+  const { colors: theme, shadowCard: sheetShadow } = useAppTheme();
+  const styles = useMemo(() => createUserProfileStyles(theme, sheetShadow), [theme, sheetShadow]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [user, setUser] = useState<User | null>(() => auth.currentUser);
@@ -383,6 +407,9 @@ export function UserProfileSheet({ visible, onClose }: Props) {
               </View>
             )}
 
+            <View style={styles.divider} />
+            <ThemeAppearanceControl />
+
             <Pressable
               onPress={confirmLogout}
               disabled={signingOut}
@@ -400,11 +427,12 @@ export function UserProfileSheet({ visible, onClose }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createUserProfileStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
   flex: { flex: 1 },
   chrome: {
     flex: 1,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   topBar: {
     flexDirection: 'row',
@@ -469,18 +497,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 10,
   },
-  statTile: {
-    flexBasis: '48%',
-    flexGrow: 1,
-    borderWidth: 1,
-    borderRadius: theme.radiusLg,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    minHeight: 88,
-  },
-  statTileHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  statLabel: { flex: 1, fontSize: 10, fontWeight: '700', letterSpacing: 0.4 },
-  statValue: { marginTop: 8, fontSize: 26, fontWeight: '800', fontVariant: ['tabular-nums'] },
   intro: {
     fontSize: 13,
     lineHeight: 20,
@@ -532,7 +548,7 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     fontSize: 16,
     color: theme.slate900,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   textInPlain: {
     minHeight: theme.minTap,
@@ -542,7 +558,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 16,
     color: theme.slate900,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   editActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 18 },
   primarySm: {
@@ -569,7 +585,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   ghostSmPressed: { backgroundColor: theme.slate50 },
   ghostSmTxt: { fontSize: 15, fontWeight: '600', color: theme.slate700 },
@@ -598,10 +614,11 @@ const styles = StyleSheet.create({
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
   },
   quickRowPressed: { backgroundColor: theme.teal50 },
   quickTextCol: { flex: 1, minWidth: 0 },
   quickTitle: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
   quickSub: { fontSize: 13, color: theme.slate600, marginTop: 3, lineHeight: 18 },
-});
+  });
+}

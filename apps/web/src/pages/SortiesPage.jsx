@@ -18,6 +18,7 @@ import { useSorties } from '@shared/hooks/useSorties'
 import { enregistrerSortie } from '@shared/services/pigeonsService'
 import { SortieSchema } from '@shared/validators/schemas'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
+import { dmFieldClass as fieldClass } from '../theme/voliereDarkUi'
 
 const TYPE_OPTIONS = [
   { value: 'VENTE', label: 'Vente', hint: 'Statut pigeon → Vendu' },
@@ -55,12 +56,6 @@ function writeSortiesPrefs(prefs) {
   } catch {
     /* quota */
   }
-}
-
-function fieldClass(err) {
-  return `w-full rounded-lg border px-3 py-2 text-slate-900 outline-none focus:ring-2 ${
-    err ? 'border-red-400 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 focus:border-teal-500 focus:ring-teal-500/30'
-  }`
 }
 
 function formatTs(ts) {
@@ -404,28 +399,28 @@ export function SortiesPage() {
         <div>
           <Link
             to="/"
-            className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900"
+            className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700 hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-100"
           >
             <ArrowLeft className="size-4" aria-hidden />
             Visualisation
           </Link>
-          <h1 className="inline-flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="inline-flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
             <ClipboardList className="size-8 shrink-0 text-teal-600" aria-hidden />
             Sorties
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             Enregistre une <strong>vente</strong>, un <strong>décès</strong> ou une <strong>perte</strong>. Le pigeon
             passe au statut correspondant, une <strong>cage</strong> occupée par lui seul est libérée, un{' '}
             <strong>couple actif</strong> le concernant est rompu avec libération de la cage du couple, et un document{' '}
             <strong>Sortie</strong> est créé pour l’historique.
           </p>
           {!loadSorties && sorties.length > 0 ? (
-            <p className="mt-2 text-xs text-slate-500" aria-live="polite">
-              <span className="font-medium text-slate-700">{stats.total}</span> sortie(s) en base
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400" aria-live="polite">
+              <span className="font-medium text-slate-700 dark:text-slate-300">{stats.total}</span> sortie(s) en base
               {hasActiveFilters ? (
                 <>
                   {' '}
-                  · <span className="text-teal-800">{filteredSorties.length}</span> affichée(s) après filtres
+                  · <span className="text-teal-800 dark:text-teal-300">{filteredSorties.length}</span> affichée(s) après filtres
                 </>
               ) : null}
             </p>
@@ -433,7 +428,7 @@ export function SortiesPage() {
         </div>
         <Link
           to="/pigeons"
-          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50"
+          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700"
         >
           Liste des pigeons
         </Link>
@@ -442,12 +437,12 @@ export function SortiesPage() {
       <div className="grid gap-5 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
+          className="space-y-4 rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm sm:p-5"
         >
-          <h2 className="text-lg font-semibold text-slate-900">Nouvelle sortie</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Nouvelle sortie</h2>
 
           <div>
-            <label htmlFor="sortie-pigeon-filter" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="sortie-pigeon-filter" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Filtrer la liste
             </label>
             <div className="relative">
@@ -461,14 +456,14 @@ export function SortiesPage() {
                 value={pigeonSelectQuery}
                 onChange={(e) => setPigeonSelectQuery(e.target.value)}
                 placeholder="Matricule, nom ou race…"
-                className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 py-2 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                 aria-label="Filtrer les pigeons actifs dans la liste déroulante"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="sortie-pigeon" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="sortie-pigeon" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Pigeon concerné <span className="text-red-600">*</span>
             </label>
             <select
@@ -504,15 +499,15 @@ export function SortiesPage() {
           </div>
 
           {contexte ? (
-            <div className="rounded-xl border border-teal-100 bg-gradient-to-br from-teal-50/80 to-white px-4 py-3 text-sm text-slate-700">
-              <p className="flex items-center gap-2 font-medium text-teal-900">
+            <div className="rounded-xl border border-teal-100 bg-gradient-to-br from-teal-50/80 to-white px-4 py-3 text-sm text-slate-700 dark:border-teal-900/50 dark:from-teal-950/40 dark:to-slate-900 dark:text-slate-200">
+              <p className="flex items-center gap-2 font-medium text-teal-900 dark:text-teal-200">
                 <Info className="size-4 shrink-0" aria-hidden />
                 Contexte avant enregistrement
               </p>
-              <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-slate-600">
+              <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-slate-600 dark:text-slate-400">
                 <li>
                   Pigeon :{' '}
-                  <span className="font-mono font-medium text-slate-800">{contexte.pigeon.matricule}</span>
+                  <span className="font-mono font-medium text-slate-800 dark:text-slate-100">{contexte.pigeon.matricule}</span>
                 </li>
                 {contexte.cageSolo ? (
                   <li>
@@ -559,15 +554,15 @@ export function SortiesPage() {
           ) : null}
 
           <fieldset>
-            <legend className="mb-2 block text-sm font-medium text-slate-700">Type de sortie</legend>
+            <legend className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Type de sortie</legend>
             <div className="flex flex-col gap-2">
               {TYPE_OPTIONS.map((opt) => (
                 <label
                   key={opt.value}
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-2.5 text-sm ${
                     typeSortie === opt.value
-                      ? 'border-teal-400 bg-teal-50/60 ring-1 ring-teal-200'
-                      : 'border-slate-200 bg-white hover:bg-slate-50'
+                      ? 'border-teal-400 bg-teal-50/60 ring-1 ring-teal-200 dark:border-teal-500 dark:bg-teal-950/40 dark:ring-teal-700'
+                      : 'border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700'
                   }`}
                 >
                   <input
@@ -577,8 +572,8 @@ export function SortiesPage() {
                     {...register('type')}
                   />
                   <span>
-                    <span className="font-medium text-slate-900">{opt.label}</span>
-                    <span className="mt-0.5 block text-xs text-slate-500">{opt.hint}</span>
+                    <span className="font-medium text-slate-900 dark:text-slate-100">{opt.label}</span>
+                    <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">{opt.hint}</span>
                   </span>
                 </label>
               ))}
@@ -586,7 +581,7 @@ export function SortiesPage() {
           </fieldset>
 
           <div>
-            <label htmlFor="sortie-date" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="sortie-date" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Date de la sortie <span className="text-red-600">*</span>
             </label>
             <input id="sortie-date" type="date" {...register('date')} className={fieldClass(errors.date)} />
@@ -596,7 +591,7 @@ export function SortiesPage() {
           {typeSortie === 'VENTE' ? (
             <>
               <div>
-                <label htmlFor="sortie-prix" className="mb-1 block text-sm font-medium text-slate-700">
+                <label htmlFor="sortie-prix" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Prix <span className="text-red-600">*</span>
                 </label>
                 <input
@@ -612,7 +607,7 @@ export function SortiesPage() {
                 {errors.prix ? <p className="mt-1 text-xs text-red-600">{errors.prix.message}</p> : null}
               </div>
               <div>
-                <label htmlFor="sortie-acheteur" className="mb-1 block text-sm font-medium text-slate-700">
+                <label htmlFor="sortie-acheteur" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Acheteur <span className="text-red-600">*</span>
                 </label>
                 <input
@@ -631,7 +626,7 @@ export function SortiesPage() {
 
           {typeSortie === 'DECES' ? (
             <div>
-              <label htmlFor="sortie-cause" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="sortie-cause" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Cause (optionnel)
               </label>
               <input id="sortie-cause" type="text" {...register('cause')} className={fieldClass(errors.cause)} />
@@ -641,7 +636,7 @@ export function SortiesPage() {
 
           {typeSortie === 'PERTE' ? (
             <div>
-              <label htmlFor="sortie-circ" className="mb-1 block text-sm font-medium text-slate-700">
+              <label htmlFor="sortie-circ" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Circonstances (optionnel)
               </label>
               <input
@@ -657,7 +652,7 @@ export function SortiesPage() {
           ) : null}
 
           <div>
-            <label htmlFor="sortie-notes" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="sortie-notes" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Notes complémentaires
             </label>
             <textarea
@@ -687,7 +682,7 @@ export function SortiesPage() {
               className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                 filterType === 'VENTE'
                   ? 'border-emerald-400 bg-emerald-100 text-emerald-950 ring-1 ring-emerald-300/60'
-                  : 'border-emerald-200 bg-emerald-50/80 text-emerald-900 hover:bg-emerald-100'
+                  : 'border-emerald-200 bg-emerald-50/80 text-emerald-900 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 dark:hover:bg-emerald-900/50'
               }`}
               aria-pressed={filterType === 'VENTE'}
             >
@@ -698,8 +693,8 @@ export function SortiesPage() {
               onClick={() => setTypeFilterFromChip('DECES')}
               className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                 filterType === 'DECES'
-                  ? 'border-slate-400 bg-slate-200 text-slate-900 ring-1 ring-slate-400/50'
-                  : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'
+                  ? 'border-slate-400 bg-slate-200 text-slate-900 ring-1 ring-slate-400/50 dark:border-slate-500 dark:bg-slate-600 dark:text-slate-50 dark:ring-slate-500/50'
+                  : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
               }`}
               aria-pressed={filterType === 'DECES'}
             >
@@ -711,22 +706,22 @@ export function SortiesPage() {
               className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                 filterType === 'PERTE'
                   ? 'border-amber-400 bg-amber-100 text-amber-950 ring-1 ring-amber-300/60'
-                  : 'border-amber-200 bg-amber-50 text-amber-950 hover:bg-amber-100'
+                  : 'border-amber-200 bg-amber-50 text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/35 dark:text-amber-100 dark:hover:bg-amber-900/45'
               }`}
               aria-pressed={filterType === 'PERTE'}
             >
               Pertes ({stats.pertes})
             </button>
-            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
               Total {stats.total}
             </span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Clique sur une pastille pour filtrer par type ; reclique pour tout afficher.
           </p>
 
           {!loadSorties && !sortiesError && sorties.length > 0 ? (
-            <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+            <div className="space-y-4 rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-3 shadow-sm sm:p-4">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                 <div className="relative min-w-0 flex-1 lg:max-w-md">
                   <Search
@@ -738,7 +733,7 @@ export function SortiesPage() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Rechercher matricule, nom, acheteur, notes, cage, conjoint…"
-                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                     aria-label="Recherche sur l’historique des sorties"
                   />
                 </div>
@@ -746,14 +741,14 @@ export function SortiesPage() {
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <label htmlFor="sortie-filter-impact" className="mb-1 block text-xs font-medium text-slate-600">
+                  <label htmlFor="sortie-filter-impact" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Impact (cascade)
                   </label>
                   <select
                     id="sortie-filter-impact"
                     value={filterImpact}
                     onChange={(e) => setFilterImpact(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                   >
                     <option value="ALL">Toutes les sorties</option>
                     <option value="CAGE">Cage libérée (solo ou couple)</option>
@@ -761,14 +756,14 @@ export function SortiesPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="sortie-filter-period" className="mb-1 block text-xs font-medium text-slate-600">
+                  <label htmlFor="sortie-filter-period" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Période
                   </label>
                   <select
                     id="sortie-filter-period"
                     value={filterPeriod}
                     onChange={(e) => setFilterPeriod(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                    className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                   >
                     <option value="">Toutes les dates</option>
                     <option value="30d">30 derniers jours</option>
@@ -777,7 +772,7 @@ export function SortiesPage() {
                   </select>
                 </div>
                 <div className="sm:col-span-2 lg:col-span-2">
-                  <label htmlFor="sorties-sort-by" className="mb-1 block text-xs font-medium text-slate-600">
+                  <label htmlFor="sorties-sort-by" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
                     Tri
                   </label>
                   <div className="flex gap-2">
@@ -785,7 +780,7 @@ export function SortiesPage() {
                       id="sorties-sort-by"
                       value={sortBy}
                       onChange={(e) => setSortByAndSave(e.target.value)}
-                      className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                      className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
                     >
                       <option value="date">Date de sortie</option>
                       <option value="matricule">Matricule pigeon</option>
@@ -799,7 +794,7 @@ export function SortiesPage() {
                           : 'Ordre décroissant — cliquer pour croissant'
                       }
                       onClick={toggleSortDirAndSave}
-                      className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                      className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-2 text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:hover:bg-slate-700"
                       aria-label={sortDir === 'asc' ? 'Trier en ordre décroissant' : 'Trier en ordre croissant'}
                     >
                       {sortDir === 'asc' ? (
@@ -813,14 +808,14 @@ export function SortiesPage() {
               </div>
 
               {hasActiveFilters ? (
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
-                  <p className="text-xs text-slate-500">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 dark:border-slate-700">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Filtres ou tri actifs : l’historique ci-dessous est restreint ou réordonné.
                   </p>
                   <button
                     type="button"
                     onClick={resetFilters}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
                     <FilterX className="size-4" aria-hidden />
                     Réinitialiser filtres & tri
@@ -830,10 +825,10 @@ export function SortiesPage() {
             </div>
           ) : null}
 
-          <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-md shadow-slate-900/5 ring-1 ring-slate-900/[0.04]">
-            <div className="border-b border-teal-100 bg-gradient-to-r from-teal-50/90 via-white to-slate-50/80 px-4 py-3">
-              <p className="text-sm font-semibold text-slate-800">Historique des sorties</p>
-              <p className="mt-0.5 text-xs text-slate-500">
+          <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-md shadow-slate-900/5 ring-1 ring-slate-900/[0.04]">
+            <div className="border-b border-teal-100 bg-gradient-to-r from-teal-50/90 via-white to-slate-50/80 px-4 py-3 dark:border-slate-700 dark:from-slate-800/90 dark:via-slate-900 dark:to-slate-900">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Historique des sorties</p>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 Cliquez sur « Fiche » pour ouvrir le pigeon concerné. Chaque ligne est un document Sortie (cages /
                 couple enregistrés sur le même document).
               </p>
@@ -844,30 +839,94 @@ export function SortiesPage() {
             ) : loadSorties ? (
               <AppLoadingScreen variant="compact" loadingContext="sorties" message="Chargement des sorties…" />
             ) : sorties.length === 0 ? (
-              <div className="px-4 py-12 text-center text-sm text-slate-600">
-                <p className="font-medium text-slate-800">Aucune sortie enregistrée</p>
-                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500">
+              <div className="px-4 py-12 text-center text-sm text-slate-600 dark:text-slate-300">
+                <p className="font-medium text-slate-800 dark:text-slate-100">Aucune sortie enregistrée</p>
+                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500 dark:text-slate-400">
                   Utilise le formulaire à gauche dès qu’un pigeon doit quitter l’élevage (vente, décès ou perte).
                 </p>
               </div>
             ) : filteredSorties.length === 0 ? (
-              <div className="px-4 py-10 text-center text-sm text-slate-600">
-                <p className="font-medium text-slate-800">Aucun résultat pour ta sélection</p>
-                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500">
+              <div className="px-4 py-10 text-center text-sm text-slate-600 dark:text-slate-300">
+                <p className="font-medium text-slate-800 dark:text-slate-100">Aucun résultat pour ta sélection</p>
+                <p className="mx-auto mt-2 max-w-md text-xs text-slate-500 dark:text-slate-400">
                   Essaie d’autres mots-clés ou réinitialise les filtres.
                 </p>
                 <button
                   type="button"
-                  className="mt-4 text-teal-700 underline hover:text-teal-800"
+                  className="mt-4 text-teal-700 underline hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
                   onClick={resetFilters}
                 >
                   Réinitialiser filtres & tri
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto md:overflow-x-visible">
-                <table className="w-full min-w-[600px] divide-y divide-slate-200 text-left text-sm md:min-w-0">
-                  <thead className="border-b border-slate-200 bg-slate-100/90 text-xs font-semibold uppercase tracking-wide text-slate-600">
+              <>
+                <div className="grid grid-cols-2 gap-2 p-3 sm:gap-3 md:hidden">
+                  {filteredSorties.map((s) => {
+                    const mat =
+                      s.pigeonMatricule ?? pigeonById.get(s.pigeonId)?.matricule ?? s.pigeonId.slice(0, 8)
+                    const nomP = pigeonById.get(s.pigeonId)?.nom
+                    const detail =
+                      s.type === 'VENTE'
+                        ? s.prix != null
+                          ? `${Number(s.prix).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} — ${s.acheteur ?? ''}`
+                          : (s.acheteur ?? '—')
+                        : s.type === 'DECES'
+                          ? s.cause || '—'
+                          : s.circonstance || '—'
+                    const cageBits = []
+                    if (s.cageSoloIdLiberee) {
+                      const c = cageById.get(s.cageSoloIdLiberee)
+                      cageBits.push(`Solo : ${c?.numero ?? s.cageSoloIdLiberee}`)
+                    }
+                    if (s.cageCoupleIdLiberee) {
+                      const c = cageById.get(s.cageCoupleIdLiberee)
+                      cageBits.push(`Couple : ${c?.numero ?? s.cageCoupleIdLiberee}`)
+                    }
+                    const coupleBit =
+                      s.coupleRompuId && s.conjointPigeonId
+                        ? `Couple rompu · conjoint ${pigeonById.get(s.conjointPigeonId)?.matricule ?? s.conjointPigeonId.slice(0, 6)}`
+                        : s.coupleRompuId
+                          ? 'Couple rompu'
+                          : '—'
+
+                    return (
+                      <article
+                        key={s.id}
+                        className="flex flex-col rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-sm dark:border-slate-600 dark:bg-slate-800/80"
+                      >
+                        <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{formatTs(s.date)}</p>
+                        <div className="mt-1">
+                          <span
+                            className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${TYPE_BADGE[s.type] ?? 'border-slate-200 bg-slate-100'}`}
+                          >
+                            {s.type === 'VENTE' ? 'Vente' : s.type === 'DECES' ? 'Décès' : 'Perte'}
+                          </span>
+                        </div>
+                        <p className="mt-2 font-mono text-[11px] font-semibold text-slate-900 dark:text-slate-100">{mat}</p>
+                        {nomP ? <p className="truncate text-[10px] text-slate-500 dark:text-slate-400">{nomP}</p> : null}
+                        <p className="mt-1 line-clamp-3 text-[10px] text-slate-600 dark:text-slate-300">{detail}</p>
+                        {(s.notes ?? '').trim() ? (
+                          <p className="mt-0.5 line-clamp-2 text-[10px] text-slate-400 dark:text-slate-500">{s.notes}</p>
+                        ) : null}
+                        <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                          {cageBits.length ? cageBits.join(' · ') : '—'}
+                        </p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">{coupleBit}</p>
+                        <Link
+                          to={`/pigeons/${s.pigeonId}`}
+                          state={{ back: SORTIES_BACK }}
+                          className="mt-auto border-t border-slate-100 pt-2 text-center text-[11px] font-medium text-teal-700 dark:border-slate-600 dark:text-teal-300"
+                        >
+                          Fiche pigeon
+                        </Link>
+                      </article>
+                    )
+                  })}
+                </div>
+                <div className="hidden overflow-x-auto md:block md:overflow-x-visible">
+                <table className="w-full min-w-[600px] divide-y divide-slate-200 text-left text-sm md:min-w-0 dark:divide-slate-700">
+                  <thead className="border-b border-slate-200 bg-slate-100/90 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-300">
                     <tr>
                       <th className="whitespace-nowrap px-4 py-3">Date</th>
                       <th className="whitespace-nowrap px-4 py-3">Type</th>
@@ -877,7 +936,7 @@ export function SortiesPage() {
                       <th className="px-4 py-3 text-right">Fiche</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                     {filteredSorties.map((s) => {
                       const mat =
                         s.pigeonMatricule ?? pigeonById.get(s.pigeonId)?.matricule ?? s.pigeonId.slice(0, 8)
@@ -909,9 +968,9 @@ export function SortiesPage() {
                       return (
                         <tr
                           key={s.id}
-                          className="transition-colors odd:bg-white even:bg-slate-50/50 hover:bg-teal-50/40"
+                          className="transition-colors odd:bg-white even:bg-slate-50/50 hover:bg-teal-50/40 dark:odd:bg-slate-900 dark:even:bg-slate-800/50 dark:hover:bg-teal-950/40"
                         >
-                          <td className="whitespace-nowrap px-4 py-3 text-slate-700">{formatTs(s.date)}</td>
+                          <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">{formatTs(s.date)}</td>
                           <td className="px-4 py-3">
                             <span
                               className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${TYPE_BADGE[s.type] ?? 'border-slate-200 bg-slate-100'}`}
@@ -920,30 +979,30 @@ export function SortiesPage() {
                             </span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="font-mono font-medium text-slate-900">{mat}</span>
+                            <span className="font-mono font-medium text-slate-900 dark:text-slate-100">{mat}</span>
                             {nomP ? (
-                              <span className="mt-0.5 block text-xs font-normal text-slate-500">{nomP}</span>
+                              <span className="mt-0.5 block text-xs font-normal text-slate-500 dark:text-slate-400">{nomP}</span>
                             ) : null}
                           </td>
-                          <td className="hidden max-w-[16rem] px-4 py-3 text-slate-600 md:table-cell">
+                          <td className="hidden max-w-[16rem] px-4 py-3 text-slate-600 dark:text-slate-300 md:table-cell">
                             <span className="line-clamp-2" title={detail}>
                               {detail}
                             </span>
                             {(s.notes ?? '').trim() ? (
-                              <span className="mt-1 block truncate text-xs text-slate-400" title={s.notes}>
+                              <span className="mt-1 block truncate text-xs text-slate-400 dark:text-slate-500" title={s.notes}>
                                 {s.notes}
                               </span>
                             ) : null}
                           </td>
-                          <td className="hidden max-w-xs px-4 py-3 text-xs text-slate-600 lg:table-cell">
+                          <td className="hidden max-w-xs px-4 py-3 text-xs text-slate-600 dark:text-slate-300 lg:table-cell">
                             <div>{cageBits.length ? cageBits.join(' · ') : '—'}</div>
-                            <div className="mt-0.5 text-slate-500">{coupleBit}</div>
+                            <div className="mt-0.5 text-slate-500 dark:text-slate-400">{coupleBit}</div>
                           </td>
                           <td className="px-4 py-3 text-right">
                             <Link
                               to={`/pigeons/${s.pigeonId}`}
                               state={{ back: SORTIES_BACK }}
-                              className="font-medium text-teal-700 hover:underline"
+                              className="font-medium text-teal-700 hover:underline dark:text-teal-300 dark:hover:text-teal-200"
                             >
                               Fiche
                             </Link>
@@ -954,6 +1013,7 @@ export function SortiesPage() {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </div>
         </div>

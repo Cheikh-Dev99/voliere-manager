@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Modal,
   Platform,
@@ -11,7 +11,8 @@ import {
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { Calendar } from 'lucide-react-native';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 type Props = {
   value: string;
@@ -73,23 +74,10 @@ export function HealthEventDatePicker({
   accessibilityLabel = "Choisir la date de l'événement",
   placeholderChoose = DEFAULT_PLACEHOLDER,
 }: Props) {
+  const { colors: c, resolved } = useAppTheme();
+  const styles = useMemo(() => createHealthDateStyles(c), [c]);
   const [iosOpen, setIosOpen] = useState(false);
   const [iosTemp, setIosTemp] = useState(() => parseYmd(value));
-
-  if (Platform.OS === 'web') {
-    return (
-      <View style={styles.wrap}>
-        <TextInput
-          style={styles.webInp}
-          value={value}
-          onChangeText={onChange}
-          placeholder="AAAA-MM-JJ"
-          placeholderTextColor={theme.slate500}
-        />
-        <Text style={styles.hint}>Sur le web Expo, saisis la date au format AAAA-MM-JJ.</Text>
-      </View>
-    );
-  }
 
   const applyDate = useCallback(
     (d: Date) => {
@@ -121,6 +109,21 @@ export function HealthEventDatePicker({
       ? formatFrLong(value.trim())
       : placeholderChoose;
 
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.wrap}>
+        <TextInput
+          style={styles.webInp}
+          value={value}
+          onChangeText={onChange}
+          placeholder="AAAA-MM-JJ"
+          placeholderTextColor={c.slate500}
+        />
+        <Text style={styles.hint}>Sur le web Expo, saisis la date au format AAAA-MM-JJ.</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.wrap}>
       <Pressable
@@ -129,7 +132,7 @@ export function HealthEventDatePicker({
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
       >
-        <Calendar size={20} color={theme.teal700} />
+        <Calendar size={20} color={c.teal700} />
         <View style={styles.triggerTextCol}>
           <Text style={[styles.triggerMain, !value.trim() && styles.triggerPlaceholder]} numberOfLines={2}>
             {displayLine}
@@ -157,7 +160,7 @@ export function HealthEventDatePicker({
                 onChange={(_, date) => {
                   if (date) setIosTemp(date);
                 }}
-                themeVariant="light"
+                themeVariant={resolved === 'dark' ? 'dark' : 'light'}
               />
               <View style={styles.sheetActions}>
                 <Pressable style={styles.btnGhost} onPress={() => setIosOpen(false)}>
@@ -181,65 +184,67 @@ export function HealthEventDatePicker({
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { marginBottom: 14 },
-  webInp: {
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: theme.radiusMd,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-    backgroundColor: theme.white,
-    color: theme.slate900,
-  },
-  trigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: theme.radiusMd,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    backgroundColor: theme.white,
-    minHeight: 52,
-  },
-  triggerTextCol: { flex: 1, minWidth: 0 },
-  triggerMain: { fontSize: 16, fontWeight: '600', color: theme.slate900 },
-  triggerPlaceholder: { color: theme.slate500, fontWeight: '500' },
-  triggerSub: { fontSize: 12, color: theme.slate500, marginTop: 4, fontVariant: ['tabular-nums'] },
-  hint: { fontSize: 12, color: theme.slate500, marginTop: 6 },
-  modalRoot: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,23,42,0.45)' },
-  sheet: {
-    backgroundColor: theme.white,
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
-    paddingTop: 16,
-    paddingBottom: 28,
-    paddingHorizontal: 16,
-  },
-  sheetTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900, marginBottom: 8, textAlign: 'center' },
-  sheetActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-    marginTop: 8,
-  },
-  btnGhost: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  btnGhostTxt: { fontWeight: '700', color: theme.slate700 },
-  btnPrimary: {
-    paddingVertical: 12,
-    paddingHorizontal: 22,
-    borderRadius: 10,
-    backgroundColor: theme.teal600,
-  },
-  btnPrimaryTxt: { fontWeight: '800', color: theme.white },
-});
+function createHealthDateStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    wrap: { marginBottom: 14 },
+    webInp: {
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: theme.radiusMd,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 15,
+      backgroundColor: theme.surfaceElevated,
+      color: theme.slate900,
+    },
+    trigger: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: theme.radiusMd,
+      paddingHorizontal: 14,
+      paddingVertical: 14,
+      backgroundColor: theme.surfaceElevated,
+      minHeight: 52,
+    },
+    triggerTextCol: { flex: 1, minWidth: 0 },
+    triggerMain: { fontSize: 16, fontWeight: '600', color: theme.slate900 },
+    triggerPlaceholder: { color: theme.slate500, fontWeight: '500' },
+    triggerSub: { fontSize: 12, color: theme.slate500, marginTop: 4, fontVariant: ['tabular-nums'] },
+    hint: { fontSize: 12, color: theme.slate500, marginTop: 6 },
+    modalRoot: { flex: 1, justifyContent: 'flex-end' },
+    backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,23,42,0.45)' },
+    sheet: {
+      backgroundColor: theme.surfaceElevated,
+      borderTopLeftRadius: 18,
+      borderTopRightRadius: 18,
+      paddingTop: 16,
+      paddingBottom: 28,
+      paddingHorizontal: 16,
+    },
+    sheetTitle: { fontSize: 17, fontWeight: '800', color: theme.slate900, marginBottom: 8, textAlign: 'center' },
+    sheetActions: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: 12,
+      marginTop: 8,
+    },
+    btnGhost: {
+      paddingVertical: 12,
+      paddingHorizontal: 18,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    btnGhostTxt: { fontWeight: '700', color: theme.slate700 },
+    btnPrimary: {
+      paddingVertical: 12,
+      paddingHorizontal: 22,
+      borderRadius: 10,
+      backgroundColor: theme.teal600,
+    },
+    btnPrimaryTxt: { fontWeight: '800', color: theme.white },
+  });
+}

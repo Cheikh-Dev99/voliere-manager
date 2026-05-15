@@ -20,7 +20,8 @@ import { enregistrerSortie } from '@shared/services/pigeonsService';
 import { SortieSchema } from '@shared/validators/schemas';
 import type { Pigeon, SortieType } from '@shared/types';
 
-import { theme, shadowCard } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { appFeedback } from '../../lib/appFeedback';
 import { AppLoadingView } from '../ui/AppLoadingView';
 import { PigeonPhotoAvatar } from '../pigeons/PigeonPhotoAvatar';
@@ -49,6 +50,8 @@ function labelPigeon(p: Pigeon | undefined): string {
 }
 
 export function SortieFormScreen() {
+  const { colors: themeColors, shadowCard } = useAppTheme();
+  const styles = useMemo(() => createSortieFormStyles(themeColors), [themeColors]);
   const router = useRouter();
   const params = useLocalSearchParams<{ pigeon?: string | string[] }>();
   const pigeonParam = useMemo(() => {
@@ -301,7 +304,7 @@ export function SortieFormScreen() {
                 value={prix}
                 onChangeText={(t) => setValue('prix', t, { shouldDirty: true })}
                 placeholder="0"
-                placeholderTextColor={theme.slate500}
+                placeholderTextColor={themeColors.slate500}
                 keyboardType="decimal-pad"
               />
               {errors.prix ? <Text style={styles.errTxt}>{errors.prix.message}</Text> : null}
@@ -311,7 +314,7 @@ export function SortieFormScreen() {
                 value={acheteur}
                 onChangeText={(t) => setValue('acheteur', t, { shouldDirty: true })}
                 placeholder="Nom ou contact"
-                placeholderTextColor={theme.slate500}
+                placeholderTextColor={themeColors.slate500}
               />
               {errors.acheteur ? <Text style={styles.errTxt}>{errors.acheteur.message}</Text> : null}
             </>
@@ -325,7 +328,7 @@ export function SortieFormScreen() {
                 value={cause}
                 onChangeText={(t) => setValue('cause', t, { shouldDirty: true })}
                 placeholder="Maladie, vieillesse…"
-                placeholderTextColor={theme.slate500}
+                placeholderTextColor={themeColors.slate500}
               />
               {errors.cause ? <Text style={styles.errTxt}>{errors.cause.message}</Text> : null}
             </>
@@ -339,7 +342,7 @@ export function SortieFormScreen() {
                 value={circonstance}
                 onChangeText={(t) => setValue('circonstance', t, { shouldDirty: true })}
                 placeholder="Vol, échappée…"
-                placeholderTextColor={theme.slate500}
+                placeholderTextColor={themeColors.slate500}
               />
               {errors.circonstance ? <Text style={styles.errTxt}>{errors.circonstance.message}</Text> : null}
             </>
@@ -351,7 +354,7 @@ export function SortieFormScreen() {
             value={notes}
             onChangeText={(t) => setValue('notes', t, { shouldDirty: true })}
             placeholder="Remarques complémentaires…"
-            placeholderTextColor={theme.slate500}
+            placeholderTextColor={themeColors.slate500}
             multiline
           />
           {errors.notes ? <Text style={styles.errTxt}>{errors.notes.message}</Text> : null}
@@ -378,7 +381,7 @@ export function SortieFormScreen() {
               value={pigeonFilter}
               onChangeText={setPigeonFilter}
               placeholder="Filtrer par matricule, nom…"
-              placeholderTextColor={theme.slate500}
+              placeholderTextColor={themeColors.slate500}
             />
             <ScrollView style={{ maxHeight: 400 }}>
               {pigeonId && selectedPigeon && !selectedInModalList ? (
@@ -431,7 +434,8 @@ export function SortieFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createSortieFormStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   flex: { flex: 1, backgroundColor: 'transparent' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'transparent' },
   scroll: { padding: theme.screenPadding, paddingBottom: 48 },
@@ -439,7 +443,7 @@ const styles = StyleSheet.create({
   lead: { fontSize: 14, color: theme.slate600, marginTop: 8, marginBottom: 16, lineHeight: 20 },
   leadBold: { fontWeight: '800', color: theme.slate800 },
   card: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -455,7 +459,7 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 12 : 10,
     fontSize: 16,
     color: theme.slate900,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   inpErr: { borderColor: theme.red600 },
   ta: { minHeight: 88, textAlignVertical: 'top' },
@@ -464,7 +468,7 @@ const styles = StyleSheet.create({
     borderColor: theme.border,
     borderRadius: theme.radiusMd,
     padding: 14,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   pickRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   pickTxt: { flex: 1, minWidth: 0, fontSize: 15, color: theme.teal800, fontWeight: '600' },
@@ -489,7 +493,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radiusMd,
     paddingVertical: 10,
     paddingHorizontal: 8,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   typeChipOn: {
     borderColor: theme.teal600,
@@ -512,7 +516,7 @@ const styles = StyleSheet.create({
   btnGhostTxt: { color: theme.teal700, fontWeight: '700' },
   modalBg: { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)', justifyContent: 'flex-end' },
   modalCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -528,6 +532,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 8,
     color: theme.slate900,
+    backgroundColor: theme.surfaceHighlight,
   },
   modalRow: { paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.border },
   modalRowRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -537,4 +542,5 @@ const styles = StyleSheet.create({
   modalRowSub: { fontSize: 12, color: theme.slate500, marginTop: 2 },
   modalClose: { marginTop: 12, padding: 14, alignItems: 'center' },
   modalCloseTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
-});
+  });
+}

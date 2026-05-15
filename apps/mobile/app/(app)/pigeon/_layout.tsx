@@ -1,18 +1,23 @@
+import { useMemo } from 'react';
 import { Stack } from 'expo-router';
 
-import { theme } from '../../../constants/theme';
+import { useAppTheme } from '../../../context/AppThemeContext';
 
 export default function PigeonStackLayout() {
+  const { colors } = useAppTheme();
+  const screenOptions = useMemo(
+    () => ({
+      headerTintColor: colors.teal700,
+      headerStyle: { backgroundColor: colors.surfaceElevated },
+      headerShadowVisible: true,
+      headerTitleStyle: { fontWeight: '600' as const, color: colors.slate900 },
+      contentStyle: { backgroundColor: 'transparent' },
+    }),
+    [colors],
+  );
+
   return (
-    <Stack
-      screenOptions={{
-        headerTintColor: theme.teal700,
-        headerStyle: { backgroundColor: theme.white },
-        headerShadowVisible: true,
-        headerTitleStyle: { fontWeight: '600', color: theme.slate900 },
-        contentStyle: { backgroundColor: 'transparent' },
-      }}
-    >
+    <Stack screenOptions={screenOptions}>
       <Stack.Screen name="nouveau" options={{ title: 'Nouveau pigeon' }} />
       <Stack.Screen name="[pigeonId]/index" options={{ title: 'Fiche pigeon' }} />
       <Stack.Screen name="[pigeonId]/modifier" options={{ title: 'Modifier' }} />

@@ -1,38 +1,48 @@
+import { useMemo } from 'react';
 import { Stack } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { MergedVoliereCodesProvider } from '../../contexts/MergedVoliereCodesContext';
-import { theme } from '../../constants/theme';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 export default function AppStackLayout() {
+  const { colors } = useAppTheme();
+
+  const screenOptions = useMemo(
+    () => ({
+      headerTintColor: colors.teal700,
+      headerStyle: { backgroundColor: colors.surfaceElevated },
+      headerShadowVisible: true,
+      headerTitleStyle: { color: colors.slate900, fontWeight: '600' as const },
+      contentStyle: { backgroundColor: colors.slate100 },
+    }),
+    [colors],
+  );
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        stackRoot: {
+          flex: 1,
+          backgroundColor: colors.slate100,
+          position: 'relative',
+        },
+      }),
+    [colors.slate100],
+  );
+
   return (
     <MergedVoliereCodesProvider>
       <View style={styles.stackRoot}>
-        <Stack
-          screenOptions={{
-            headerTintColor: theme.teal700,
-            headerStyle: { backgroundColor: theme.white },
-            headerShadowVisible: true,
-            headerTitleStyle: { color: theme.slate900, fontWeight: '600' },
-            contentStyle: { backgroundColor: theme.slate100 },
-          }}
-        >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="pigeon" options={{ headerShown: false }} />
-        <Stack.Screen name="cage" options={{ headerShown: false }} />
-        <Stack.Screen name="couple" options={{ headerShown: false }} />
-        <Stack.Screen name="reproduction" options={{ headerShown: false }} />
-        <Stack.Screen name="sortie" options={{ headerShown: false }} />
-      </Stack>
+        <Stack screenOptions={screenOptions}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="pigeon" options={{ headerShown: false }} />
+          <Stack.Screen name="cage" options={{ headerShown: false }} />
+          <Stack.Screen name="couple" options={{ headerShown: false }} />
+          <Stack.Screen name="reproduction" options={{ headerShown: false }} />
+          <Stack.Screen name="sortie" options={{ headerShown: false }} />
+        </Stack>
       </View>
     </MergedVoliereCodesProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  stackRoot: {
-    flex: 1,
-    backgroundColor: theme.slate100,
-    position: 'relative',
-  },
-});

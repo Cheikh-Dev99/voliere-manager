@@ -25,7 +25,8 @@ import {
   FLOATING_ADD_LIST_PADDING_BOTTOM,
 } from '../../../components/ui/FloatingAddButton';
 import { AppLoadingView } from '../../../components/ui/AppLoadingView';
-import { theme, shadowCard } from '../../../constants/theme';
+import type { ThemeColors } from '../../../constants/palettes';
+import { useAppTheme } from '../../../context/AppThemeContext';
 import { formatFirestoreDate } from '../../../utils/formatDate';
 
 function compareCouplesRow(a: Couple, b: Couple, sortDir: 'asc' | 'desc'): number {
@@ -38,6 +39,8 @@ function compareCouplesRow(a: Couple, b: Couple, sortDir: 'asc' | 'desc'): numbe
 }
 
 export default function CouplesTabScreen() {
+  const { colors: theme, shadowCard } = useAppTheme();
+  const styles = useMemo(() => createCouplesStyles(theme), [theme]);
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -159,7 +162,7 @@ export default function CouplesTabScreen() {
                 {header}
                 {!rows.length ? (
                   <EmptyStateCard
-                    icon={<Heart size={28} color="#e11d48" strokeWidth={2} />}
+                    icon={<Heart size={28} color={theme.red600} strokeWidth={2} />}
                     iconBackgroundColor={theme.rose50}
                     title="Aucun couple enregistré"
                     hint="Crée un couple à partir de deux pigeons actifs. Tu pourras ensuite enregistrer des reproductions. Touche le bouton rond + en bas à droite."
@@ -203,7 +206,7 @@ export default function CouplesTabScreen() {
           <FloatingAddButton
             onPress={() => router.push('/(app)/couple/nouveau')}
             accessibilityLabel="Nouveau couple"
-            icon={<Heart size={24} color={theme.white} strokeWidth={2.4} />}
+            icon={<Heart size={24} color="#ffffff" strokeWidth={2.4} />}
           />
         </>
       )}
@@ -211,68 +214,71 @@ export default function CouplesTabScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: 'transparent' },
-  header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
-  search: {
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: theme.radiusMd,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: theme.white,
-  },
-  row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 4 },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: theme.white,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  chipOn: { backgroundColor: theme.teal50, borderColor: theme.teal600 },
-  chipTxt: { fontSize: 12, fontWeight: '600', color: theme.slate700 },
-  chipTxtOn: { color: theme.teal900 },
-  dirBtn: { padding: 8 },
-  dirTxt: { fontWeight: '700', color: theme.teal700 },
-  meta: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
-  list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28 },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: theme.white,
-    borderRadius: theme.radiusLg,
-    padding: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: theme.border,
-    alignItems: 'flex-start',
-  },
-  cardMain: { flex: 1, minWidth: 0 },
-  title: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
-  sub: { fontSize: 13, color: theme.slate500, marginTop: 4 },
-  badge: {
-    alignSelf: 'flex-start',
-    marginTop: 8,
-    fontSize: 11,
-    fontWeight: '800',
-    color: theme.emerald900,
-    backgroundColor: theme.emerald50,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  badgeOff: { color: theme.slate700, backgroundColor: theme.slate100 },
-  rompre: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#fef2f2',
-    borderWidth: 1,
-    borderColor: '#fecaca',
-  },
-  rompreTxt: { color: '#b91c1c', fontWeight: '700', fontSize: 13 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  err: { color: theme.red600, padding: 16 },
-});
+function createCouplesStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: 'transparent' },
+    header: { paddingHorizontal: theme.screenPadding, paddingBottom: 8, gap: 12 },
+    search: {
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: theme.radiusMd,
+      padding: 12,
+      fontSize: 16,
+      color: theme.slate900,
+      backgroundColor: theme.surfaceElevated,
+    },
+    row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 4 },
+    chip: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: theme.surfaceElevated,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    chipOn: { backgroundColor: theme.teal50, borderColor: theme.teal600 },
+    chipTxt: { fontSize: 12, fontWeight: '600', color: theme.slate700 },
+    chipTxtOn: { color: theme.teal900 },
+    dirBtn: { padding: 8 },
+    dirTxt: { fontWeight: '700', color: theme.teal700 },
+    meta: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
+    list: { paddingHorizontal: theme.screenPadding, paddingBottom: 28 },
+    card: {
+      flexDirection: 'row',
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: theme.radiusLg,
+      padding: 14,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      alignItems: 'flex-start',
+    },
+    cardMain: { flex: 1, minWidth: 0 },
+    title: { fontSize: 16, fontWeight: '800', color: theme.slate900 },
+    sub: { fontSize: 13, color: theme.slate500, marginTop: 4 },
+    badge: {
+      alignSelf: 'flex-start',
+      marginTop: 8,
+      fontSize: 11,
+      fontWeight: '800',
+      color: theme.emerald900,
+      backgroundColor: theme.emerald50,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 8,
+      overflow: 'hidden',
+    },
+    badgeOff: { color: theme.slate700, backgroundColor: theme.slate100 },
+    rompre: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 8,
+      backgroundColor: theme.rose50,
+      borderWidth: 1,
+      borderColor: theme.rose900,
+    },
+    rompreTxt: { color: theme.rose900, fontWeight: '700', fontSize: 13 },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    err: { color: theme.red600, padding: 16 },
+  });
+}

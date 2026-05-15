@@ -8,6 +8,7 @@ import { ElevageStatsSection } from '../components/profile/ElevageStatsSection'
 import { VoliereCodesPanel } from '../components/settings/VoliereCodesPanel'
 import { updateUserProfile } from '@shared/services/usersProfileService'
 import useAuthStore from '../stores/authStore'
+import { ThemeHeaderToggle } from '../theme/ThemeHeaderToggle'
 
 function initials(prenom, nom, email) {
   const p = (prenom ?? '').trim()
@@ -89,22 +90,23 @@ export function UserProfileFullPage() {
   const elevage = (profile?.nomElevage ?? '').trim() || 'Ma volière'
 
   return (
-    <div className="flex min-h-dvh w-full max-w-none flex-col bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-20 w-full shrink-0 border-b border-slate-200/90 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:px-6 lg:px-10">
+    <div className="flex min-h-dvh w-full max-w-none flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <header className="sticky top-0 z-20 w-full shrink-0 border-b border-slate-200/90 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-slate-700 dark:bg-slate-900/95 dark:supports-[backdrop-filter]:bg-slate-900/90 sm:px-6 lg:px-10">
         <div className="flex w-full items-center gap-3">
           <Link
             to="/"
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
           >
             <ArrowLeft className="size-4 shrink-0" aria-hidden />
             Retour
           </Link>
-          <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-slate-900">Mon profil</h1>
+          <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-slate-900 dark:text-slate-50">Mon profil</h1>
+          <ThemeHeaderToggle />
         </div>
       </header>
 
       <main className="flex w-full min-w-0 flex-1 flex-col overflow-y-auto">
-        <div className="flex w-full min-w-0 flex-1 flex-col bg-white shadow-none ring-0">
+        <div className="flex w-full min-w-0 flex-1 flex-col bg-white shadow-none ring-0 dark:bg-slate-900">
           <div className="w-full bg-gradient-to-br from-teal-600 via-teal-600 to-teal-700 px-4 py-6 text-white sm:px-8 lg:px-12">
             <div className="flex w-full max-w-none items-start gap-4">
               <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-white/15 text-xl font-bold shadow-inner ring-1 ring-white/20">
@@ -118,7 +120,7 @@ export function UserProfileFullPage() {
             </div>
           </div>
 
-          <div className="w-full space-y-4 border-b border-slate-100 px-4 py-6 sm:px-8 lg:px-12">
+          <div className="w-full space-y-4 border-b border-slate-100 px-4 py-6 sm:px-8 lg:px-12 dark:border-slate-700">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Mon élevage</p>
             <ElevageStatsSection cages={cages} cagesLoading={lc} profile={profile} variant="page" />
           </div>
@@ -128,11 +130,11 @@ export function UserProfileFullPage() {
             className="scroll-mt-[4.5rem] w-full border-b border-slate-100 px-4 py-6 sm:px-8 lg:px-12"
           >
             <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Mes volières</p>
-            <p className="mt-2 max-w-none text-sm leading-relaxed text-slate-600">
-              Une <span className="font-medium text-slate-800">volière</span> est un bâtiment ou une zone ; dans l’app tu
-              lui donnes un <span className="font-medium text-slate-800">nom court</span> (ex.{' '}
-              <span className="font-medium text-slate-800">A</span>,{' '}
-              <span className="font-medium text-slate-800">B</span>, <span className="font-medium text-slate-800">Nord</span>
+            <p className="mt-2 max-w-none text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              Une <span className="font-medium text-slate-800 dark:text-slate-100">volière</span> est un bâtiment ou une zone ; dans l’app tu
+              lui donnes un <span className="font-medium text-slate-800 dark:text-slate-100">nom court</span> (ex.{' '}
+              <span className="font-medium text-slate-800 dark:text-slate-100">A</span>,{' '}
+              <span className="font-medium text-slate-800 dark:text-slate-100">B</span>, <span className="font-medium text-slate-800 dark:text-slate-100">Nord</span>
               ) pour classer tes cages et te repérer dans les listes, même avant d’y mettre des cages.
             </p>
             {user?.uid ? (

@@ -1,11 +1,13 @@
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Bird, Pencil, Trash2 } from 'lucide-react-native';
 
 import type { Cage, Couple, Pigeon } from '@shared/types';
 
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { appFeedback } from '../../lib/appFeedback';
-import { theme, shadowCard } from '../../constants/theme';
-import { cageStatutTheme } from './cageStatutTheme';
+import { cageStatutVisualFor } from './cageStatutTheme';
 
 type Props = {
   cage: Cage;
@@ -44,6 +46,138 @@ function formatOccupancy(
   return '—';
 }
 
+function createCageListRowStyles(theme: ThemeColors, resolved: 'light' | 'dark') {
+  const selectRailBg = resolved === 'dark' ? 'rgba(15,23,42,0.75)' : 'rgba(255,255,255,0.65)';
+  const actionRowBg = resolved === 'dark' ? 'rgba(15,23,42,0.45)' : 'rgba(255,255,255,0.55)';
+
+  return StyleSheet.create({
+    wrap: {
+      borderRadius: theme.radiusLg,
+      borderWidth: 1,
+      overflow: 'hidden',
+      marginBottom: 10,
+      flexDirection: 'row',
+      alignItems: 'stretch',
+    },
+    wrapSelected: {
+      borderColor: theme.teal600,
+      borderWidth: 2,
+    },
+    selectRail: {
+      width: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: selectRailBg,
+      borderRightWidth: StyleSheet.hairlineWidth,
+      borderRightColor: theme.border,
+    },
+    selectDot: {
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      borderWidth: 2,
+      borderColor: theme.slate500,
+      backgroundColor: theme.surfaceElevated,
+    },
+    selectDotOn: {
+      borderColor: theme.teal600,
+      backgroundColor: theme.teal100,
+    },
+    bodyColumn: {
+      flex: 1,
+      minWidth: 0,
+    },
+    main: {
+      width: '100%',
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+    },
+    mainPressed: { opacity: 0.92 },
+    topRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      gap: 10,
+    },
+    titleBlock: { flex: 1, minWidth: 0 },
+    ref: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: theme.slate600,
+      letterSpacing: 0.3,
+      textTransform: 'uppercase',
+    },
+    nomCage: {
+      marginTop: 4,
+      fontSize: 17,
+      fontWeight: '800',
+      color: theme.slate900,
+    },
+    badge: {
+      flexShrink: 0,
+      maxWidth: '42%',
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+    },
+    badgeTxt: { fontSize: 11, fontWeight: '800', textAlign: 'center' },
+    occRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 8,
+      marginTop: 10,
+    },
+    occTxt: {
+      flex: 1,
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.slate800,
+      lineHeight: 20,
+    },
+    metaRow: { marginTop: 8 },
+    meta: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
+    descPreview: {
+      marginTop: 8,
+      fontSize: 12,
+      color: theme.slate500,
+      lineHeight: 17,
+    },
+    actionRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      gap: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: theme.border,
+      backgroundColor: actionRowBg,
+    },
+    iconBtn: {
+      minWidth: theme.minTap,
+      minHeight: theme.minTap,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+      borderColor: theme.teal100,
+      backgroundColor: theme.surfaceElevated,
+    },
+    iconBtnDanger: {
+      minWidth: theme.minTap,
+      minHeight: theme.minTap,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: theme.radiusMd,
+      borderWidth: 1,
+      borderColor: '#fecaca',
+      backgroundColor: theme.surfaceElevated,
+    },
+    iconBtnPressed: { opacity: 0.88 },
+  });
+}
+
 export function CageListRow({
   cage,
   pigeon,
@@ -56,7 +190,9 @@ export function CageListRow({
   selectionMode = false,
   selected = false,
 }: Props) {
-  const st = cageStatutTheme[cage.statut] ?? cageStatutTheme.LIBRE;
+  const { colors: theme, shadowCard, resolved } = useAppTheme();
+  const styles = useMemo(() => createCageListRowStyles(theme, resolved), [theme, resolved]);
+  const st = cageStatutVisualFor(resolved, cage.statut);
   const desc = (cage.description ?? '').trim();
   const vol = cage.voliereCode ?? 'A';
   const sup = Number(cage.superficie);
@@ -112,7 +248,7 @@ export function CageListRow({
                 {cage.nom?.trim() ? cage.nom : 'Sans nom'}
               </Text>
             </View>
-            <View style={[styles.badge, { borderColor: st.border, backgroundColor: theme.white }]}>
+            <View style={[styles.badge, { borderColor: st.border, backgroundColor: theme.surfaceHighlight }]}>
               <Text style={[styles.badgeTxt, { color: st.birdColor }]} numberOfLines={1}>
                 {statutLibelle}
               </Text>
@@ -165,130 +301,3 @@ export function CageListRow({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    borderRadius: theme.radiusLg,
-    borderWidth: 1,
-    overflow: 'hidden',
-    marginBottom: 10,
-    flexDirection: 'row',
-    alignItems: 'stretch',
-  },
-  wrapSelected: {
-    borderColor: theme.teal600,
-    borderWidth: 2,
-  },
-  selectRail: {
-    width: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.65)',
-    borderRightWidth: StyleSheet.hairlineWidth,
-    borderRightColor: theme.border,
-  },
-  selectDot: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 2,
-    borderColor: theme.slate500,
-    backgroundColor: theme.white,
-  },
-  selectDotOn: {
-    borderColor: theme.teal600,
-    backgroundColor: theme.teal100,
-  },
-  bodyColumn: {
-    flex: 1,
-    minWidth: 0,
-  },
-  main: {
-    width: '100%',
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-  },
-  mainPressed: { opacity: 0.92 },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  titleBlock: { flex: 1, minWidth: 0 },
-  ref: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: theme.slate600,
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
-  },
-  nomCage: {
-    marginTop: 4,
-    fontSize: 17,
-    fontWeight: '800',
-    color: theme.slate900,
-  },
-  badge: {
-    flexShrink: 0,
-    maxWidth: '42%',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-  },
-  badgeTxt: { fontSize: 11, fontWeight: '800', textAlign: 'center' },
-  occRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    marginTop: 10,
-  },
-  occTxt: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.slate800,
-    lineHeight: 20,
-  },
-  metaRow: { marginTop: 8 },
-  meta: { fontSize: 13, color: theme.slate600, fontWeight: '600' },
-  descPreview: {
-    marginTop: 8,
-    fontSize: 12,
-    color: theme.slate500,
-    lineHeight: 17,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.border,
-    backgroundColor: 'rgba(255,255,255,0.55)',
-  },
-  iconBtn: {
-    minWidth: theme.minTap,
-    minHeight: theme.minTap,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-    borderColor: theme.teal100,
-    backgroundColor: theme.white,
-  },
-  iconBtnDanger: {
-    minWidth: theme.minTap,
-    minHeight: theme.minTap,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: theme.radiusMd,
-    borderWidth: 1,
-    borderColor: '#fecaca',
-    backgroundColor: theme.white,
-  },
-  iconBtnPressed: { opacity: 0.88 },
-});

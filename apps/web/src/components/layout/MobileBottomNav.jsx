@@ -18,14 +18,16 @@ function MobileNavLink({ to, end, label, Icon }) {
       end={end}
       className={({ isActive }) =>
         `${itemBase} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 ${
-          isActive ? 'text-teal-700' : 'text-slate-500 active:bg-slate-100/80'
+          isActive
+            ? 'text-teal-700 dark:text-teal-300'
+            : 'text-slate-500 active:bg-slate-100/80 dark:text-slate-400 dark:active:bg-slate-800/80'
         }`
       }
     >
       {({ isActive }) => (
         <>
           <Icon
-            className={`size-[22px] shrink-0 ${isActive ? 'text-teal-700' : 'text-slate-500'}`}
+            className={`size-[22px] shrink-0 ${isActive ? 'text-teal-700 dark:text-teal-300' : 'text-slate-500 dark:text-slate-400'}`}
             strokeWidth={isActive ? 2.35 : 2}
             aria-hidden
           />
@@ -43,7 +45,7 @@ function MobileNavLink({ to, end, label, Icon }) {
 export function MobileBottomNav() {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-slate-200/95 bg-white/95 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pt-1 shadow-[0_-6px_24px_rgba(15,23,42,0.07)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-slate-200/95 bg-white/95 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pt-1 shadow-[0_-6px_24px_rgba(15,23,42,0.07)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90 dark:border-slate-700/95 dark:bg-slate-900/95 dark:shadow-[0_-6px_24px_rgba(0,0,0,0.45)] dark:supports-[backdrop-filter]:bg-slate-900/90 md:hidden"
       aria-label="Navigation principale (mobile)"
     >
       <MobileNavLink to="/" end label="Volière" Icon={LayoutTemplate} />

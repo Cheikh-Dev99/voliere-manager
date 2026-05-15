@@ -18,39 +18,46 @@ import { mergeProfileVoliereCodesWithCages } from '@shared/utils/voliereCodesMer
 
 const TONE = {
   slate: {
-    ring: 'border-slate-100 bg-slate-50 text-slate-900',
-    icon: 'text-slate-600',
-    hover: 'hover:border-slate-300 hover:bg-slate-100/90',
+    ring:
+      'border-slate-100 bg-slate-50 text-slate-900 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100',
+    icon: 'text-slate-600 dark:text-slate-300',
+    hover: 'hover:border-slate-300 hover:bg-slate-100/90 dark:hover:border-slate-500 dark:hover:bg-slate-700/90',
   },
   teal: {
-    ring: 'border-teal-100 bg-teal-50/80 text-teal-900',
-    icon: 'text-teal-600',
-    hover: 'hover:border-teal-200 hover:bg-teal-50',
+    ring:
+      'border-teal-100 bg-teal-50/80 text-teal-900 dark:border-teal-800 dark:bg-teal-950/50 dark:text-teal-100',
+    icon: 'text-teal-600 dark:text-teal-300',
+    hover: 'hover:border-teal-200 hover:bg-teal-50 dark:hover:border-teal-600 dark:hover:bg-teal-900/60',
   },
   rose: {
-    ring: 'border-rose-100 bg-rose-50/90 text-rose-950',
-    icon: 'text-rose-600',
-    hover: 'hover:border-rose-200 hover:bg-rose-50',
+    ring:
+      'border-rose-100 bg-rose-50/90 text-rose-950 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-100',
+    icon: 'text-rose-600 dark:text-rose-300',
+    hover: 'hover:border-rose-200 hover:bg-rose-50 dark:hover:border-rose-700 dark:hover:bg-rose-900/50',
   },
   violet: {
-    ring: 'border-violet-100 bg-violet-50/90 text-violet-950',
-    icon: 'text-violet-600',
-    hover: 'hover:border-violet-200 hover:bg-violet-100/80',
+    ring:
+      'border-violet-100 bg-violet-50/90 text-violet-950 dark:border-violet-800 dark:bg-violet-950/40 dark:text-violet-100',
+    icon: 'text-violet-600 dark:text-violet-300',
+    hover: 'hover:border-violet-200 hover:bg-violet-100/80 dark:hover:border-violet-700 dark:hover:bg-violet-900/50',
   },
   amber: {
-    ring: 'border-amber-100 bg-amber-50/90 text-amber-950',
-    icon: 'text-amber-700',
-    hover: 'hover:border-amber-200 hover:bg-amber-50',
+    ring:
+      'border-amber-100 bg-amber-50/90 text-amber-950 dark:border-amber-800 dark:bg-amber-950/35 dark:text-amber-100',
+    icon: 'text-amber-700 dark:text-amber-300',
+    hover: 'hover:border-amber-200 hover:bg-amber-50 dark:hover:border-amber-700 dark:hover:bg-amber-900/45',
   },
   emerald: {
-    ring: 'border-emerald-100 bg-emerald-50/90 text-emerald-950',
-    icon: 'text-emerald-600',
-    hover: 'hover:border-emerald-200 hover:bg-emerald-50',
+    ring:
+      'border-emerald-100 bg-emerald-50/90 text-emerald-950 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-100',
+    icon: 'text-emerald-600 dark:text-emerald-300',
+    hover: 'hover:border-emerald-200 hover:bg-emerald-50 dark:hover:border-emerald-700 dark:hover:bg-emerald-900/50',
   },
   indigo: {
-    ring: 'border-indigo-100 bg-indigo-50/90 text-indigo-950',
-    icon: 'text-indigo-600',
-    hover: 'hover:border-indigo-200 hover:bg-indigo-50',
+    ring:
+      'border-indigo-100 bg-indigo-50/90 text-indigo-950 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-100',
+    icon: 'text-indigo-600 dark:text-indigo-300',
+    hover: 'hover:border-indigo-200 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-indigo-900/50',
   },
 }
 

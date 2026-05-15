@@ -14,7 +14,8 @@ import { ChevronDown, Plus, Search, X } from 'lucide-react-native';
 
 import { PIGEON_RACES_REFERENCE } from '@shared/data/pigeonFormCatalog';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { mergeRacesCatalog, persistNewCustomRace, readCustomRaces } from '../../utils/pigeonCustomRacesStorage';
 
 type Props = {
@@ -28,6 +29,8 @@ const MAX_BROWSE = 100;
 const MAX_FILTERED = 150;
 
 export function PigeonRacePicker({ value, onChange, error, onClearError }: Props) {
+  const { colors: c } = useAppTheme();
+  const styles = useMemo(() => createRacePickerStyles(c), [c]);
   const [open, setOpen] = useState(false);
   const [searchQ, setSearchQ] = useState('');
   const [customRaces, setCustomRaces] = useState<string[]>([]);
@@ -100,7 +103,7 @@ export function PigeonRacePicker({ value, onChange, error, onClearError }: Props
         <Text style={[styles.triggerTxt, !value.trim() && styles.triggerPlaceholder]} numberOfLines={2}>
           {displayLabel}
         </Text>
-        <ChevronDown size={22} color={theme.slate500} />
+        <ChevronDown size={22} color={c.slate500} />
       </Pressable>
       <Text style={styles.hint}>Liste indicative : recherche, choix dans la liste ou ajout d’une race.</Text>
       {error ? <Text style={styles.errTxt}>{error}</Text> : null}
@@ -117,18 +120,18 @@ export function PigeonRacePicker({ value, onChange, error, onClearError }: Props
               <View style={styles.sheetHeader}>
                 <Text style={styles.sheetTitle}>Race</Text>
                 <Pressable onPress={closeModal} hitSlop={12} accessibilityLabel="Fermer">
-                  <X size={24} color={theme.slate600} />
+                  <X size={24} color={c.slate600} />
                 </Pressable>
               </View>
 
               <View style={styles.searchRow}>
-                <Search size={18} color={theme.slate500} style={styles.searchIcon} />
+                <Search size={18} color={c.slate500} style={styles.searchIcon} />
                 <TextInput
                   style={styles.searchInp}
                   value={searchQ}
                   onChangeText={setSearchQ}
                   placeholder="Filtrer ou saisir une race…"
-                  placeholderTextColor={theme.slate500}
+                  placeholderTextColor={c.slate500}
                   autoCorrect={false}
                   autoCapitalize="sentences"
                   clearButtonMode="while-editing"
@@ -137,7 +140,7 @@ export function PigeonRacePicker({ value, onChange, error, onClearError }: Props
 
               {showAddRow ? (
                 <Pressable style={styles.addBanner} onPress={() => void onAddCustom()} accessibilityRole="button">
-                  <Plus size={20} color={theme.teal800} />
+                  <Plus size={20} color={c.teal800} />
                   <Text style={styles.addBannerTxt}>Ajouter « {trimmedSearch} » à mes races</Text>
                 </Pressable>
               ) : null}
@@ -171,7 +174,8 @@ export function PigeonRacePicker({ value, onChange, error, onClearError }: Props
   );
 }
 
-const styles = StyleSheet.create({
+function createRacePickerStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   wrap: { marginBottom: 0 },
   trigger: {
     flexDirection: 'row',
@@ -183,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'ios' ? 14 : 12,
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     minHeight: 48,
   },
   triggerErr: { borderColor: theme.red600 },
@@ -195,7 +199,7 @@ const styles = StyleSheet.create({
   modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,23,42,0.45)' },
   sheetOuter: { width: '100%' },
   sheet: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingBottom: Platform.OS === 'ios' ? 28 : 20,
@@ -220,7 +224,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.border,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
     paddingHorizontal: 12,
   },
   searchIcon: { marginRight: 4 },
@@ -254,4 +258,5 @@ const styles = StyleSheet.create({
   },
   rowTxt: { fontSize: 15, color: theme.slate800, lineHeight: 21 },
   empty: { textAlign: 'center', color: theme.slate500, padding: 24, fontSize: 14 },
-});
+  });
+}

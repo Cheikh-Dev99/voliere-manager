@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { Search } from 'lucide-react-native';
 
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 type SearchFieldProps = {
   value: string;
@@ -9,7 +11,31 @@ type SearchFieldProps = {
   placeholder: string;
 };
 
+function createSearchFieldStyles(theme: ThemeColors) {
+  return StyleSheet.create({
+    wrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: theme.radiusMd,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      backgroundColor: theme.surfaceElevated,
+    },
+    input: {
+      flex: 1,
+      fontSize: 16,
+      color: theme.slate900,
+      paddingVertical: 0,
+    },
+  });
+}
+
 export function SearchField({ value, onChangeText, placeholder }: SearchFieldProps) {
+  const { colors: theme } = useAppTheme();
+  const styles = useMemo(() => createSearchFieldStyles(theme), [theme]);
   return (
     <View style={styles.wrap}>
       <Search size={18} color={theme.slate500} strokeWidth={2} />
@@ -24,23 +50,3 @@ export function SearchField({ value, onChangeText, placeholder }: SearchFieldPro
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: theme.radiusMd,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: theme.white,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: theme.slate900,
-    paddingVertical: 0,
-  },
-});

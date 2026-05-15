@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { theme, shadowCard } from '../../constants/theme';
+import type { ShadowCardStyle, ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 
 type EmptyStateCardProps = {
   icon: ReactNode;
@@ -15,18 +17,72 @@ type EmptyStateCardProps = {
   onPrimaryPress?: () => void;
 };
 
+function createEmptyStateStyles(theme: ThemeColors, shadowCard: ShadowCardStyle) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: theme.radiusLg,
+      borderWidth: 1,
+      borderColor: theme.border,
+      padding: 20,
+      alignItems: 'center',
+      ...shadowCard,
+    },
+    iconWrap: {
+      width: 52,
+      height: 52,
+      borderRadius: theme.radiusMd,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 14,
+    },
+    title: {
+      fontSize: 17,
+      fontWeight: '800',
+      color: theme.slate900,
+      textAlign: 'center',
+    },
+    hint: {
+      marginTop: 10,
+      fontSize: 14,
+      lineHeight: 20,
+      color: theme.slate600,
+      textAlign: 'center',
+    },
+    list: { marginTop: 14, alignSelf: 'stretch', gap: 8 },
+    bullet: { fontSize: 13, color: theme.slate600, lineHeight: 18 },
+    btn: {
+      marginTop: 18,
+      alignSelf: 'stretch',
+      backgroundColor: theme.teal600,
+      borderRadius: theme.radiusMd,
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    btnPressed: { opacity: 0.92 },
+    btnTxt: { color: theme.white, fontWeight: '800', fontSize: 15 },
+  });
+}
+
 export function EmptyStateCard({
   icon,
-  iconBackgroundColor = theme.teal50,
+  iconBackgroundColor,
   title,
   hint,
   bullets,
   primaryLabel,
   onPrimaryPress,
 }: EmptyStateCardProps) {
+  const { colors: theme, shadowCard, resolved } = useAppTheme();
+  const styles = useMemo(
+    () => createEmptyStateStyles(theme, shadowCard),
+    [theme, shadowCard, resolved],
+  );
+  const iconBg = iconBackgroundColor ?? theme.teal50;
+
   return (
     <View style={styles.card}>
-      <View style={[styles.iconWrap, { backgroundColor: iconBackgroundColor }]}>{icon}</View>
+      <View style={[styles.iconWrap, { backgroundColor: iconBg }]}>{icon}</View>
       <Text style={styles.title}>{title}</Text>
       {hint ? <Text style={styles.hint}>{hint}</Text> : null}
       {bullets?.length ? (
@@ -51,48 +107,3 @@ export function EmptyStateCard({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: theme.white,
-    borderRadius: theme.radiusLg,
-    borderWidth: 1,
-    borderColor: theme.border,
-    padding: 20,
-    alignItems: 'center',
-    ...shadowCard,
-  },
-  iconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: theme.radiusMd,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 14,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: theme.slate900,
-    textAlign: 'center',
-  },
-  hint: {
-    marginTop: 10,
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.slate600,
-    textAlign: 'center',
-  },
-  list: { marginTop: 14, alignSelf: 'stretch', gap: 8 },
-  bullet: { fontSize: 13, color: theme.slate600, lineHeight: 18 },
-  btn: {
-    marginTop: 18,
-    alignSelf: 'stretch',
-    backgroundColor: theme.teal600,
-    borderRadius: theme.radiusMd,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  btnPressed: { opacity: 0.92 },
-  btnTxt: { color: theme.white, fontWeight: '800', fontSize: 15 },
-});

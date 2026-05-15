@@ -22,7 +22,8 @@ import { ReproductionSchema } from '@shared/validators/schemas';
 import type { Couple, Pigeon } from '@shared/types';
 
 import { appFeedback } from '../../lib/appFeedback';
-import { theme } from '../../constants/theme';
+import type { ThemeColors } from '../../constants/palettes';
+import { useAppTheme } from '../../context/AppThemeContext';
 import { AppLoadingView } from '../ui/AppLoadingView';
 
 type FormValues = {
@@ -43,6 +44,8 @@ function formatCoupleLabel(c: Couple, pigeonById: Map<string, Pigeon>): string {
 }
 
 export function ReproductionFormScreen() {
+  const { colors: themeColors } = useAppTheme();
+  const styles = useMemo(() => createReproductionFormStyles(themeColors), [themeColors]);
   const router = useRouter();
   const { coupleId: coupleIdParam } = useLocalSearchParams<{ coupleId?: string }>();
   const coupleIdFromUrl = (Array.isArray(coupleIdParam) ? coupleIdParam[0] : coupleIdParam)?.trim() ?? '';
@@ -207,7 +210,7 @@ export function ReproductionFormScreen() {
           value={datePonte}
           onChangeText={(t) => setValue('datePonte', t, { shouldDirty: true })}
           placeholder="AAAA-MM-JJ"
-          placeholderTextColor={theme.slate500}
+          placeholderTextColor={themeColors.slate500}
         />
         <Text style={[styles.lab, { marginTop: 14 }]}>Date d’éclosion (optionnel)</Text>
         <TextInput
@@ -215,7 +218,7 @@ export function ReproductionFormScreen() {
           value={dateEclosion}
           onChangeText={(t) => setValue('dateEclosion', t, { shouldDirty: true })}
           placeholder="AAAA-MM-JJ"
-          placeholderTextColor={theme.slate500}
+          placeholderTextColor={themeColors.slate500}
         />
         <View style={styles.row2}>
           <View style={styles.half}>
@@ -244,7 +247,7 @@ export function ReproductionFormScreen() {
           value={notes}
           onChangeText={(t) => setValue('notes', t, { shouldDirty: true })}
           multiline
-          placeholderTextColor={theme.slate500}
+          placeholderTextColor={themeColors.slate500}
         />
       </View>
 
@@ -287,13 +290,14 @@ export function ReproductionFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createReproductionFormStyles(theme: ThemeColors) {
+  return StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   scroll: { padding: theme.screenPadding, paddingBottom: 40 },
   h1: { fontSize: 22, fontWeight: '800', color: theme.slate900 },
   lead: { fontSize: 14, color: theme.slate600, marginTop: 8, marginBottom: 16, lineHeight: 20 },
   card: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: theme.radiusLg,
     borderWidth: 1,
     borderColor: theme.border,
@@ -308,7 +312,7 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 12 : 10,
     fontSize: 16,
     color: theme.slate900,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   ta: { minHeight: 80, textAlignVertical: 'top' },
   row2: { flexDirection: 'row', gap: 12, marginTop: 4 },
@@ -318,14 +322,14 @@ const styles = StyleSheet.create({
     borderColor: theme.border,
     borderRadius: theme.radiusMd,
     padding: 14,
-    backgroundColor: theme.slate50,
+    backgroundColor: theme.surfaceHighlight,
   },
   pickTxt: { fontSize: 15, color: theme.teal800, fontWeight: '600' },
   preview: {
     marginTop: 10,
     padding: 10,
     borderRadius: theme.radiusMd,
-    backgroundColor: theme.slate100,
+    backgroundColor: theme.surfaceHighlight,
     borderWidth: 1,
     borderColor: theme.border,
   },
@@ -344,7 +348,7 @@ const styles = StyleSheet.create({
   btnGhostTxt: { color: theme.teal700, fontWeight: '700' },
   modalBg: { flex: 1, backgroundColor: 'rgba(15,23,42,0.45)', justifyContent: 'flex-end' },
   modalCard: {
-    backgroundColor: theme.white,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -355,4 +359,5 @@ const styles = StyleSheet.create({
   modalRowTxt: { fontSize: 16, color: theme.slate900 },
   modalClose: { marginTop: 12, padding: 14, alignItems: 'center' },
   modalCloseTxt: { color: theme.teal700, fontWeight: '800', fontSize: 16 },
-});
+  });
+}

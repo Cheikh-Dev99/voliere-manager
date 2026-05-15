@@ -11,12 +11,7 @@ import {
   enregistrerReproduction,
 } from '@shared/services/reproductionsService'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
-
-function fieldClass(err) {
-  return `w-full rounded-lg border px-3 py-2 text-slate-900 outline-none focus:ring-2 ${
-    err ? 'border-red-400 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 focus:border-teal-500 focus:ring-teal-500/30'
-  }`
-}
+import { dmFieldClass as fieldClass, dmFormShell, dmLabelSm } from '../theme/voliereDarkUi'
 
 function formatCoupleLabel(c, pigeonById) {
   const m = pigeonById.get(c.maleId)
@@ -127,20 +122,20 @@ export function ReproductionFormPage() {
     <div className="mx-auto max-w-lg space-y-4">
       <Link
         to="/reproductions"
-        className="inline-flex items-center gap-1 text-sm font-medium text-teal-800 hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium text-teal-800 hover:underline dark:text-teal-300"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Liste des reproductions
       </Link>
-      <h1 className="text-xl font-semibold text-slate-900">Nouvelle reproduction</h1>
-      <p className="text-sm text-slate-600">
+      <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Nouvelle reproduction</h1>
+      <p className="text-sm text-slate-600 dark:text-slate-300">
         Choisis un <strong>couple actif</strong>. Les deux pigeons doivent être <strong>actifs</strong> au moment de
         l’enregistrement.
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className={dmFormShell}>
         <div>
-          <label htmlFor="rep-couple" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="rep-couple" className={dmLabelSm}>
             Couple
           </label>
           <select
@@ -158,9 +153,9 @@ export function ReproductionFormPage() {
           </select>
           {errors.coupleId ? <p className="mt-1 text-xs text-red-600">{errors.coupleId.message}</p> : null}
           {couples.length === 0 ? (
-            <p className="mt-2 text-xs text-amber-800">
+            <p className="mt-2 text-xs text-amber-800 dark:text-amber-200">
               Aucun couple actif.{' '}
-              <Link to="/couples/nouveau" className="font-medium underline">
+              <Link to="/couples/nouveau" className="font-medium underline dark:text-amber-100">
                 Créer un couple
               </Link>
             </p>
@@ -168,7 +163,7 @@ export function ReproductionFormPage() {
         </div>
 
         {coupleId ? (
-          <div className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+          <div className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300">
             {(() => {
               const c = couples.find((x) => x.id === coupleId)
               if (!c) return null
@@ -184,7 +179,7 @@ export function ReproductionFormPage() {
         ) : null}
 
         <div>
-          <label htmlFor="rep-ponte" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="rep-ponte" className={dmLabelSm}>
             Date de ponte
           </label>
           <input id="rep-ponte" type="date" {...register('datePonte')} className={fieldClass(errors.datePonte)} />
@@ -192,7 +187,7 @@ export function ReproductionFormPage() {
         </div>
 
         <div>
-          <label htmlFor="rep-eclosion" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="rep-eclosion" className={dmLabelSm}>
             Date d’éclosion (optionnel)
           </label>
           <input id="rep-eclosion" type="date" {...register('dateEclosion')} className={fieldClass(errors.dateEclosion)} />
@@ -203,7 +198,7 @@ export function ReproductionFormPage() {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="rep-oeufs" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="rep-oeufs" className={dmLabelSm}>
               Nombre d’œufs
             </label>
             <input
@@ -217,7 +212,7 @@ export function ReproductionFormPage() {
             {errors.nombreOeufs ? <p className="mt-1 text-xs text-red-600">{errors.nombreOeufs.message}</p> : null}
           </div>
           <div>
-            <label htmlFor="rep-jeunes" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="rep-jeunes" className={dmLabelSm}>
               Pigeonneaux (nombre)
             </label>
             <input
@@ -235,7 +230,7 @@ export function ReproductionFormPage() {
         </div>
 
         <div>
-          <label htmlFor="rep-notes" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="rep-notes" className={dmLabelSm}>
             Notes
           </label>
           <textarea id="rep-notes" rows={3} {...register('notes')} className={fieldClass(errors.notes)} />
@@ -251,7 +246,7 @@ export function ReproductionFormPage() {
           </button>
           <Link
             to="/reproductions"
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             Annuler
           </Link>
