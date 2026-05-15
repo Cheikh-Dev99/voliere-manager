@@ -1,5 +1,7 @@
 # Architecture technique — Web
 
+**Documents liés** : [Manuel utilisateur — Web](./MANUEL-UTILISATEUR-WEB.md) · [Installation](./INSTALLATION-ET-CONFIGURATION.md) · [Déploiement](./DEPLOYEMENT-DEMO-ET-PROD.md) · [Conception](./CONCEPTION.md)
+
 ## 1. Stack technologique
 
 | Couche                   | Technologie                                | Version indicative (monorepo)    |
@@ -188,5 +190,7 @@ flowchart TB
 - **`*`** : toute URL non reconnue redirige vers **`/`** (composant `Navigate`).
 
 Tableau **URL → composant** : **§ 4**.
+
+**Mobile** : application native via [`Volière Manager.apk`](../Volière%20Manager.apk) ou Expo — voir [Architecture mobile](./ARCHITECTURE-MOBILE.md).
 
 ---

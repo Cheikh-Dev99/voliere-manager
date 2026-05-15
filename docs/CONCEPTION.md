@@ -2,6 +2,8 @@
 
 Document de synthèse (conception + persistance) « gestion de volière » et les règles métier.
 
+**Documents liés** : [Cahier des charges](./CAHIER-DE-CHARGE.md) · [Architecture web](./ARCHITECTURE-WEB.md) · [Architecture mobile](./ARCHITECTURE-MOBILE.md) · [Manuel web](./MANUEL-UTILISATEUR-WEB.md) · [Manuel mobile](./MANUEL-UTILISATEUR-MOBILE.md)
+
 ## 1. Objectifs
 
 - Digitaliser l’élevage (pigeons, couples, reproductions, sorties, cages).

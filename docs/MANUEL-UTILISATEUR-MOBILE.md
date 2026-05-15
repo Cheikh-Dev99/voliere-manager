@@ -1,10 +1,8 @@
 # Manuel utilisateur — Mobile
 
-> **Alignement cahier DTS** : ce manuel décrit les **parcours utilisateur** de l’app **Expo** (React Native), en parallèle du [Manuel utilisateur — Web](./MANUEL-UTILISATEUR-WEB.md). Les exigences fonctionnelles de référence restent en **§5.2** du [`Cahier_de_charge.md`](./Cahier_de_charge.md#dts-5).
+> **Alignement cahier de charge** : ce manuel décrit les **parcours utilisateur** de l’app **Expo** (React Native), en parallèle du [Manuel utilisateur — Web](./MANUEL-UTILISATEUR-WEB.md). Les exigences fonctionnelles de référence restent en [§ 5.2 Phase de réalisation](./CAHIER-DE-CHARGE.md#phase-realisation) du [Cahier des charges](./CAHIER-DE-CHARGE.md).
 
 Après connexion, la navigation principale repose sur **six onglets** en bas d’écran (Volière, Cages, Pigeons, Couples, Reproductions, Sorties). Les **fiches** et **formulaires** s’ouvrent en pile au-dessus des onglets.
-
-> **À compléter pour le jury** : insérer des **captures d’écran** numérotées aux marqueurs *[Capture]*.
 
 Stack technique, dossiers `app/` et variables d’environnement : [Architecture technique — Mobile](./ARCHITECTURE-MOBILE.md).
 
@@ -12,7 +10,8 @@ Stack technique, dossiers `app/` et variables d’environnement : [Architecture 
 
 ### 1.1 Accès à l’authentification
 
-- Lancer l’app (Expo Go ou build de développement).
+- **APK** : télécharger [`Volière Manager.apk`](../Volière%20Manager.apk) à la racine du dépôt, l’installer sur un téléphone Android (autoriser les sources inconnues si demandé), puis ouvrir l’application **Volière Manager**.
+- **Développement** : lancer l’app avec Expo Go ou `yarn start` dans `apps/mobile/`.
 - Si tu n’es pas connecté, l’écran **`(auth)/login`** s’affiche.
 
 ### 1.2 Connexion

@@ -2,6 +2,8 @@
 
 Ce document décrit l’app **Expo** (`apps/mobile/`), son **empilement technique** et l’intégration **`@shared`** (`packages/shared`).
 
+**Documents liés** : [APK](../Volière%20Manager.apk) · [Installation — build APK](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas) · [Déploiement](./DEPLOYEMENT-DEMO-ET-PROD.md)
+
 - **Parcours utilisateur** (connexion, onglets, actions) : [Manuel utilisateur — Mobile](./MANUEL-UTILISATEUR-MOBILE.md).
 - **Comparaison avec le web** (routes, layout) : [Architecture technique — Web](./ARCHITECTURE-WEB.md).
 
@@ -62,7 +64,7 @@ Les formulaires et listes qui concernent uniquement des **choix de couples encor
 
 ## 6. Configuration et démarrage
 
-1. Copier **`apps/mobile/.env.example`** vers **`.env`** (à la racine du workspace mobile) et renseigner **`EXPO_PUBLIC_FIREBASE_*`** (même projet Firebase que le web).
+1. Copier **`apps/mobile/.env.example`** vers **`apps/mobile/.env.local`** et renseigner **`EXPO_PUBLIC_FIREBASE_*`** (même projet Firebase que le web).
 2. Depuis la racine **`voliere-manager/`** : `yarn mobile` (équivalent : `yarn workspace @voliere/mobile start`).
 3. Depuis **`apps/mobile/`** : `yarn start` ou `yarn mobile`.
 
@@ -76,6 +78,7 @@ npx tsc --noEmit
 ## 7. Déploiement et exports
 
 - Builds store : **EAS Build** (comptes Apple / Google Play hors périmètre de ce dépôt).
+- **APK de démonstration** (profil EAS `preview`) : [`Volière Manager.apk`](../Volière%20Manager.apk) à la racine du monorepo (à côté de `README.md`). Voir [Installation et configuration — § 5.2](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas) pour régénérer ou télécharger un build.
 - Export **CSV** pigeons : fichier généré via `@shared/utils/pigeonCsv` puis partagé avec **`expo-sharing`** ; tester sur appareil ou émulateur avec services adaptés.
 
 ---

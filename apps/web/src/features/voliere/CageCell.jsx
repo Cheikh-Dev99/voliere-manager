@@ -20,7 +20,7 @@ const statutStyles = {
 }
 
 /**
- * Carte cage — grille volière (codes couleur cahier DTS).
+ * Carte cage — grille volière.
  * Glisser-déposer : poignée sur cage « 1 pigeon » pour former un couple sur une autre cage occupée par un pigeon du sexe opposé.
  */
 export function CageCell({

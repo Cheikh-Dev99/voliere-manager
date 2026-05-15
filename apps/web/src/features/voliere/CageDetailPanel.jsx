@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   AlertTriangle,
@@ -157,6 +157,12 @@ export function CageDetailPanel({
   const [moveDetail, setMoveDetail] = useState('')
   const [pendingAction, setPendingAction] = useState(false)
   const [panelTab, setPanelTab] = useState('detail')
+  const cageId = cage?.id ?? null
+  const [panelTabCageId, setPanelTabCageId] = useState(cageId)
+  if (cageId !== panelTabCageId) {
+    setPanelTabCageId(cageId)
+    setPanelTab('detail')
+  }
 
   const showGenealogyTab =
     cage &&
@@ -170,10 +176,6 @@ export function CageDetailPanel({
 
   const { reproductions: coupleReproductions, loading: reproLoading, error: reproError } =
     useReproductionsByCouple(showReproductionTab ? couple?.id : null)
-
-  useEffect(() => {
-    setPanelTab('detail')
-  }, [cage?.id])
 
   const closeLibererModal = useCallback(() => {
     setShowLibererModal(false)
@@ -308,7 +310,7 @@ export function CageDetailPanel({
                   id="cage-tab-detail"
                   aria-controls="cage-tabpanel-detail"
                   onClick={() => setPanelTab('detail')}
-                  className={`flex min-h-[2.75rem] min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
+                  className={`flex min-h-11 min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
                     panelTab === 'detail'
                       ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-700 dark:text-slate-100 dark:ring-slate-600'
                       : 'text-slate-600 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-slate-100'
@@ -325,7 +327,7 @@ export function CageDetailPanel({
                     id="cage-tab-genealogy"
                     aria-controls="cage-tabpanel-genealogy"
                     onClick={() => setPanelTab('genealogy')}
-                    className={`flex min-h-[2.75rem] min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
+                    className={`flex min-h-11 min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
                       panelTab === 'genealogy'
                         ? 'bg-white text-teal-900 shadow-sm ring-1 ring-teal-200/70 dark:bg-teal-950/50 dark:text-teal-100 dark:ring-teal-800'
                         : 'text-slate-600 hover:bg-white/60 hover:text-teal-900 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-teal-200'
@@ -343,7 +345,7 @@ export function CageDetailPanel({
                     id="cage-tab-reproductions"
                     aria-controls="cage-tabpanel-reproductions"
                     onClick={() => setPanelTab('reproductions')}
-                    className={`flex min-h-[2.75rem] min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
+                    className={`flex min-h-11 min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
                       panelTab === 'reproductions'
                         ? 'bg-white text-teal-900 shadow-sm ring-1 ring-teal-200/70 dark:bg-teal-950/50 dark:text-teal-100 dark:ring-teal-800'
                         : 'text-slate-600 hover:bg-white/60 hover:text-teal-900 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-teal-200'
@@ -360,7 +362,7 @@ export function CageDetailPanel({
                   id="cage-tab-history"
                   aria-controls="cage-tabpanel-history"
                   onClick={() => setPanelTab('history')}
-                  className={`flex min-h-[2.75rem] min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
+                  className={`flex min-h-11 min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition sm:gap-2 sm:px-2 sm:text-sm ${
                     panelTab === 'history'
                       ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-700 dark:text-slate-100 dark:ring-slate-600'
                       : 'text-slate-600 hover:bg-white/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-slate-100'
@@ -387,8 +389,7 @@ export function CageDetailPanel({
                 Reproductions
               </h3>
               <p className="mb-3 text-xs leading-snug text-slate-500 dark:text-slate-400">
-                Portées enregistrées pour le couple assigné à cette cage (dates de ponte, œufs, jeunes). Aligné avec le
-                module Reproductions du DTS.
+                Portées enregistrées pour le couple assigné à cette cage (dates de ponte, œufs, jeunes).
               </p>
               <Link
                 to={`/reproductions/nouveau?coupleId=${encodeURIComponent(couple.id)}`}
@@ -488,7 +489,7 @@ export function CageDetailPanel({
                 </p>
               ) : (
                 <ul
-                  className="max-h-[min(55vh,22rem)] space-y-2 overflow-y-auto overflow-x-hidden pr-1 text-sm text-slate-600 dark:text-slate-300 [scrollbar-gutter:stable]"
+                  className="max-h-[min(55vh,22rem)] space-y-2 overflow-y-auto overflow-x-hidden pr-1 text-sm text-slate-600 dark:text-slate-300 scrollbar-gutter-stable"
                   aria-label="Liste des événements, faire défiler pour tout voir"
                 >
                   {occupancyEvents.map((ev) => (

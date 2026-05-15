@@ -159,7 +159,7 @@ Le candidat devra :
 - produire un **MCD** (Modèle Conceptuel de Données) ;
 - proposer une **architecture technique** (frontend, backend, base de données).
 
-### 5.2 Phase de réalisation
+### 5.2 Phase de réalisation {#phase-realisation}
 
 L’application doit inclure impérativement les modules suivants :
 
@@ -224,7 +224,7 @@ Le candidat devra :
 
 1. **Cahier des charges** (3 pages maximum) : objectifs, règles métier, fonctionnalités.
 2. **Code source complet** déposé sur GitHub / GitLab avec un **README** clair.
-3. **Application déployée** ou **APK** mis à disposition.
+3. **Application déployée** ou **APK** mis à disposition — fichier livrable : [`Volière Manager.apk`](../Volière%20Manager.apk) à la racine du dépôt (voir aussi le [README](../README.md)).
 4. **Présentation orale** : 5 min de démo + 5 min de questions.
 
 ---

@@ -1,5 +1,7 @@
 # Sécurité, règles Firestore et déploiement
 
+**Documents liés** : [Installation](./INSTALLATION-ET-CONFIGURATION.md) · [Déploiement](./DEPLOYEMENT-DEMO-ET-PROD.md)
+
 ## 1. Modèle de confiance
 
 - **Authentification** : Firebase Auth (identité utilisateur = `request.auth.uid`).
@@ -21,7 +23,7 @@ Toute tentative d’accès à un document d’un autre utilisateur est **rejeté
 Ne jamais committer :
 
 - **`apps/web/.env.local`** (clés Firebase web — exposées au navigateur mais liées à des restrictions de domaine et règles Firestore).
-- **`apps/mobile/.env`** (variables `EXPO_PUBLIC_FIREBASE_*` pour Expo) : ne pas committer ; les fichiers `.env` / `.env.*` sont exclus par **`.gitignore`** (les `.env.example` restent versionnés).
+- **`apps/mobile/.env.local`** (variables `EXPO_PUBLIC_FIREBASE_*` pour Expo) : ne pas committer ; les fichiers `.env*.local` sont exclus par **`.gitignore`** (les `.env.example` restent versionnés).
 - **Comptes de service** `*-firebase-adminsdk*.json`, `serviceAccount*.json` (scripts admin).
 - **Keystores** Android / certificats iOS pour publication mobile.
 

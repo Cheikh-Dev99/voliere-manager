@@ -1,10 +1,9 @@
 # Manuel utilisateur — Web
 
-> **Alignement cahier DTS** : ce manuel détaille la **§5.2 Phase de réalisation** côté parcours utilisateur (modules web, navigation, authentification). Le texte officiel des exigences fonctionnelles est en **§5.2** du fichier [`Cahier_de_charge.md`](./Cahier_de_charge.md#dts-5).
+> **Alignement cahier de charge** : ce manuel détaille la **§ 5.2 Phase de réalisation** côté parcours utilisateur (modules web, navigation, authentification). Le texte officiel des exigences fonctionnelles est dans le [Cahier des charges](./CAHIER-DE-CHARGE.md) ([§ 5.2](./CAHIER-DE-CHARGE.md#phase-realisation)).
 
 Ce manuel décrit les **parcours utilisateur** de l’interface web. Les libellés de menu correspondent à la barre de navigation principale après connexion. L’équivalent pour l’app **mobile (Expo)** est le [Manuel utilisateur — Mobile](./MANUEL-UTILISATEUR-MOBILE.md).
 
-> **À compléter pour le jury** : insérer des **captures d’écran** numérotées (ex. fig. 1 — Écran de connexion) aux endroits indiqués par des marqueurs *[Capture]*.
 
 ## 1. Première visite — Connexion et inscription
 

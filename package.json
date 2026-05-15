@@ -29,7 +29,9 @@
     "seed:cages": "node scripts/seed-cages.mjs",
     "migrate:owner-uid": "node scripts/migrate-owner-uid.mjs",
     "reassign:owner-uid": "node scripts/reassign-owner-uid.mjs",
-    "test": "yarn workspace @voliere/shared test"
+    "test": "yarn workspace @voliere/shared test",
+    "typecheck": "yarn workspace @voliere/shared typecheck && yarn workspace @voliere/mobile typecheck",
+    "eas-build-pre-install": "corepack enable && corepack prepare yarn@4.6.0 --activate"
   },
   "devDependencies": {
     "firebase-admin": "^13.0.0"

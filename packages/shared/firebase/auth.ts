@@ -34,6 +34,6 @@ export async function registerWithProfile(
 export const sendPasswordReset = (email: string) =>
   sendPasswordResetEmail(auth, email.trim());
 
-// Compte démo jury
+// Compte démo
 // Email    : admin@voliere.sn
 // Password : Bakeli2026!

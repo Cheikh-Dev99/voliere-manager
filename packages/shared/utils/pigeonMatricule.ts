@@ -1,7 +1,7 @@
 import type { Pigeon } from '../types';
 
 /**
- * Prochain matricule type cahier DTS (ex. P001, P011) : préfixe P + numéro séquentiel
+ * Prochain matricule type cahier de charge (ex. P001, P011) : préfixe P + numéro séquentiel
  * d’après les pigeons déjà en base dont le matricule suit ce motif.
  */
 export function proposerMatriculeSuivant(pigeonsList: Pigeon[]): string {

@@ -8,7 +8,7 @@
 
 ## 2. Cloner et installer les dépendances
 
-À la racine du monorepo `**voliere-manager/`\*\* :
+À la racine du monorepo `voliere-manager/` :
 
 ```bash
 cd voliere-manager
@@ -25,13 +25,13 @@ Cela installe les dépendances pour **tous** les workspaces (`apps/*`, `packages
 4. Déployer les **règles** du dépôt : fichier `firebase/firestore.rules` (voir [Sécurité, règles Firestore et déploiement](./SECURITE-REGLES-ET-DEPLOIEMENT.md)).
 5. Récupérer la **config Web** : Paramètres du projet → Tes applications → Appli web → objet `firebaseConfig`.
 
-Dans `**apps/web/`\*\*, copier le fichier d’exemple :
+Dans `apps/web/`, copier le fichier d’exemple :
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
 ```
 
-Renseigner les variables `**VITE_FIREBASE_***` dans `apps/web/.env.local` (voir commentaires dans `.env.example`).
+Renseigner les variables `VITE_FIREBASE_*` dans `apps/web/.env.local` (voir commentaires dans `.env.example`).
 
 ### 3.1 Domaines autorisés (mot de passe oublié)
 
@@ -51,7 +51,7 @@ Depuis la racine du monorepo :
 yarn workspace web dev
 ```
 
-Ou depuis `**apps/web/**` :
+Ou depuis `apps/web/` :
 
 ```bash
 yarn dev
@@ -59,20 +59,20 @@ yarn dev
 yarn web
 ```
 
-Par défaut Vite écoute sur `**http://localhost:5173**` (vérifier la sortie du terminal).
+Par défaut Vite écoute sur `http://localhost:5173` (vérifier la sortie du terminal).
 
 ## 5. Application mobile (Expo)
 
 1. Même prérequis Node / Yarn / projet Firebase que pour le web.
-2. Dans `**apps/mobile/**`, copier l’exemple d’environnement :
+2. Dans `apps/mobile/`, copier l’exemple d’environnement :
 
 ```bash
- cp apps/mobile/.env.example apps/mobile/.env
+cp apps/mobile/.env.example apps/mobile/.env.local
 ```
 
-3. Renseigner les variables `**EXPO_PUBLIC_FIREBASE_***` dans `**apps/mobile/.env**` (même projet que le web, préfixe obligatoire Expo pour exposition au bundle).
+3. Renseigner les variables `EXPO_PUBLIC_FIREBASE_*` dans `apps/mobile/.env.local` (même projet que le web, préfixe obligatoire Expo pour exposition au bundle).
 4. Pour **Google sur mobile** :
-   - Copier l’**ID client Web** dans `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (`apps/mobile/.env`).
+   - Copier l’**ID client Web** dans `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (`apps/mobile/.env.local`).
    - Dans [Google Cloud Console](https://console.cloud.google.com/) → **API et services** → **Identifiants** → client OAuth **Application Web** (même ID que ci-dessus) → **URI de redirection autorisées**, ajouter :
      - **Expo Go** : `https://auth.expo.io/@cheikhdev99/voliere-manager` (adapter `owner` / `slug` de `apps/mobile/app.json`).
      - **Build natif** : `voliere-manager://oauthredirect`
@@ -86,7 +86,7 @@ Depuis la racine du monorepo :
 yarn mobile
 ```
 
-Ou depuis `**apps/mobile/**` :
+Ou depuis `apps/mobile/` :
 
 ```bash
 yarn start
@@ -94,7 +94,7 @@ yarn start
 
 Détail technique mobile : [Architecture technique — Mobile](./ARCHITECTURE-MOBILE.md) ; parcours utilisateur : [Manuel utilisateur — Mobile](./MANUEL-UTILISATEUR-MOBILE.md).
 
-### 5.2 Build APK / AAB (EAS)
+### 5.2 Build APK / AAB (EAS) {#build-apk-eas}
 
 1. Installer EAS CLI : `npm i -g eas-cli` puis `eas login`.
 2. Depuis `apps/mobile/`, créer les secrets projet (liste dans `eas.env.example`) :
@@ -106,14 +106,37 @@ eas secret:create --scope project --name EXPO_PUBLIC_FIREBASE_API_KEY --value "V
 ```
 
 3. Google Cloud : sur le client OAuth **Web**, ajouter `voliere-manager://oauthredirect` (APK / build natif).
-4. Générer l’APK jury :
+4. Générer l’APK:
 
 ```bash
 cd apps/mobile
 eas build --profile preview --platform android
 ```
 
-5. Tester sur appareil réel : connexion e-mail, Google, grille volière.
+5. Télécharger l’APK (remplacer `BUILD_ID` par l’identifiant affiché sur [expo.dev](https://expo.dev)) :
+
+```bash
+eas build:download --build-id BUILD_ID
+```
+
+6. **APK** — placer le fichier à la **racine du monorepo** (même niveau que `README.md`) :
+
+| Élément | Chemin |
+| --- | --- |
+| Fichier | [`Volière Manager.apk`](../Volière%20Manager.apk) |
+| Emplacement | racine du monorepo (`voliere-manager/Volière Manager.apk`, au même niveau que `README.md`) |
+
+Exemple après téléchargement EAS :
+
+```bash
+mv ~/Downloads/VOTRE_BUILD.apk "../../Volière Manager.apk"
+```
+
+(Adapter le chemin source ; depuis `apps/mobile/`, la racine du monorepo est `../..`.)
+
+Tu peux **renommer** le fichier (extension `.apk` obligatoire) sans casser l’installation. Pour une nouvelle version, remplacer ce fichier à la racine et mettre à jour le dépôt Git.
+
+7. Tester sur appareil réel : copier l’APK sur le téléphone, installer (sources inconnues si demandé), puis vérifier connexion e-mail, Google et grille volière.
 
 ## 6. Scripts utiles (référence)
 
@@ -134,7 +157,7 @@ cd apps/web
 yarn build
 ```
 
-Les fichiers statiques sont générés dans `**apps/web/dist/**`. Ils peuvent être servis par **Firebase Hosting**, Netlify, Vercel, ou tout serveur HTTP statique, en configurant le **fallback** vers `index.html` pour le routage SPA (React Router).
+Les fichiers statiques sont générés dans `apps/web/dist/`. Ils peuvent être servis par **Firebase Hosting**, Netlify, Vercel, ou tout serveur HTTP statique, en configurant le **fallback** vers `index.html` pour le routage SPA (React Router). Voir [Déploiement — démo et production](./DEPLOYEMENT-DEMO-ET-PROD.md).
 
 ## 8. Scripts d’administration (données)
 

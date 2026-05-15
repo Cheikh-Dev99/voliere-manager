@@ -2,6 +2,14 @@
 
 Monorepo **Yarn 4** : application web (React / Vite), mobile (Expo) et code partagé (`packages/shared`), avec configuration **Firebase** (Auth, Firestore, règles).
 
+## Télécharger l’application Android (APK)
+
+| | |
+| --- | --- |
+| **Fichier** | [`Volière Manager.apk`](Volière%20Manager.apk) (à la racine de ce dépôt, au même niveau que ce README) |
+| **Usage** | Sur GitHub : ouvrir le fichier → bouton **Download** (ou clic droit → enregistrer). Sur téléphone : copier l’APK, autoriser les sources inconnues si besoin, puis installer. |
+| **Regénérer** | [Installation et configuration — § 5.2](docs/INSTALLATION-ET-CONFIGURATION.md#build-apk-eas) (EAS Build, profil `preview`) |
+
 ## Documentation
 
 Toute la documentation détaillée est dans le dossier **`docs/`** (fichiers listés ci-dessous).
@@ -29,11 +37,17 @@ yarn install
 
 **Web** — depuis la racine : `yarn workspace web dev` ; ou dans `apps/web/` : `yarn dev` / `yarn web` (serveur Vite, port affiché dans le terminal, souvent `http://localhost:5173`).
 
-**Mobile** — depuis la racine : `yarn mobile` ; ou dans `apps/mobile/` : `yarn start`. Prévoir un fichier `.env` avec les variables `EXPO_PUBLIC_FIREBASE_*` (voir `apps/mobile/.env.example` et [docs/INSTALLATION-ET-CONFIGURATION.md](docs/INSTALLATION-ET-CONFIGURATION.md)).
+**Mobile** — depuis la racine : `yarn mobile` ; ou dans `apps/mobile/` : `yarn start`. Prévoir `apps/mobile/.env.local` avec les variables `EXPO_PUBLIC_FIREBASE_*` (voir `apps/mobile/.env.example` et [Installation et configuration](docs/INSTALLATION-ET-CONFIGURATION.md)).
 
 **Tests** (package partagé) :
 
 ```bash
 yarn test
+```
+
+**TypeScript** (`@shared` + mobile) :
+
+```bash
+yarn typecheck
 ```
 

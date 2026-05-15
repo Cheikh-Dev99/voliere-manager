@@ -12,9 +12,23 @@ yarn test
 
 Cela exécute `yarn workspace @voliere/shared test` (voir `package.json` racine).
 
-**Exemples** de fichiers de tests : `packages/shared/utils/voliereCageList.test.ts`, etc.
+## 1.1 Vérification TypeScript
 
-> Pour le dossier DTS : indiquer le **nombre de tests** et un **extrait de résultat** (capture terminal ou rapport CI) dans les annexes du rendu.
+Depuis la racine `voliere-manager/` :
+
+```bash
+yarn typecheck
+```
+
+Cela enchaîne :
+
+- `packages/shared` — `tsc --noEmit` (logique métier, hooks, services) ;
+- `apps/mobile` — `tsc --noEmit` (écrans Expo + `@shared`).
+
+Le workspace **web** est en **JavaScript** (`.jsx`) : pas de `tsc` ; qualité via `yarn workspace web lint`.
+
+**Exemples** de fichiers de tests : `packages/shared/utils/voliereCageList.test.ts`, `coupleValidation.test.ts`, `sortieLogic.test.ts`, `parseDisplayName.test.ts`, `auth/googleRedirectUri.test.ts`, `firebase/googleAuthErrors.test.ts`.
+
 
 ## 2. Qualité statique — Web
 
@@ -24,7 +38,7 @@ Dans **`apps/web`** :
 yarn lint
 ```
 
-ESLint avec plugins React / hooks (voir `package.json` du workspace web). Corriger les avertissements avant livraison jury si exigé.
+ESLint avec plugins React / hooks (voir `package.json` du workspace web).
 
 ## 3. Typage
 
@@ -35,7 +49,7 @@ ESLint avec plugins React / hooks (voir `package.json` du workspace web). Corrig
 ## 4. Limites connues et dette documentaire
 
 - **Historique cage** (sous-collection `evenements`) : prévu dans les règles Firestore pour `cages/{id}/evenements` ; l’exposition complète dans l’UI peut être itérative (cf. [Conception](./CONCEPTION.md)).
-- **Couverture de tests** : concentrée sur `packages/shared` ; les pages React peuvent être enrichies avec **Testing Library** si le cahier DTS l’exige explicitement.
+- **Couverture de tests** : concentrée sur `packages/shared` ; les pages React peuvent être enrichies avec **Testing Library** si le cahier de charge l’exige explicitement.
 - **Accessibilité** : amélioration continue (ARIA sur composants clés, contrastes) — relevé utile pour une grille d’évaluation « qualité UI ».
 
 ## 5. Pistes d’évolution
@@ -48,13 +62,13 @@ ESLint avec plugins React / hooks (voir `package.json` du workspace web). Corrig
 | Rôles | Gérant / propriétaire multi-boutiques (hors modèle actuel mono-`ownerUid`). |
 | Rapports PDF | Export inventaire, généalogie pour associations. |
 
-## 6. Checklist « prêt pour jury »
+## 6. Checklist
 
-- [ ] `yarn install` propre sur machine vierge + `yarn build` web OK + `npx tsc --noEmit` dans `apps/mobile` OK.
+- [ ] `yarn install` propre sur machine vierge + `yarn build` web OK + `yarn typecheck` OK.
 - [ ] `.env.example` à jour ; aucun secret dans Git.
 - [ ] Règles Firestore déployées sur le projet de démo.
 - [ ] Compte de démo ou vidéo screencast du parcours utilisateur.
-- [ ] Documentation à jour (ce dossier `docs/`) + captures insérées dans le PDF final.
+- [ ] Documentation à jour (ce dossier `docs/`) + captures insérées dans le PDF final ; APK jury : [`Volière Manager.apk`](../Volière%20Manager.apk).
 - [ ] `yarn test` vert.
 
 ---
