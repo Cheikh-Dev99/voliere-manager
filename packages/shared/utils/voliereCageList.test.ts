@@ -27,6 +27,23 @@ function pigeon(partial: Partial<Pigeon> & Pick<Pigeon, 'id' | 'matricule'>): Pi
 }
 
 describe('occupantPigeons', () => {
+  it('ignore un pigeon archivé en cage solo', () => {
+    const p = pigeon({ id: 'p1', matricule: 'P001', deletedAt: ts() });
+    const cage: Cage = {
+      id: 'c1',
+      numero: 'A01',
+      nom: 'C1',
+      superficie: 1,
+      description: '',
+      statut: 'OCCUPE_PIGEON',
+      pigeonId: 'p1',
+      coupleId: null,
+      createdAt: ts(),
+      updatedAt: ts(),
+    };
+    expect(occupantPigeons(cage, new Map([['p1', p]]), new Map(), new Map(), new Map())).toEqual([]);
+  });
+
   it('retourne le pigeon seul', () => {
     const p = pigeon({ id: 'p1', matricule: 'P001' });
     const cage: Cage = {

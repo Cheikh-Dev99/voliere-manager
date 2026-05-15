@@ -16,6 +16,8 @@ import { db } from '../firebase/config';
 import { requireOwnerUid } from '../firebase/requireOwnerUid';
 import { COLLECTIONS } from '../firebase/collections';
 import type { Cage, Couple, Pigeon, PigeonFormData } from '../types';
+import { pigeonHasDescendants } from '../utils/coupleValidation';
+import { assertPigeonActifPourSortie, assertPigeonArchivable, mapSortieTypeToStatut } from '../utils/sortieLogic';
 
 /**
  * Créer un nouveau pigeon
@@ -75,13 +77,115 @@ export const supprimerPigeon = async (pigeonId: string): Promise<void> => {
   );
   const [snapPere, snapMere] = await Promise.all([getDocs(qPere), getDocs(qMere)]);
 
-  if (!snapPere.empty || !snapMere.empty) {
+  if (pigeonHasDescendants(snapPere, snapMere)) {
     throw new Error('Ce pigeon a des descendants');
   }
 
-  await updateDoc(doc(db, COLLECTIONS.PIGEONS, pigeonId), {
-    deletedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+  const pigeonRef = doc(db, COLLECTIONS.PIGEONS, pigeonId);
+
+  const qCageSolo = query(
+    collection(db, COLLECTIONS.CAGES),
+    where('ownerUid', '==', ownerUid),
+    where('pigeonId', '==', pigeonId),
+  );
+  const qCoupleM = query(
+    collection(db, COLLECTIONS.COUPLES),
+    where('ownerUid', '==', ownerUid),
+    where('statut', '==', 'ACTIF'),
+    where('maleId', '==', pigeonId),
+  );
+  const qCoupleF = query(
+    collection(db, COLLECTIONS.COUPLES),
+    where('ownerUid', '==', ownerUid),
+    where('statut', '==', 'ACTIF'),
+    where('femelleId', '==', pigeonId),
+  );
+
+  const [cageSoloSnap, coupleSnapM, coupleSnapF] = await Promise.all([
+    getDocs(qCageSolo),
+    getDocs(qCoupleM),
+    getDocs(qCoupleF),
+  ]);
+
+  const cageSoloRefs = cageSoloSnap.docs.map(d => d.ref);
+
+  const coupleById = new Map<string, (typeof coupleSnapM.docs)[number]>();
+  for (const d of coupleSnapM.docs) coupleById.set(d.id, d);
+  for (const d of coupleSnapF.docs) coupleById.set(d.id, d);
+  const coupleDocs = [...coupleById.values()];
+
+  if (coupleDocs.length > 1) {
+    throw new Error('Données incohérentes : plusieurs couples actifs pour ce pigeon.');
+  }
+
+  const coupleRefs = coupleDocs.map(d => d.ref);
+  const coupleCageIds = new Set<string>();
+  for (const d of coupleDocs) {
+    const c = d.data() as Couple;
+    if (c.cageId) coupleCageIds.add(c.cageId);
+  }
+  const coupleCageRefs = [...coupleCageIds].map(id => doc(db, COLLECTIONS.CAGES, id));
+
+  await runTransaction(db, async tx => {
+    const pigeonSnap = await tx.get(pigeonRef);
+    if (!pigeonSnap.exists()) throw new Error('Pigeon introuvable');
+    const pigeon = pigeonSnap.data() as Pigeon;
+    assertPigeonArchivable(pigeon, ownerUid);
+
+    const soloSnaps = await Promise.all(cageSoloRefs.map(r => tx.get(r)));
+    const coupleSnaps = await Promise.all(coupleRefs.map(r => tx.get(r)));
+    const coupleCageSnaps = await Promise.all(coupleCageRefs.map(r => tx.get(r)));
+    const snapByCageId = new Map<string, (typeof coupleCageSnaps)[number]>();
+    coupleCageRefs.forEach((r, i) => {
+      snapByCageId.set(r.id, coupleCageSnaps[i]);
+    });
+
+    for (let i = 0; i < cageSoloRefs.length; i++) {
+      const s = soloSnaps[i];
+      if (!s.exists()) continue;
+      const cage = s.data() as Cage;
+      if (cage.pigeonId === pigeonId && cage.statut === 'OCCUPE_PIGEON') {
+        tx.update(cageSoloRefs[i], {
+          statut   : 'LIBRE',
+          pigeonId : null,
+          updatedAt: serverTimestamp(),
+        });
+      }
+    }
+
+    for (let i = 0; i < coupleRefs.length; i++) {
+      const cs = coupleSnaps[i];
+      if (!cs.exists()) continue;
+      const c = cs.data() as Couple;
+      if (c.statut !== 'ACTIF') continue;
+      if (c.maleId !== pigeonId && c.femelleId !== pigeonId) continue;
+
+      const coupleId = coupleRefs[i].id;
+      tx.update(coupleRefs[i], {
+        statut : 'ROMPU',
+        dateFin: serverTimestamp(),
+      });
+
+      if (c.cageId) {
+        const cgSnap = snapByCageId.get(c.cageId);
+        if (cgSnap?.exists()) {
+          const cg = cgSnap.data() as Cage;
+          if (cg.coupleId === coupleId) {
+            tx.update(doc(db, COLLECTIONS.CAGES, c.cageId), {
+              statut   : 'LIBRE',
+              coupleId : null,
+              pigeonId : null,
+              updatedAt: serverTimestamp(),
+            });
+          }
+        }
+      }
+    }
+
+    tx.update(pigeonRef, {
+      deletedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
   });
 };
 
@@ -166,22 +270,13 @@ export const enregistrerSortie = async (data: {
 
   const sortieRef = doc(collection(db, COLLECTIONS.SORTIES));
 
-  const statutMap: Record<string, Pigeon['statut']> = {
-    VENTE: 'VENDU',
-    DECES: 'MORT',
-    PERTE: 'PERDU',
-  };
-
   const notesTrim = (data.notes ?? '').trim();
 
   await runTransaction(db, async tx => {
     const pigeonSnap = await tx.get(pigeonRef);
     if (!pigeonSnap.exists()) throw new Error('Pigeon introuvable');
     const pigeon = pigeonSnap.data() as Pigeon;
-    if (pigeon.ownerUid && pigeon.ownerUid !== ownerUid) {
-      throw new Error('Ce pigeon n’appartient pas à votre compte.');
-    }
-    if (pigeon.statut !== 'ACTIF') throw new Error('Ce pigeon n\'est plus actif');
+    assertPigeonActifPourSortie(pigeon, ownerUid);
 
     const soloSnaps = await Promise.all(cageSoloRefs.map(r => tx.get(r)));
 
@@ -236,7 +331,7 @@ export const enregistrerSortie = async (data: {
     }
 
     tx.update(pigeonRef, {
-      statut   : statutMap[data.type],
+      statut   : mapSortieTypeToStatut(data.type),
       updatedAt: serverTimestamp(),
     });
 

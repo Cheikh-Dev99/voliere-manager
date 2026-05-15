@@ -3,6 +3,10 @@ import type { Cage, Couple, Pigeon } from '../types';
 /**
  * Pigeons présents dans une cage (0, 1 ou 2) — logique partagée liste / tri / filtres volière.
  */
+function isVisibleOccupant(p: Pigeon | undefined): p is Pigeon {
+  return !!p && p.deletedAt == null;
+}
+
 export function occupantPigeons(
   c: Cage,
   pigeonById: Map<string, Pigeon>,
@@ -12,14 +16,14 @@ export function occupantPigeons(
 ): Pigeon[] {
   if (c.statut === 'OCCUPE_PIGEON' && c.pigeonId) {
     const p = pigeonById.get(c.pigeonId);
-    return p ? [p] : [];
+    return isVisibleOccupant(p) ? [p] : [];
   }
   if (c.statut === 'OCCUPE_COUPLE' && c.coupleId) {
     const cp = coupleById.get(c.coupleId);
-    if (!cp) return [];
+    if (!cp || cp.statut !== 'ACTIF') return [];
     const m = maleByCouple.get(cp.id);
     const f = femelleByCouple.get(cp.id);
-    return [m, f].filter(Boolean) as Pigeon[];
+    return [m, f].filter(isVisibleOccupant);
   }
   return [];
 }

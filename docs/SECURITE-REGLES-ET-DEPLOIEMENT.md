@@ -36,7 +36,13 @@ cd voliere-manager
 firebase deploy --only firestore:rules
 ```
 
-Le fichier **`firebase.json`** à la racine du monorepo pointe vers `firebase/firestore.rules` et `firebase/firestore.indexes.json`. Idem pour **Storage** (`firebase/storage.rules`) si tu déploies les règles Storage.
+Le fichier **`firebase.json`** à la racine du monorepo pointe vers `firebase/firestore.rules` et `firebase/firestore.indexes.json`. Pour **Storage** :
+
+```bash
+firebase deploy --only storage
+```
+
+Les photos pigeons (`pigeons/{userId}/…`) ne sont lisibles et modifiables que par l’utilisateur authentifié dont l’`uid` correspond à `{userId}` (`firebase/storage.rules`).
 
 ## 5. Déploiement du front web
 

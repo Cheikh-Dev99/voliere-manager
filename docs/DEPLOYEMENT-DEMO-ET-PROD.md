@@ -58,7 +58,13 @@ cd apps/web && yarn build && cd ../..
 firebase deploy --only hosting
 ```
 
-Déployer aussi les règles si nécessaire : `firebase deploy --only firestore:rules,storage` (voir [Sécurité, règles Firestore et déploiement](./SECURITE-REGLES-ET-DEPLOIEMENT.md)).
+Déployer aussi les règles et index avant la démo :
+
+```bash
+firebase deploy --only firestore:rules,firestore:indexes,storage
+```
+
+Les photos pigeons (Storage) ne sont lisibles que par l’utilisateur authentifié propriétaire du dossier (`firebase/storage.rules`). Voir [Sécurité, règles Firestore et déploiement](./SECURITE-REGLES-ET-DEPLOIEMENT.md).
 
 ## 5. Mobile (rappel)
 

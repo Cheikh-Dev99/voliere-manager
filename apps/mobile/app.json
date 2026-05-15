@@ -24,10 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "sn.bakeli.voliere.manager",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "package": "sn.bakeli.voliere.manager"
     },
     "web": {
       "favicon": "./assets/favicon.png",

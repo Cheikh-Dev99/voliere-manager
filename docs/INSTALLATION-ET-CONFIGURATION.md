@@ -94,6 +94,27 @@ yarn start
 
 Détail technique mobile : [Architecture technique — Mobile](./ARCHITECTURE-MOBILE.md) ; parcours utilisateur : [Manuel utilisateur — Mobile](./MANUEL-UTILISATEUR-MOBILE.md).
 
+### 5.2 Build APK / AAB (EAS)
+
+1. Installer EAS CLI : `npm i -g eas-cli` puis `eas login`.
+2. Depuis `apps/mobile/`, créer les secrets projet (liste dans `eas.env.example`) :
+
+```bash
+cd apps/mobile
+eas secret:create --scope project --name EXPO_PUBLIC_FIREBASE_API_KEY --value "VOTRE_CLE"
+# … répéter pour chaque EXPO_PUBLIC_* du fichier eas.env.example
+```
+
+3. Google Cloud : sur le client OAuth **Web**, ajouter `voliere-manager://oauthredirect` (APK / build natif).
+4. Générer l’APK jury :
+
+```bash
+cd apps/mobile
+eas build --profile preview --platform android
+```
+
+5. Tester sur appareil réel : connexion e-mail, Google, grille volière.
+
 ## 6. Scripts utiles (référence)
 
 | Emplacement              | Commande                  | Effet                                                |

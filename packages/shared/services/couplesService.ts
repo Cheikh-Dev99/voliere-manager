@@ -17,6 +17,11 @@ import { requireOwnerUid } from '../firebase/requireOwnerUid';
 import { COLLECTIONS } from '../firebase/collections';
 import type { Cage, CageOccupancyKind, Couple, CoupleFormData, Pigeon } from '../types';
 import { CAGE_OCCUPANCY_EVENTS } from './cagesService';
+import {
+  validateCoupleSexes,
+  validateOppositeSexesForDragCouple,
+  validatePigeonsActifsForCouple,
+} from '../utils/coupleValidation';
 
 function assertPigeonAppartientAuCompte(p: Pigeon, uid: string, role: string): void {
   if (!p.ownerUid) {
@@ -73,10 +78,8 @@ export const creerCouple = async (data: CoupleFormData): Promise<string> => {
   assertPigeonAppartientAuCompte(male, ownerUid, 'Mâle');
   assertPigeonAppartientAuCompte(femelle, ownerUid, 'Femelle');
 
-  if (male.sexe    !== 'MALE')   throw new Error('Le premier pigeon doit être un mâle');
-  if (femelle.sexe !== 'FEMALE') throw new Error('Le second pigeon doit être une femelle');
-  if (male.statut    !== 'ACTIF') throw new Error(`Le mâle ${male.matricule} n'est pas actif`);
-  if (femelle.statut !== 'ACTIF') throw new Error(`La femelle ${femelle.matricule} n'est pas active`);
+  validateCoupleSexes(male.sexe, femelle.sexe);
+  validatePigeonsActifsForCouple(male, femelle);
 
   await verifierDisponibilitePourCouple(data.maleId, ownerUid);
   await verifierDisponibilitePourCouple(data.femelleId, ownerUid);
@@ -195,9 +198,7 @@ export const creerCoupleParGlissement = async (params: {
   if (g.statut !== 'ACTIF' || o.statut !== 'ACTIF') {
     throw new Error('Les deux pigeons doivent être actifs.');
   }
-  if (g.sexe === o.sexe) {
-    throw new Error('Les deux pigeons doivent être de sexe opposé pour former un couple.');
-  }
+  validateOppositeSexesForDragCouple(g.sexe, o.sexe);
 
   await verifierDisponibilitePourCouple(gid, ownerUid);
   await verifierDisponibilitePourCouple(oid, ownerUid);
