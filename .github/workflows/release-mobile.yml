@@ -91,7 +91,7 @@ jobs:
           ID="$(echo "$JSON" | jq -er '(if type == "array" then .[0] else . end).id')"
           DEST="${{ github.workspace }}/artifacts"
           mkdir -p "$DEST"
-          cd "$DEST"
+          # Téléchargement depuis la racine du projet EAS (obligatoire en non-interactif)
           eas build:download --non-interactive --build-id "$ID"
           shopt -s nullglob
           files=( *.apk )
@@ -99,7 +99,7 @@ jobs:
             echo "::error::Aucun .apk après eas build:download"
             exit 1
           fi
-          mv "${files[0]}" Voliere-Manager-android.apk
+          mv "${files[0]}" "$DEST/Voliere-Manager-android.apk"
 
       - name: EAS Build + download (iOS)
         if: ${{ steps.cfg.outputs.platform == 'ios' || steps.cfg.outputs.platform == 'all' }}
@@ -113,7 +113,6 @@ jobs:
           ID="$(echo "$JSON" | jq -er '(if type == "array" then .[0] else . end).id')"
           DEST="${{ github.workspace }}/artifacts"
           mkdir -p "$DEST"
-          cd "$DEST"
           eas build:download --non-interactive --build-id "$ID"
           shopt -s nullglob
           files=( *.ipa )
@@ -121,7 +120,7 @@ jobs:
             echo "::error::Aucun .ipa après eas build:download"
             exit 1
           fi
-          mv "${files[0]}" Voliere-Manager-ios.ipa
+          mv "${files[0]}" "$DEST/Voliere-Manager-ios.ipa"
 
       - name: Publish GitHub Release
         env:

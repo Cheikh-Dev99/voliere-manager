@@ -67,9 +67,9 @@ Objectif : après un **`git push` du tag** `v…`, une **Release** GitHub avec a
 
 L’**APK** est quand même publié si Android a réussi. Corrige Apple / EAS puis relance avec **`all`**, ou utilise **`ios`** seul pour retester iOS.
 
----
+**Dépannage** : si `eas build:download` en CI affiche *« EAS project not configured »*, c’est en général qu’il a été lancé **hors** du dossier `apps/mobile/` — le workflow du dépôt doit exécuter cette commande **depuis `apps/mobile`** (là où se trouvent `app.json` / `eas.json`).
 
-## 2. Manuel — machine locale + `gh`
+---
 
 Depuis `apps/mobile/` (secrets EAS déjà créés, voir [§ 5.2 Installation](./INSTALLATION-ET-CONFIGURATION.md#build-apk-eas)) :
 
