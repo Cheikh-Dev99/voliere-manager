@@ -7,6 +7,7 @@ import { auth } from '@shared/firebase/authClient'
 import useAuthStore from '../stores/authStore'
 import logoUrl from '../assets/logo.png'
 import { AppLoadingScreen } from '../components/loading/AppLoadingScreen'
+import { AuthDivider, GoogleSignInButton } from '../components/auth/GoogleSignInButton'
 import { SiteBackgroundDecor } from '../components/layout/SiteBackgroundDecor'
 import { resolvePostAuthPath } from '../router/postAuthRedirect'
 
@@ -37,6 +38,7 @@ export function LoginPage() {
   const errorFieldMessages = useAuthStore((s) => s.errorFieldMessages)
   const login = useAuthStore((s) => s.login)
   const register = useAuthStore((s) => s.register)
+  const signInWithGoogle = useAuthStore((s) => s.signInWithGoogle)
   const clearError = useAuthStore((s) => s.clearError)
   const loading = useAuthStore((s) => s.loading)
   const navigate = useNavigate()
@@ -53,6 +55,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showRegPassword, setShowRegPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [googleBusy, setGoogleBusy] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [loginIssues, setLoginIssues] = useState(() => (/** @type {{ email?: string; password?: string }} */ ({})))
   const [regIssues, setRegIssues] = useState(
@@ -77,6 +80,23 @@ export function LoginPage() {
     setShowPassword(false)
     setShowRegPassword(false)
   }
+
+  const handleGoogleSignIn = async () => {
+    clearError()
+    setGoogleBusy(true)
+    try {
+      const user = await signInWithGoogle()
+      if (!user) return
+      toast.success('Connexion Google réussie')
+      navigate(resolvePostAuthPath(location.state?.from?.pathname), { replace: true })
+    } catch (err) {
+      toast.error(err?.message || 'Connexion Google impossible')
+    } finally {
+      setGoogleBusy(false)
+    }
+  }
+
+  const authBusy = submitting || googleBusy
 
   const handleSubmitLogin = async (e) => {
     e.preventDefault()
@@ -328,7 +348,16 @@ export function LoginPage() {
           ) : null}
 
           {isLogin ? (
-            <form className="mt-4 space-y-3" onSubmit={handleSubmitLogin} noValidate>
+            <>
+            <div className="mt-4">
+              <GoogleSignInButton
+                onClick={handleGoogleSignIn}
+                busy={googleBusy}
+                disabled={authBusy}
+              />
+              <AuthDivider />
+            </div>
+            <form className="space-y-3" onSubmit={handleSubmitLogin} noValidate>
               <div>
                 <label
                   htmlFor="auth-email"
@@ -442,7 +471,7 @@ export function LoginPage() {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={authBusy}
                 aria-busy={submitting}
                 title={submitting ? 'Connexion en cours…' : undefined}
                 className="w-full rounded-lg bg-teal-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-teal-900/15 transition hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
@@ -450,6 +479,7 @@ export function LoginPage() {
                 {submitting ? 'Connexion en cours…' : 'Se connecter'}
               </button>
             </form>
+            </>
           ) : isForgot ? (
             <form className="mt-4 space-y-3" onSubmit={handleSubmitForgot} noValidate>
               {forgotSent ? (
@@ -518,7 +548,17 @@ export function LoginPage() {
               </button>
             </form>
           ) : (
-            <form className="mt-4 space-y-3" onSubmit={handleSubmitRegister} noValidate>
+            <>
+            <div className="mt-4">
+              <GoogleSignInButton
+                onClick={handleGoogleSignIn}
+                busy={googleBusy}
+                disabled={authBusy}
+                label="S’inscrire avec Google"
+              />
+              <AuthDivider />
+            </div>
+            <form className="space-y-3" onSubmit={handleSubmitRegister} noValidate>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <label
@@ -789,7 +829,7 @@ export function LoginPage() {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={authBusy}
                 aria-busy={submitting}
                 title={submitting ? 'Création du compte…' : undefined}
                 className="w-full rounded-lg bg-teal-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-teal-900/15 transition hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
@@ -797,6 +837,7 @@ export function LoginPage() {
                 {submitting ? 'Création du compte…' : 'Créer mon compte'}
               </button>
             </form>
+            </>
           )}
         </div>
       </div>

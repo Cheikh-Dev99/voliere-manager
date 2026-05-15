@@ -8,7 +8,7 @@
 
 ## 2. Cloner et installer les dépendances
 
-À la racine du monorepo `**voliere-manager/`** :
+À la racine du monorepo `**voliere-manager/`\*\* :
 
 ```bash
 cd voliere-manager
@@ -20,12 +20,12 @@ Cela installe les dépendances pour **tous** les workspaces (`apps/*`, `packages
 ## 3. Configuration Firebase (web)
 
 1. Dans la [Console Firebase](https://console.firebase.google.com/), créer ou sélectionner un projet.
-2. Activer **Authentication** → méthode **E-mail / mot de passe**.
+2. Activer **Authentication** → **E-mail / mot de passe** et **Google** (fournisseur Google).
 3. Créer une base **Firestore** en mode production (ou test avec précaution).
 4. Déployer les **règles** du dépôt : fichier `firebase/firestore.rules` (voir [Sécurité, règles Firestore et déploiement](./SECURITE-REGLES-ET-DEPLOIEMENT.md)).
 5. Récupérer la **config Web** : Paramètres du projet → Tes applications → Appli web → objet `firebaseConfig`.
 
-Dans `**apps/web/`**, copier le fichier d’exemple :
+Dans `**apps/web/`\*\*, copier le fichier d’exemple :
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
@@ -65,10 +65,18 @@ Par défaut Vite écoute sur `**http://localhost:5173**` (vérifier la sortie du
 
 1. Même prérequis Node / Yarn / projet Firebase que pour le web.
 2. Dans `**apps/mobile/**`, copier l’exemple d’environnement :
-  ```bash
-   cp apps/mobile/.env.example apps/mobile/.env
-  ```
+
+```bash
+ cp apps/mobile/.env.example apps/mobile/.env
+```
+
 3. Renseigner les variables `**EXPO_PUBLIC_FIREBASE_***` dans `**apps/mobile/.env**` (même projet que le web, préfixe obligatoire Expo pour exposition au bundle).
+4. Pour **Google sur mobile** :
+   - Copier l’**ID client Web** dans `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (`apps/mobile/.env`).
+   - Dans [Google Cloud Console](https://console.cloud.google.com/) → **API et services** → **Identifiants** → client OAuth **Application Web** (même ID que ci-dessus) → **URI de redirection autorisées**, ajouter :
+     - **Expo Go** : `https://auth.expo.io/@cheikhdev99/voliere-manager` (adapter `owner` / `slug` de `apps/mobile/app.json`).
+     - **Build natif** : `voliere-manager://oauthredirect`
+   - Écran de consentement OAuth : en mode **Test**, ajouter ton compte Google comme **utilisateur test**.
 
 ### 5.1 Lancer Expo en développement
 
@@ -88,7 +96,6 @@ Détail technique mobile : [Architecture technique — Mobile](./ARCHITECTURE-MO
 
 ## 6. Scripts utiles (référence)
 
-
 | Emplacement              | Commande                  | Effet                                                |
 | ------------------------ | ------------------------- | ---------------------------------------------------- |
 | Racine `voliere-manager` | `yarn workspace web dev`  | Serveur Vite (web), depuis la racine.                |
@@ -98,7 +105,6 @@ Détail technique mobile : [Architecture technique — Mobile](./ARCHITECTURE-MO
 | `apps/web`               | `yarn build`              | Build production → `dist/`.                          |
 | `apps/web`               | `yarn preview`            | Sert le build localement.                            |
 | `apps/web`               | `yarn lint`               | ESLint sur le code web.                              |
-
 
 ## 7. Build de production (web)
 
@@ -114,4 +120,3 @@ Les fichiers statiques sont générés dans `**apps/web/dist/**`. Ils peuvent ê
 À la racine, des scripts Node existent pour tâches ponctuelles (migration `ownerUid`, seed, etc.) — voir `package.json` racine (`seed:cages`, `migrate:owner-uid`, …). Ils supposent en général des **clés compte de service** (fichiers **non versionnés** — voir `.gitignore`).
 
 ---
-

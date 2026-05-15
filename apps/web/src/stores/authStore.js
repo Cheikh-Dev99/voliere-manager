@@ -6,6 +6,8 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { auth } from '@shared/firebase/authClient';
+import { signInWithGoogle as signInWithGooglePopup } from '@shared/firebase/googleAuth';
+import { isGoogleAuthCancelled, messageForGoogleAuthError } from '@shared/firebase/googleAuthErrors';
 import { mergeUserProfileOnRegister } from '@shared/services/usersProfileService';
 
 /** @typedef {{ email?: boolean, password?: boolean }} AuthFieldFlags */
@@ -233,6 +235,27 @@ const useAuthStore = create((set, get) => ({
         },
       });
       throw new Error(generic, { cause: err });
+    }
+  },
+
+  signInWithGoogle: async () => {
+    set({ error: null, ...emptyFieldState() });
+    try {
+      const user = await signInWithGooglePopup();
+      set({ user, loading: false });
+      return user;
+    } catch (err) {
+      if (isGoogleAuthCancelled(err)) {
+        set({ error: null, ...emptyFieldState() });
+        return null;
+      }
+      const msg = messageForGoogleAuthError(err);
+      set({
+        error              : msg,
+        errorFieldFlags    : null,
+        errorFieldMessages : null,
+      });
+      throw new Error(msg, { cause: err });
     }
   },
 

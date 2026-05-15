@@ -33,6 +33,8 @@ import {
 } from '@shared/firebase/auth';
 
 import { appFeedback } from '../../lib/appFeedback';
+import { useGoogleSignIn } from '../../lib/useGoogleSignIn';
+import { GoogleSignInButton } from '../../components/auth/GoogleSignInButton';
 import { SiteBackgroundDecor } from '../../components/layout/SiteBackgroundDecor';
 import type { ThemeColors } from '../../constants/palettes';
 import { useAppTheme } from '../../context/AppThemeContext';
@@ -81,6 +83,13 @@ export default function LoginScreen() {
 
   const [globalError, setGlobalError] = useState<string | null>(null);
 
+  const {
+    signInWithGoogle,
+    googleBusy,
+    googleError,
+    clearGoogleError,
+  } = useGoogleSignIn();
+
   const switchTab = useCallback((next: AuthTab) => {
     setTab(next);
     setLoginIssues({});
@@ -88,6 +97,7 @@ export default function LoginScreen() {
     setForgotIssues({});
     setForgotSent(false);
     setGlobalError(null);
+    clearGoogleError();
     setRegPrenom('');
     setRegNom('');
     setRegNomVoliere('');
@@ -96,7 +106,16 @@ export default function LoginScreen() {
     setRegConfirm('');
     setShowPw(false);
     setShowRegPw(false);
-  }, []);
+  }, [clearGoogleError]);
+
+  const onGooglePress = () => {
+    setGlobalError(null);
+    clearGoogleError();
+    void signInWithGoogle();
+  };
+
+  const displayError = globalError || googleError;
+  const authBusy = busy || googleBusy;
 
   const onSubmitLogin = async () => {
     setGlobalError(null);
@@ -311,15 +330,28 @@ export default function LoginScreen() {
                 : 'Prénom, nom, e-mail et mot de passe. Le nom de la volière est optionnel.'}
           </Text>
 
-          {globalError ? (
+          {displayError ? (
             <View style={styles.errorBanner} accessibilityLiveRegion="polite">
               <AlertCircle size={18} color={theme.red600} />
-              <Text style={styles.errorBannerTxt}>{globalError}</Text>
+              <Text style={styles.errorBannerTxt}>{displayError}</Text>
             </View>
           ) : null}
 
           {isLogin ? (
             <>
+              <GoogleSignInButton
+                label="Continuer avec Google"
+                onPress={onGooglePress}
+                disabled={authBusy}
+                busy={googleBusy}
+                theme={theme}
+              />
+              <View style={styles.authDividerRow}>
+                <View style={styles.authDividerLine} />
+                <Text style={styles.authDividerTxt}>ou</Text>
+                <View style={styles.authDividerLine} />
+              </View>
+
               <Text style={styles.lab}>E-mail</Text>
               <View
                 style={[styles.inputWrap, loginEmailInvalid && styles.inputWrapInvalid]}
@@ -339,7 +371,7 @@ export default function LoginScreen() {
                     setLoginIssues((p) => ({ ...p, email: undefined }));
                     setGlobalError(null);
                   }}
-                  editable={!busy}
+                  editable={!authBusy}
                   textContentType="username"
                   autoComplete="email"
                 />
@@ -370,7 +402,7 @@ export default function LoginScreen() {
                     setLoginIssues((p) => ({ ...p, password: undefined }));
                     setGlobalError(null);
                   }}
-                  editable={!busy}
+                  editable={!authBusy}
                   textContentType="password"
                   autoComplete="password"
                 />
@@ -391,9 +423,9 @@ export default function LoginScreen() {
               ) : null}
 
               <Pressable
-                style={[styles.button, busy && styles.buttonDisabled]}
+                style={[styles.button, authBusy && styles.buttonDisabled]}
                 onPress={onSubmitLogin}
-                disabled={busy}
+                disabled={authBusy}
                 accessibilityRole="button"
                 accessibilityLabel="Se connecter"
               >
@@ -453,6 +485,19 @@ export default function LoginScreen() {
             </>
           ) : (
             <>
+              <GoogleSignInButton
+                label="S’inscrire avec Google"
+                onPress={onGooglePress}
+                disabled={authBusy}
+                busy={googleBusy}
+                theme={theme}
+              />
+              <View style={styles.authDividerRow}>
+                <View style={styles.authDividerLine} />
+                <Text style={styles.authDividerTxt}>ou</Text>
+                <View style={styles.authDividerLine} />
+              </View>
+
               <View style={styles.row2}>
                 <View style={styles.colHalf}>
                   <Text style={styles.lab}>Prénom</Text>
@@ -472,7 +517,7 @@ export default function LoginScreen() {
                         });
                         setGlobalError(null);
                       }}
-                      editable={!busy}
+                      editable={!authBusy}
                       textContentType="givenName"
                       autoComplete="given-name"
                     />
@@ -497,7 +542,7 @@ export default function LoginScreen() {
                         });
                         setGlobalError(null);
                       }}
-                      editable={!busy}
+                      editable={!authBusy}
                       textContentType="familyName"
                       autoComplete="family-name"
                     />
@@ -517,7 +562,7 @@ export default function LoginScreen() {
                   placeholderTextColor={theme.slate500}
                   value={regNomVoliere}
                   onChangeText={setRegNomVoliere}
-                  editable={!busy}
+                  editable={!authBusy}
                 />
               </View>
               <Text style={styles.hintMuted}>
@@ -543,7 +588,7 @@ export default function LoginScreen() {
                     });
                     setGlobalError(null);
                   }}
-                  editable={!busy}
+                  editable={!authBusy}
                   textContentType="emailAddress"
                   autoComplete="email"
                 />
@@ -568,7 +613,7 @@ export default function LoginScreen() {
                     });
                     setGlobalError(null);
                   }}
-                  editable={!busy}
+                  editable={!authBusy}
                   textContentType="newPassword"
                   autoComplete="password-new"
                 />
@@ -596,7 +641,7 @@ export default function LoginScreen() {
                     });
                     setGlobalError(null);
                   }}
-                  editable={!busy}
+                  editable={!authBusy}
                   textContentType="newPassword"
                   autoComplete="password-new"
                 />
@@ -604,9 +649,9 @@ export default function LoginScreen() {
               {regIssues.confirm ? <Text style={styles.fieldErr}>{regIssues.confirm}</Text> : null}
 
               <Pressable
-                style={[styles.button, busy && styles.buttonDisabled]}
+                style={[styles.button, authBusy && styles.buttonDisabled]}
                 onPress={onSubmitRegister}
-                disabled={busy}
+                disabled={authBusy}
                 accessibilityRole="button"
               >
                 {busy ? (
@@ -778,5 +823,23 @@ function createLoginStyles(theme: ThemeColors) {
     justifyContent: 'center',
   },
   secondaryBtnTxt: { fontSize: 15, fontWeight: '700', color: theme.teal700 },
+  authDividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginVertical: 14,
+  },
+  authDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: theme.border,
+  },
+  authDividerTxt: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.slate500,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
 });
 }

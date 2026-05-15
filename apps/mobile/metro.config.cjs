@@ -12,5 +12,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
 ];
+// Monorepo Yarn : résolution stable des paquets hoistés à la racine
+config.resolver.disableHierarchicalLookup = true;
 
 module.exports = config;
