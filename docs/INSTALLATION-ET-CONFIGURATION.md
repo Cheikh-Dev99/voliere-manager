@@ -147,17 +147,37 @@ Tu peux **renommer** le fichier (extension `.apk` obligatoire) sans casser l’i
 | Racine                   | `yarn test`               | Lance les tests Vitest du package `@voliere/shared`. |
 | `apps/web`               | `yarn dev` / `yarn start` | Serveur de développement Vite.                       |
 | `apps/web`               | `yarn build`              | Build production → `dist/`.                          |
+| Racine                   | `yarn deploy:pages`       | Build + publication branche `gh-pages`.                |
+| `apps/web`               | `yarn deploy:pages`       | Idem (workspace web).                                  |
 | `apps/web`               | `yarn preview`            | Sert le build localement.                            |
 | `apps/web`               | `yarn lint`               | ESLint sur le code web.                              |
 
 ## 7. Build de production (web)
+
+### 7.1 Variables
+
+- **Développement** : `apps/web/.env.local` (`VITE_FIREBASE_*` uniquement ; pas de `VITE_BASE` ou `VITE_BASE=/`).
+- **GitHub Pages / hébergement sous-chemin** : créer `apps/web/.env.production` avec les mêmes clés Firebase **et** `VITE_BASE=/nom-du-depot/` (ex. `/voliere-manager/`). Voir le modèle commenté dans `apps/web/.env.example`.
+
+### 7.2 Commandes
 
 ```bash
 cd apps/web
 yarn build
 ```
 
-Les fichiers statiques sont générés dans `apps/web/dist/`. Ils peuvent être servis par **Firebase Hosting**, Netlify, Vercel, ou tout serveur HTTP statique, en configurant le **fallback** vers `index.html` pour le routage SPA (React Router). Voir [Déploiement — démo et production](./DEPLOYEMENT-DEMO-ET-PROD.md).
+Les fichiers statiques sont générés dans `apps/web/dist/`.
+
+**Publication GitHub Pages** (démo jury) :
+
+```bash
+# depuis la racine voliere-manager/
+yarn deploy:pages
+```
+
+Procédure complète (réglages GitHub, Firebase, dépannage) : [Déploiement — démo et production](./DEPLOYEMENT-DEMO-ET-PROD.md).
+
+Pour **Firebase Hosting** ou autre hébergeur statique, configurer le fallback vers `index.html` (routage SPA React Router).
 
 ## 8. Scripts d’administration (données)
 

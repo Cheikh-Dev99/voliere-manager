@@ -2,6 +2,8 @@
 
 Monorepo **Yarn 4** : application web (React / Vite), mobile (Expo) et code partagé (`packages/shared`), avec configuration **Firebase** (Auth, Firestore, règles).
 
+**Démo web (GitHub Pages)** : [https://cheikh-dev99.github.io/voliere-manager/](https://cheikh-dev99.github.io/voliere-manager/) — procédure de publication : [Déploiement — démo et production](docs/DEPLOYEMENT-DEMO-ET-PROD.md).
+
 ## Télécharger l’application Android (APK)
 
 | | |

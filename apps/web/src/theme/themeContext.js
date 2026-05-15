@@ -4,7 +4,7 @@ import { createContext, useContext } from 'react'
 
 /** @type {import('react').Context<{ preference: ThemePreference, setPreference: (p: ThemePreference) => void, resolved: 'light' | 'dark' }>} */
 export const ThemeContext = createContext({
-  preference: 'system',
+  preference: 'light',
   setPreference: () => {},
   resolved: 'light',
 })

@@ -29,7 +29,7 @@ type AppThemeValue = {
 const AppThemeContext = createContext<AppThemeValue | null>(null);
 
 function readInitialPreference(): ThemePreference {
-  return 'system';
+  return 'light';
 }
 
 export function AppThemeProvider({ children }: { children: ReactNode }) {

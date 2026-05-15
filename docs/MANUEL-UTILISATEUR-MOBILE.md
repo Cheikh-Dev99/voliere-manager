@@ -99,6 +99,7 @@ Statuts pigeon (rappel) : ACTIF, VENDU, MORT, PERDU — impact couples et cages.
 
 ## 8. Profil et paramètres
 
+- **Apparence** : thème **clair** par défaut au premier lancement. Dans le **profil** ou l’en-tête, basculer entre **Clair**, **Système** (suit le téléphone) et **Sombre**.
 - Depuis le **menu en-tête** : accès au **profil** (feuille ou écran dédié) : informations compte, **statistiques** d’élevage, **codes volière** pour regrouper l’affichage des cages, cohérent avec le web (`UserProfileMenu` / profil complet côté web).
 
 *[Capture : menu profil]*

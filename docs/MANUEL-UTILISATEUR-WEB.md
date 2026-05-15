@@ -9,7 +9,7 @@ Ce manuel décrit les **parcours utilisateur** de l’interface web. Les libell�
 
 ### 1.1 Accès à la page d’authentification
 
-- Ouvrir l’URL de l’application (ex. `http://localhost:5173/` en développement).
+- Ouvrir l’URL de l’application (ex. `http://localhost:5173/` en développement, ou la [démo GitHub Pages](https://cheikh-dev99.github.io/voliere-manager/) documentée dans [Déploiement — démo et production](./DEPLOYEMENT-DEMO-ET-PROD.md)).
 - Si tu n’es pas connecté, tu es redirigé vers **`/login`**.
 
 ### 1.2 Connexion
@@ -115,8 +115,9 @@ Comportement par défaut : arrivée sur la **Visualisation** (`/`).
 
 Détail technique : fichier `apps/web/src/router/postAuthRedirect.js`.
 
-## 9. Paramètres — Codes volière
+## 9. Paramètres — Apparence et codes volière
 
+- **Apparence** : au premier lancement, l’interface est en thème **clair**. Sur la page de connexion, dans l’en-tête ou sur **`/profil`**, le sélecteur **Clair / Système / Sombre** permet de changer le thème (préférence enregistrée dans le navigateur).
 - Zone **paramètres / profil** (menu utilisateur en en-tête) : accès au **profil complet** et aux **codes volière** (`VoliereCodesPanel`) pour regrouper les cages à l’affichage.
 
 ## 10. Profil plein écran et historique de cage

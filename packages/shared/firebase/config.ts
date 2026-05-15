@@ -16,28 +16,25 @@ function normalizeStorageBucket(raw: string | undefined): string | undefined {
 /**
  * Pas de `import.meta` ici : Hermes (Expo / Metro) ne le supporte pas au parse.
  * - Expo : variables `EXPO_PUBLIC_FIREBASE_*` dans `.env`.
- * - Web Vite : `apps/web/vite.config.js` injecte les mêmes clés via `define` à partir de `VITE_FIREBASE_*`.
+ * - Web Vite : `apps/web/vite.config.js` remplace `process.env.*` par des littéraux (`define`).
+ *
+ * Ne pas entourer `process.env` d’un `typeof process` : en navigateur `process` est absent,
+ * Vite inline quand même les clés mais le ternaire prend la branche `undefined` → auth/invalid-api-key.
  */
 const firebaseConfig = {
-  apiKey:
-    (typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_FIREBASE_API_KEY : undefined) ||
-    (typeof process !== 'undefined' ? process.env.VITE_FIREBASE_API_KEY : undefined),
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY,
   authDomain:
-    (typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN : undefined) ||
-    (typeof process !== 'undefined' ? process.env.VITE_FIREBASE_AUTH_DOMAIN : undefined),
+    process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || process.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId:
-    (typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID : undefined) ||
-    (typeof process !== 'undefined' ? process.env.VITE_FIREBASE_PROJECT_ID : undefined),
+    process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: normalizeStorageBucket(
-    (typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET : undefined) ||
-      (typeof process !== 'undefined' ? process.env.VITE_FIREBASE_STORAGE_BUCKET : undefined),
+    process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+      process.env.VITE_FIREBASE_STORAGE_BUCKET,
   ),
   messagingSenderId:
-    (typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID : undefined) ||
-    (typeof process !== 'undefined' ? process.env.VITE_FIREBASE_MESSAGING_SENDER_ID : undefined),
-  appId:
-    (typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_FIREBASE_APP_ID : undefined) ||
-    (typeof process !== 'undefined' ? process.env.VITE_FIREBASE_APP_ID : undefined),
+    process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
+    process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID,
 };
 
 // Éviter la double initialisation (hot reload Expo / Vite)

@@ -10,7 +10,7 @@ function readStoredPreference() {
   } catch {
     /* ignore */
   }
-  return 'system'
+  return 'light'
 }
 
 function systemPrefersDark() {
@@ -25,7 +25,7 @@ function applyDomClass(resolved) {
 
 export function ThemeProvider({ children }) {
   const [preference, setPreferenceState] = useState(() =>
-    typeof window !== 'undefined' ? readStoredPreference() : 'system',
+    typeof window !== 'undefined' ? readStoredPreference() : 'light',
   )
   const [systemDark, setSystemDark] = useState(() =>
     typeof window !== 'undefined' ? systemPrefersDark() : false,

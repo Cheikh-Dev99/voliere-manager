@@ -6,7 +6,8 @@
   "scripts": {
     "web": "vite",
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node ../../scripts/pages-postbuild.mjs",
+    "deploy:pages": "yarn build && node ../../scripts/deploy-github-pages.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
