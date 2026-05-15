@@ -22,7 +22,8 @@ on:
           - ios
           - all
         default: android
-  # Push d’un tag sémantique → build Android + iOS (EAS) puis release GitHub (même logique que platform=all).
+  # Push d’un tag sémantique → **Android uniquement** (pas de compte Apple requis).
+  # Pour iOS en plus : Actions → Run workflow → platform « all » (compte Apple + EAS requis).
   push:
     tags:
       - 'v*'
@@ -76,7 +77,7 @@ jobs:
             echo "platform=${{ inputs.platform }}" >> "$GITHUB_OUTPUT"
           else
             echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "platform=all" >> "$GITHUB_OUTPUT"
+            echo "platform=android" >> "$GITHUB_OUTPUT"
           fi
 
       - name: EAS Build + download (Android)
@@ -102,6 +103,7 @@ jobs:
 
       - name: EAS Build + download (iOS)
         if: ${{ steps.cfg.outputs.platform == 'ios' || steps.cfg.outputs.platform == 'all' }}
+        continue-on-error: true
         working-directory: apps/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -137,7 +139,7 @@ jobs:
             echo ""
             echo "### Installation"
             echo "- **Android** : télécharger l’APK, transférer sur l’appareil, autoriser les sources inconnues si demandé."
-            echo "- **iOS** : l’IPA dépend des profils Apple / appareils enregistrés sur ton compte EAS ; sinon utiliser TestFlight / build simulateur selon ta config."
+            echo "- **iOS** : l’IPA n’est présent que si le build iOS a réussi (compte Apple + certificats EAS). Sinon seul l’APK Android est joint."
           } > "$NOTES"
 
           mapfile -t FILES < <(find "$ROOT/artifacts" -maxdepth 1 \( -name 'Voliere-Manager-android.apk' -o -name 'Voliere-Manager-ios.ipa' \) -type f | sort)
