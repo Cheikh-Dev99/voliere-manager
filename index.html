@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Favicon : src/assets/favicon.png (injecté dans main.jsx pour URL hashée en prod) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Volière Manager</title>
+    <script type="module" crossorigin src="/voliere-manager/assets/index-Gap4iow8.js"></script>
+    <link rel="stylesheet" crossorigin href="/voliere-manager/assets/index-BQ5rmfKn.css">
+  </head>
+  <body>
+    <!-- Filtre global : rend les pixels très clairs (fond blanc des GIF) transparents -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="0"
+      height="0"
+      class="pointer-events-none absolute h-0 w-0 overflow-hidden"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <filter
+          id="vm-loading-gif-knockout"
+          color-interpolation-filters="sRGB"
+          x="-5%"
+          y="-5%"
+          width="110%"
+          height="110%"
+        >
+          <feColorMatrix
+            in="SourceGraphic"
+            type="matrix"
+            values="-1 0 0 0 1
+                    0 -1 0 0 1
+                    0 0 -1 0 1
+                    0 0 0 1 0"
+            result="invertRgb"
+          />
+          <feColorMatrix in="invertRgb" type="luminanceToAlpha" result="alphaMask" />
+          <feComposite in="SourceGraphic" in2="alphaMask" operator="in" />
+        </filter>
+      </defs>
+    </svg>
+    <div id="root"></div>
+  </body>
+</html>
