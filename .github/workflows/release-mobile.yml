@@ -1,8 +1,7 @@
-# Build EAS (Android APK + option iOS IPA) puis publication des artefacts sur une GitHub Release
+# Build EAS (Android APK uniquement) puis publication sur une GitHub Release
 # (aucun binaire à la racine du dépôt).
 #
 # Prérequis dépôt : secret EXPO_TOKEN (https://expo.dev/accounts/[compte]/settings/access-tokens)
-# iOS : compte Apple / certificats déjà configurés via un premier `eas build -p ios` en local.
 #
 name: Release mobile (EAS → GitHub Release)
 
@@ -13,17 +12,7 @@ on:
         description: 'Tag de release (ex. v1.0.1). Crée la release si elle n’existe pas.'
         required: true
         type: string
-      platform:
-        description: 'Plateforme à builder sur EAS'
-        required: true
-        type: choice
-        options:
-          - android
-          - ios
-          - all
-        default: android
-  # Push d’un tag sémantique → **Android uniquement** (pas de compte Apple requis).
-  # Pour iOS en plus : Actions → Run workflow → platform « all » (compte Apple + EAS requis).
+  # Push d’un tag sémantique → build Android + release GitHub
   push:
     tags:
       - 'v*'
@@ -69,19 +58,16 @@ jobs:
       - name: Prepare artifacts directory
         run: mkdir -p "${{ github.workspace }}/artifacts"
 
-      - name: Définir tag et plateforme
+      - name: Définir le tag de release
         id: cfg
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "platform=${{ inputs.platform }}" >> "$GITHUB_OUTPUT"
           else
             echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "platform=android" >> "$GITHUB_OUTPUT"
           fi
 
       - name: EAS Build + download (Android)
-        if: ${{ steps.cfg.outputs.platform == 'android' || steps.cfg.outputs.platform == 'all' }}
         working-directory: apps/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -91,36 +77,14 @@ jobs:
           ID="$(echo "$JSON" | jq -er '(if type == "array" then .[0] else . end).id')"
           DEST="${{ github.workspace }}/artifacts"
           mkdir -p "$DEST"
-          # Téléchargement depuis la racine du projet EAS (obligatoire en non-interactif)
-          eas build:download --non-interactive --build-id "$ID"
-          shopt -s nullglob
-          files=( *.apk )
-          if [[ ${#files[@]} -eq 0 ]]; then
-            echo "::error::Aucun .apk après eas build:download"
+          # EAS place l’artefact dans son cache (/tmp/.../eas-build-run-cache/…), pas dans le cwd.
+          DL_JSON="$(eas build:download --non-interactive --build-id "$ID" --json)"
+          BIN_PATH="$(echo "$DL_JSON" | jq -er '.path')"
+          if [[ ! -f "$BIN_PATH" ]]; then
+            echo "::error::APK introuvable après eas build:download (path=$BIN_PATH)"
             exit 1
           fi
-          mv "${files[0]}" "$DEST/Voliere-Manager-android.apk"
-
-      - name: EAS Build + download (iOS)
-        if: ${{ steps.cfg.outputs.platform == 'ios' || steps.cfg.outputs.platform == 'all' }}
-        continue-on-error: true
-        working-directory: apps/mobile
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          set -euo pipefail
-          JSON="$(eas build --platform ios --profile preview --wait --non-interactive --json)"
-          ID="$(echo "$JSON" | jq -er '(if type == "array" then .[0] else . end).id')"
-          DEST="${{ github.workspace }}/artifacts"
-          mkdir -p "$DEST"
-          eas build:download --non-interactive --build-id "$ID"
-          shopt -s nullglob
-          files=( *.ipa )
-          if [[ ${#files[@]} -eq 0 ]]; then
-            echo "::error::Aucun .ipa après eas build:download"
-            exit 1
-          fi
-          mv "${files[0]}" "$DEST/Voliere-Manager-ios.ipa"
+          cp "$BIN_PATH" "$DEST/Voliere-Manager-android.apk"
 
       - name: Publish GitHub Release
         env:
@@ -134,23 +98,22 @@ jobs:
             echo "## Volière Manager — binaires mobiles (EAS)"
             echo ""
             echo "- **Profil** : \`preview\` (distribution interne)"
+            echo "- **Plateforme** : Android (APK)"
             echo "- **Workflow** : [run #${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
             echo ""
             echo "### Installation"
             echo "- **Android** : télécharger l’APK, transférer sur l’appareil, autoriser les sources inconnues si demandé."
-            echo "- **iOS** : l’IPA n’est présent que si le build iOS a réussi (compte Apple + certificats EAS). Sinon seul l’APK Android est joint."
           } > "$NOTES"
 
-          mapfile -t FILES < <(find "$ROOT/artifacts" -maxdepth 1 \( -name 'Voliere-Manager-android.apk' -o -name 'Voliere-Manager-ios.ipa' \) -type f | sort)
-
-          if [[ ${#FILES[@]} -eq 0 ]]; then
-            echo "::error::Aucun artefact téléchargé (vérifie les étapes EAS ci-dessus)."
+          APK="$ROOT/artifacts/Voliere-Manager-android.apk"
+          if [[ ! -f "$APK" ]]; then
+            echo "::error::APK absent sous $APK"
             exit 1
           fi
 
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release $TAG existe — ajout / remplacement des fichiers."
-            gh release upload "$TAG" "${FILES[@]}" --clobber
+            echo "Release $TAG existe — ajout / remplacement du fichier."
+            gh release upload "$TAG" "$APK" --clobber
           else
-            gh release create "$TAG" "${FILES[@]}" --target "${{ github.sha }}" --title "Mobile $TAG" --notes-file "$NOTES"
+            gh release create "$TAG" "$APK" --target "${{ github.sha }}" --title "Mobile $TAG" --notes-file "$NOTES"
           fi

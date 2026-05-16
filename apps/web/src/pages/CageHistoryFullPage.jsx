@@ -10,7 +10,6 @@ import {
   deleteCageOccupancyEvent,
   fetchCageOccupancyEvents,
 } from '@shared/services/cagesService'
-import { PageTransition } from '../components/layout/PageTransition'
 import {
   dmEventCard,
   dmFieldClass,
@@ -253,7 +252,7 @@ export function CageHistoryFullPage() {
       </header>
 
       <main className="flex w-full min-w-0 flex-1 flex-col overflow-y-auto bg-white dark:bg-slate-900">
-        <PageTransition>
+        <div className="vm-page-enter min-w-0">
         <div className={`mx-4 mt-4 sm:mx-8 lg:mx-12 ${dmFilterCard}`}>
           <div className="flex flex-wrap items-end gap-3">
             <div className="min-w-[min(100%,14rem)] flex-1">
@@ -407,7 +406,7 @@ export function CageHistoryFullPage() {
             {hasActiveFilters ? ' (filtres actifs)' : null}
           </footer>
         ) : null}
-        </PageTransition>
+        </div>
       </main>
     </div>
   )

@@ -1,4 +1,4 @@
-# Releases mobiles (GitHub) — APK / IPA sans fichier à la racine
+# Releases mobiles (GitHub) — APK sans fichier à la racine
 
 Les binaires **ne sont plus versionnés** à la racine du monorepo. Ils sont publiés en **GitHub Releases** (assets téléchargeables), aligné avec les bonnes pratiques Git (pas de gros binaires dans l’historique).
 
@@ -19,22 +19,21 @@ Les binaires **ne sont plus versionnés** à la racine du monorepo. Ils sont pub
 
 ---
 
-### Pas à pas : obtenir l’**APK Android** (et l’**IPA iOS** seulement si tu as Apple)
+### Pas à pas : obtenir l’**APK Android** via GitHub Actions
 
-Objectif : après un **`git push` du tag** `v…`, une **Release** GitHub avec au minimum **`Voliere-Manager-android.apk`**. Le fichier **`Voliere-Manager-ios.ipa`** n’apparaît **que** si un build iOS a réussi (compte **Apple Developer** + certificats sur EAS).
+Objectif : après un **`git push` du tag** `v…` (ou un lancement manuel du workflow), une **Release** GitHub avec **`Voliere-Manager-android.apk`**.
+
+Le workflow **ne build plus iOS** sur les runners GitHub (pas d’IPA joint automatiquement). Pour un **IPA iPhone**, il faut un build **`eas build -p ios`** **en local** (compte Apple + certificats EAS), puis joindre le fichier à la release à la main ou via `gh release upload` si besoin.
 
 ### Sans compte Apple
 
 - Tu peux **livrer et tester sur Android** sans rien côté Apple.
-- Un **IPA installable sur iPhone** via EAS (profil `preview` device) **exige** un compte Apple / équipe de développement (gratuit ou payant selon le cas) pour signer l’app. **Sans ça, pas d’IPA « store-like » réaliste.**
-- Le workflow déclenché par **`git push origin v1.0.x`** ne build plus que **Android** (évite un job rouge à cause d’iOS).
-- Pour tenter iOS quand tu auras un compte : **Actions** → **Run workflow** → **platform** = **`all`** (l’étape iOS peut échouer sans bloquer la publication de l’APK).
+- Un **IPA installable sur iPhone** via EAS **exige** un compte Apple / équipe de développement ; ce n’est **pas** automatisé dans ce dépôt côté Actions.
 
 ### Avant la première fois
 
 1. **`EXPO_TOKEN`** en **Repository secret** (voir ci-dessus). Le même secret dans l’environnement **github-pages** ne sert **pas** à ce workflow ; ce qui compte est la ligne **Repository secrets** → `EXPO_TOKEN`.
-2. *(Optionnel iOS)* Un `eas build --profile preview --platform ios` **en local** une fois que tu as un compte Apple, pour enregistrer les certificats sur EAS.
-3. Le fichier **`.github/workflows/release-mobile.yml`** doit être sur **`main`** avant de pousser le tag.
+2. Le fichier **`.github/workflows/release-mobile.yml`** doit être sur **`main`** avant de pousser le tag.
 
 ### Méthode recommandée — push d’un **tag** `v…`
 
@@ -52,7 +51,7 @@ Objectif : après un **`git push` du tag** `v…`, une **Release** GitHub avec a
 4. Attends la fin du job (souvent **~15–40 min** pour l’APK Android sur EAS).
 5. Va dans **Releases** : [releases](https://github.com/cheikh-dev99/voliere-manager/releases) → ouvre la release **`v1.0.3`** → télécharge **`Voliere-Manager-android.apk`**.
 
-> **Tag `v*`** : déclenche **Android uniquement**. Pour **Android + iOS** : lance le workflow à la main avec **platform = `all`** (compte Apple requis pour iOS).
+> **Tag `v*`** : déclenche **Android uniquement** (APK sur la release).
 
 > **Note** : un simple `git push` sur `main` **sans** tag ne lance pas ce workflow.
 
@@ -60,12 +59,8 @@ Objectif : après un **`git push` du tag** `v…`, une **Release** GitHub avec a
 
 1. `git push` ton code comme d’habitude.
 2. **Actions** → **Release mobile (EAS → GitHub Release)** → **Run workflow**.
-3. **tag** : ex. `v1.0.3` — **platform** : **`all`**.
-4. Même attente, mêmes fichiers sur la release. (Tu peux aussi choisir **`android`** ou **`ios`** seul.)
-
-### Si le build iOS échoue (manuel avec **all**)
-
-L’**APK** est quand même publié si Android a réussi. Corrige Apple / EAS puis relance avec **`all`**, ou utilise **`ios`** seul pour retester iOS.
+3. **tag** : ex. `v1.0.3` (même logique que le push de tag : build Android + APK sur la release).
+4. Même attente ; la release contient **`Voliere-Manager-android.apk`**.
 
 **Dépannage** : si `eas build:download` en CI affiche *« EAS project not configured »*, c’est en général qu’il a été lancé **hors** du dossier `apps/mobile/` — le workflow du dépôt doit exécuter cette commande **depuis `apps/mobile`** (là où se trouvent `app.json` / `eas.json`).
 
@@ -80,8 +75,8 @@ eas login
 eas build --profile preview --platform android --wait
 # Noter le BUILD_ID affiché, ou depuis https://expo.dev
 eas build:download --build-id BUILD_ID
-# Le .apk est dans le répertoire courant ; renommer / déplacer si besoin :
-# mv *.apk ../../artifacts/Voliere-Manager-android.apk
+# Le chemin exact peut être dans le cache EAS ; en CI on utilise `eas build:download --json` pour récupérer `.path`.
+# En local : copier le fichier indiqué à la fin du téléchargement vers ../../artifacts/Voliere-Manager-android.apk
 
 # iOS (si compte Apple / certificats OK sur EAS)
 # eas build --profile preview --platform ios --wait
@@ -125,7 +120,7 @@ Le fichier peut rester sur le disque ; il est ignoré via `.gitignore` (`*.apk`,
 
 Voir `apps/mobile/eas.json` :
 
-- **`preview`** : APK Android (distribution interne) ; iOS en build « device » si credentials OK.
+- **`preview`** : APK Android (distribution interne) sur EAS ; iOS reste possible **en local** si credentials Apple OK.
 - **`production`** : AAB Android pour Play Store (hors sujet de cette page).
 
 ---
